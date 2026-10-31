@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* =====================================================
    TEMAS
@@ -140,7 +141,8 @@ svg.i{width:1.15em;height:1.15em;flex:none;vertical-align:-.2em}
 .band-right{position:relative;z-index:1;display:flex;justify-content:flex-end;align-items:center;gap:10px}
 .clock{display:flex;flex-direction:column;align-items:flex-end;line-height:1;margin-right:4px}
 .clock b{font-family:var(--serif);font-size:30px;font-weight:600;white-space:nowrap}
-.clock small{font-size:12px;opacity:.7;margin-top:3px}
+.clock small{font-size:12px;opacity:.75;margin-top:3px;white-space:nowrap}
+.clock small.off{opacity:1;color:#FFD15C}
 .icon-btn{background:var(--band-2);border:1px solid color-mix(in srgb,var(--on-band) 28%, transparent);color:var(--on-band);border-radius:12px;height:44px;padding:0 14px;display:inline-flex;align-items:center;gap:8px;font-size:14.5px;transition:border-color .2s}
 .icon-btn:hover{border-color:var(--gold)}
 
@@ -592,7 +594,7 @@ body[data-screen="event"] #eventApp{display:block}
       <div class="login-err" id="lErr" role="alert"></div>
       <button class="btn dark" type="submit" id="lSubmit"><i data-icon="lock"></i>Entrar</button>
       <button type="button" class="link-btn" id="lForgot">¿Olvidaste tu contraseña?</button>
-      <div class="demo-note" id="lDemo"><i data-icon="sparkle"></i><span>Vista previa: todavía no está conectada a Supabase. Entra con cualquier correo y una contraseña de 6 caracteres o más.</span></div>
+      <div class="demo-note" id="lDemo" hidden><i data-icon="sparkle"></i><span>Versión de prueba: los datos se guardan solo en este dispositivo y aún no hay cuentas reales. Entra con cualquier correo y una contraseña de 6 caracteres o más.</span></div>
     </form>
   </div>
 </section>
@@ -639,11 +641,11 @@ body[data-screen="event"] #eventApp{display:block}
     <div><b id="plannerName">MARIANA GÓMEZ</b><span id="plannerSub">Wedding Planner</span></div>
   </div>
   <div class="event">
-    <h1 id="eventName">Boda Daphne &amp; Rafa</h1>
+    <h1 id="eventName">Boda Ana &amp; Luis</h1>
     <div class="meta"><span><i data-icon="calendar"></i><span id="eventDate"></span></span><span><i data-icon="clock"></i><span id="eventTime"></span></span></div>
   </div>
   <div class="band-right">
-    <div class="clock"><b id="clock"></b><small>Hora actual</small></div>
+    <div class="clock"><b id="clock"></b><small id="syncState">Conectando…</small></div>
     <button class="icon-btn" id="toEvents" aria-label="Volver a mis eventos"><i data-icon="grid"></i><span class="lbl">Eventos</span></button>
     <button class="icon-btn" id="openThemes" aria-label="Cambiar diseño"><i data-icon="palette"></i><span class="lbl">Diseño</span></button>
     <button class="icon-btn" id="openSettings" aria-label="Ajustes del evento"><i data-icon="sliders"></i><span class="lbl">Evento</span></button>
@@ -813,6 +815,16 @@ body[data-screen="event"] #eventApp{display:block}
   </div>
 </div>
 
+<div class="overlay" id="pwOverlay" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+  <div class="card sheet">
+    <div class="sh"><span class="hi"><i data-icon="lock"></i></span><h3 id="pwTitle">Nueva contraseña</h3></div>
+    <p>Escribe tu nueva contraseña para entrar a la recepción.</p>
+    <div class="form"><label class="wide">Nueva contraseña<input id="pwNew" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres"></label></div>
+    <div id="pwErr"></div>
+    <div class="actions"><button class="btn dark" id="pwSave"><i data-icon="check"></i>Guardar contraseña</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast" role="status"><span class="ti"><i data-icon="check"></i></span><span id="toastMsg"></span><button id="toastUndo"><i data-icon="undo"></i>Deshacer</button></div>
 
 <script>
@@ -882,10 +894,10 @@ function emptyState(ev){ return {event:{planner:PROFILE.planner, sub:PROFILE.sub
 const LOW = 4; // con 4 lugares libres o menos la mesa se pinta naranja
 const CAPS = [17,10,10,9,10,10,11,12,12,8,9,11,8,13,10];
 const KNOWN = [
-  ["Adrian Treviño +1",2,12],["Aime Gutierrez +1",2,15],["Alex Bekris +1",2,5],["Alicia Tijerina +1",2,13],
-  ["Alonso Escalante +1",2,9],["Ana Laura Velazquez +1",2,14],["Ana Lilia Palestina +1",2,14],["Anahi Coello +1",2,15],
-  ["Antonio de Leon +1",2,11],["Antonio Galvan +1",2,12],["Ary Iturbe +1",2,6],["Barbara Cardenas +1",2,1],
-  ["Beatriz Avalos",1,2],["Beatriz Gonzalez",1,1],["Cecilia Llanas +1",2,8]
+  ["Alberto Castillo +1",2,12],["Alejandra Fuentes +1",2,15],["Arturo Medina +1",2,5],["Bertha Salazar +1",2,13],
+  ["Bruno Esquivel +1",2,9],["Carla Domínguez +1",2,14],["Carmen Ibarra +1",2,14],["César Montoya +1",2,15],
+  ["Diana Peña +1",2,11],["Esteban Robles +1",2,12],["Fabiola Ortega +1",2,6],["Gilberto Nava +1",2,1],
+  ["Hilda Ponce",1,2],["Irene Solís",1,1],["Joaquín Vela +1",2,8]
 ];
 function demoState(theme){
   let seed = 7; const rnd = () => (seed = (seed*9301+49297)%233280)/233280;
@@ -903,7 +915,7 @@ function demoState(theme){
     }
   });
   return {
-    event:{planner:"Mariana Gómez",sub:"Wedding Planner",name:"Boda Daphne & Rafa",date:"2026-10-31",time:"18:30",theme:theme||"olivo"},
+    event:{planner:"Mariana Gómez",sub:"Wedding Planner",name:"Boda Ana & Luis",date:"2026-10-31",time:"18:30",theme:theme||"olivo"},
     tables: CAPS.map((c,i)=>({num:i+1,cap:c,extra:0})),
     guests: finalize(guests),
     requests: []
@@ -911,60 +923,258 @@ function demoState(theme){
 }
 function finalize(list){
   return list.sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:"base"}))
-    .map((g,i)=>({id:i+1,name:String(g.name).trim(),persons:Math.max(1,+g.persons||1),table:+g.table||0,arrived:+g.arrived||0,at:g.at||null}));
+    .map((g,i)=>({id:i+1,uid:g.uid||uuid(),name:String(g.name).trim(),persons:Math.max(1,+g.persons||1),table:+g.table||0,arrived:+g.arrived||0,at:g.at||null}));
 }
 function migrate(s){
   s.requests = s.requests || [];
   s.event.type = s.event.type || guessType(s.event.name);
   s.event.theme = s.event.theme || "olivo";
   s.tables.forEach(t=>{ t.extra = t.extra || 0; });
+  s.requests.forEach(r=>{ if(!r.guestUid && r.guestId){ const g = s.guests.find(x=>x.id===r.guestId); if(g) r.guestUid = g.uid; } });
   return s;
 }
 
-/* ================= Datos y sesión =================
-   Hoy guarda en el almacenamiento de la vista previa.
-   En el siguiente paso, este mismo bloque se conecta a Supabase
-   (mismas funciones: signIn, listEvents, loadEvent, saveEvent…). */
-const DB = (()=>{
-  const mem = {};
-  async function get(k){ try{ if(window.storage){ const r = await window.storage.get(k,false); return r && r.value ? JSON.parse(r.value) : null; } }catch(e){} return mem[k] ?? null; }
-  async function set(k,v){ mem[k] = v; try{ if(window.storage) await window.storage.set(k, JSON.stringify(v), false); }catch(e){ console.warn("No se pudo guardar", e); } }
-  async function del(k){ delete mem[k]; try{ if(window.storage) await window.storage.delete(k,false); }catch(e){} }
-  return {
-    mode:"preview",
-    get, set,
-    async getSession(){ return await get("app:sesion"); },
-    async signIn(email, pass){
-      if(!/^\S+@\S+\.\S+$/.test(email)) throw new Error("Escribe un correo válido, por ejemplo nombre@correo.com.");
-      if(pass.length < 6) throw new Error("La contraseña debe tener al menos 6 caracteres.");
-      const s = {email}; await set("app:sesion", s); return s;
-    },
-    async signOut(){ await del("app:sesion"); },
-    async resetPassword(email){ if(!/^\S+@\S+\.\S+$/.test(email)) throw new Error("Escribe tu correo para enviarte el enlace."); return true; },
-    async listEvents(){ return (await get("app:eventos")) || []; },
-    async loadEvent(id){ return await get("evento:"+id); },
-    async saveEvent(id, state){
-      await set("evento:"+id, state);
-      const list = await this.listEvents(), m = metaOf(id, state), i = list.findIndex(e=>e.id===id);
-      if(i>-1) list[i] = m; else list.push(m);
-      await set("app:eventos", list); return m;
-    },
-    async deleteEvent(id){ await del("evento:"+id); await set("app:eventos", (await this.listEvents()).filter(e=>e.id!==id)); }
-  };
-})();
+/* ================= Conexión con Supabase ================= */
+const SUPABASE_URL = "https://tdjbmpvqcawvdctrwufy.supabase.co";
+const SUPABASE_KEY = "sb_publishable_yqj8j21Kdjqeq9BD_dQHvg__jPp7qRk"; // llave pública (publishable)
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:true, autoRefreshToken:true, detectSessionInUrl:true}}) : null;
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)));
+const isoOf = v => v ? new Date(v).toISOString() : null;
+const msOf = v => v ? new Date(v).getTime() : null;
+const byName = (a,b) => a.name.localeCompare(b.name,"es",{sensitivity:"base"});
+async function must(q){ const r = await q; if(r.error) throw r.error; return r.data; }
+async function fetchAll(build){
+  let out = [], from = 0;
+  for(;;){ const d = await must(build().range(from, from+999)); out = out.concat(d); if(d.length < 1000) break; from += 1000; }
+  return out;
+}
+function chunks(a, n){ const r = []; for(let i=0;i<a.length;i+=n) r.push(a.slice(i,i+n)); return r; }
+
+/* Guardado local solo como respaldo sin conexión */
+const LS = { get(k){ try{ const v = localStorage.getItem("recepcion:"+k); return v ? JSON.parse(v) : null; }catch(e){ return null; } },
+             set(k,v){ try{ localStorage.setItem("recepcion:"+k, JSON.stringify(v)); }catch(e){} } };
+
+/* Filas de la base de datos */
+function rowEvent(id, s){ const e = s.event; return {id, name:e.name, type:e.type||"Boda", event_date:e.date||null, start_time:e.time||null, theme:e.theme||"olivo", planner:e.planner||"", subtitle:e.sub||""}; }
+function rowTable(id, t){ if(!t.uid) t.uid = uuid(); return {id:t.uid, event_id:id, num:t.num, capacity:Math.max(0,t.cap|0), extra:Math.max(0,t.extra|0)}; }
+function rowGuest(id, g){ if(!g.uid) g.uid = uuid(); return {id:g.uid, event_id:id, seq:g.id|0, name:g.name, persons:Math.max(1,g.persons|0), table_num:g.table||null, arrived:Math.max(0,g.arrived|0), arrived_at:isoOf(g.at)}; }
+function rowRequest(id, r){
+  if(!r.guestUid && r.guestId){ const g = S && S.guests.find(x=>x.id===r.guestId); if(g) r.guestUid = g.uid; }
+  return {id:r.id, event_id:id, kind:r.kind, guest_id:r.guestUid||null, name:r.name, persons:Math.max(1,r.persons|0), table_num:r.table||null, status:r.status, mode:r.mode||null, resolution:r.resolution||null, created_at:isoOf(r.at), resolved_at:isoOf(r.resolvedAt)};
+}
+const TBL = {tables:"event_tables", guests:"guests", requests:"requests"};
+const ROW = {tables:rowTable, guests:rowGuest, requests:rowRequest};
+function rowsOf(id, s){ return {tables:s.tables.map(t=>rowTable(id,t)), guests:s.guests.map(g=>rowGuest(id,g)), requests:s.requests.map(r=>rowRequest(id,r))}; }
+
+class NoAccess extends Error {}
+async function assertTeam(user){
+  const tm = await must(sb.from("team_members").select("role").eq("user_id", user.id).maybeSingle());
+  if(!tm){ await sb.auth.signOut(); throw new NoAccess("Tu usuario existe pero todavía no tiene acceso a los eventos. Pide que te agreguen al equipo."); }
+  return {email:user.email, role:tm.role};
+}
+
+const DB = {
+  mode:"supabase",
+  async get(k){ return LS.get(k); },
+  async set(k,v){ LS.set(k,v); },
+  async getSession(){
+    if(!sb) return null;
+    const {data:{session}} = await sb.auth.getSession();
+    if(!session) return null;
+    try{ return await assertTeam(session.user); }
+    catch(e){ if(e instanceof NoAccess) return null; return {email:session.user.email, role:"?"}; } // sin internet: confía en la sesión guardada
+  },
+  async signIn(email, pass){
+    if(!sb) throw new Error("No se pudo conectar con el servidor. Revisa tu conexión a internet y recarga la página.");
+    if(!/^\S+@\S+\.\S+$/.test(email)) throw new Error("Escribe un correo válido, por ejemplo nombre@correo.com.");
+    if(!pass) throw new Error("Escribe tu contraseña.");
+    const {data, error} = await sb.auth.signInWithPassword({email, password:pass});
+    if(error) throw new Error(/invalid/i.test(error.message) ? "Correo o contraseña incorrectos." : "No se pudo iniciar sesión: "+error.message);
+    return await assertTeam(data.user);
+  },
+  async signOut(){ if(sb) await sb.auth.signOut(); },
+  async resetPassword(email){
+    if(!/^\S+@\S+\.\S+$/.test(email)) throw new Error("Escribe tu correo arriba para enviarte el enlace.");
+    const {error} = await sb.auth.resetPasswordForEmail(email, {redirectTo: location.origin + location.pathname});
+    if(error) throw new Error("No se pudo enviar el enlace: "+error.message);
+  },
+  async listEvents(){
+    try{
+      const [evs, gs, ts] = await Promise.all([
+        must(sb.from("events").select("id,name,type,event_date,start_time,theme")),
+        fetchAll(()=>sb.from("guests").select("event_id,persons,arrived").order("id")),
+        fetchAll(()=>sb.from("event_tables").select("event_id").order("id"))
+      ]);
+      const list = evs.map(e=>{
+        const g = gs.filter(x=>x.event_id===e.id);
+        return {id:e.id, name:e.name, type:e.type, date:e.event_date||"", time:(e.start_time||"").slice(0,5), theme:e.theme,
+          guests:g.length, persons:g.reduce((a,x)=>a+x.persons,0), arrived:g.reduce((a,x)=>a+Math.min(x.arrived,x.persons),0),
+          tables:ts.filter(x=>x.event_id===e.id).length};
+      });
+      LS.set("eventos", list); return list;
+    }catch(e){
+      console.warn(e); showToast("Sin conexión: se muestra la última lista guardada en este dispositivo.", false);
+      return LS.get("eventos") || [];
+    }
+  },
+  async loadEvent(id){
+    try{
+      const [ev, tables, guests, reqs] = await Promise.all([
+        must(sb.from("events").select("*").eq("id", id).maybeSingle()),
+        fetchAll(()=>sb.from("event_tables").select("*").eq("event_id", id).order("num")),
+        fetchAll(()=>sb.from("guests").select("*").eq("event_id", id).order("id")),
+        fetchAll(()=>sb.from("requests").select("*").eq("event_id", id).order("created_at",{ascending:false}))
+      ]);
+      if(!ev) return null;
+      const gl = guests.map(g=>({uid:g.id, seq:g.seq, name:g.name, persons:g.persons, table:g.table_num||0, arrived:g.arrived, at:msOf(g.arrived_at)})).sort(byName);
+      const used = new Set(); let max = gl.reduce((m,g)=>Math.max(m,g.seq||0),0);
+      gl.forEach(g=>{ if(g.seq>0 && !used.has(g.seq)){ g.id = g.seq; } else { g.id = ++max; } used.add(g.id); delete g.seq; });
+      const st = {
+        event:{name:ev.name, type:ev.type, date:ev.event_date||"", time:(ev.start_time||"").slice(0,5), theme:ev.theme, planner:ev.planner, sub:ev.subtitle},
+        tables: tables.map(t=>({uid:t.id, num:t.num, cap:t.capacity, extra:t.extra})),
+        guests: gl,
+        requests: reqs.map(r=>({id:r.id, kind:r.kind, guestUid:r.guest_id, name:r.name, persons:r.persons, table:r.table_num||0, status:r.status, mode:r.mode, resolution:r.resolution, at:msOf(r.created_at), resolvedAt:msOf(r.resolved_at)}))
+      };
+      st.requests.forEach(r=>{ const g = gl.find(x=>x.uid===r.guestUid); if(g) r.guestId = g.id; });
+      return {state:st, fromServer:true};
+    }catch(e){
+      console.warn(e);
+      const cache = LS.get("cache:"+id);
+      if(cache){ showToast("Sin conexión: se abrió la copia guardada en este dispositivo.", false); return {state:cache, fromServer:false}; }
+      throw e;
+    }
+  },
+  async saveEventFull(id, s){
+    await must(sb.from("events").upsert(rowEvent(id, s)));
+    const rows = rowsOf(id, s);
+    for(const k of ["tables","guests","requests"]) for(const c of chunks(rows[k], 500)) await must(sb.from(TBL[k]).upsert(c));
+  },
+  async deleteEvent(id){ await must(sb.from("events").delete().eq("id", id)); }
+};
 function metaOf(id, s){
   const persons = s.guests.reduce((a,g)=>a+g.persons,0), arrived = s.guests.reduce((a,g)=>a+Math.min(g.arrived,g.persons),0);
-  return {id, name:s.event.name, type:s.event.type||"Boda", date:s.event.date, time:s.event.time, theme:s.event.theme||"olivo",
-    guests:s.guests.length, persons, arrived, tables:s.tables.length, updated:Date.now()};
+  return {id, name:s.event.name, type:s.event.type||"Boda", date:s.event.date, time:s.event.time, theme:s.event.theme||"olivo", guests:s.guests.length, persons, arrived, tables:s.tables.length};
 }
 let currentId = null, SESSION = null, EVENTS = [];
 let PROFILE = {planner:"Mariana Gómez", sub:"Wedding Planner"};
+
+/* ---------- Sincronización del evento abierto ---------- */
+const SYNC = {last:null, busy:false, again:false, channel:null, retry:null};
+function resetSyncFrom(id, s){
+  const r = rowsOf(id, s);
+  SYNC.last = {event:JSON.stringify(rowEvent(id, s)), tables:new Map(r.tables.map(x=>[x.id,JSON.stringify(x)])), guests:new Map(r.guests.map(x=>[x.id,JSON.stringify(x)])), requests:new Map(r.requests.map(x=>[x.id,JSON.stringify(x)]))};
+}
+function setSync(st){
+  const el = $("syncState"); if(!el) return;
+  el.textContent = st==="ok" ? "Guardado en la nube" : st==="saving" ? "Guardando…" : "Sin conexión, reintentando";
+  el.classList.toggle("off", st==="offline");
+}
 const store = {
   timer:null,
-  save(){ clearTimeout(this.timer); this.timer = setTimeout(()=>this.flush(), 300); },
-  async flush(){ clearTimeout(this.timer); if(currentId && S) await DB.saveEvent(currentId, S); }
+  save(){ clearTimeout(this.timer); if(currentId && S) LS.set("cache:"+currentId, S); this.timer = setTimeout(()=>this.flush(), 300); },
+  async flush(){
+    clearTimeout(this.timer);
+    if(!currentId || !S || !SYNC.last) return;
+    if(SYNC.busy){ SYNC.again = true; return; }
+    SYNC.busy = true; setSync("saving");
+    const id = currentId, last = SYNC.last;
+    try{
+      const ev = rowEvent(id, S), evJ = JSON.stringify(ev);
+      if(evJ !== last.event){ await must(sb.from("events").upsert(ev)); last.event = evJ; }
+      const cur = rowsOf(id, S);
+      for(const k of ["tables","guests","requests"]){
+        const changed = cur[k].filter(r=>JSON.stringify(r)!==last[k].get(r.id));
+        for(const c of chunks(changed, 500)){ await must(sb.from(TBL[k]).upsert(c)); c.forEach(r=>last[k].set(r.id, JSON.stringify(r))); }
+      }
+      for(const k of ["requests","guests","tables"]){
+        const keep = new Set(cur[k].map(r=>r.id)), gone = [...last[k].keys()].filter(x=>!keep.has(x));
+        for(const c of chunks(gone, 200)){ await must(sb.from(TBL[k]).delete().in("id", c)); c.forEach(x=>last[k].delete(x)); }
+      }
+      LS.set("cache:"+id, S);
+      clearTimeout(SYNC.retry); setSync("ok");
+    }catch(e){
+      console.warn("Sincronización pendiente", e); setSync("offline");
+      clearTimeout(SYNC.retry); SYNC.retry = setTimeout(()=>store.flush(), 5000);
+    }finally{
+      SYNC.busy = false;
+      if(SYNC.again){ SYNC.again = false; store.flush(); }
+    }
+  }
 };
-const newId = () => "ev-" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+window.addEventListener("online", ()=>store.flush());
+
+/* ---------- Cambios que llegan de otros dispositivos ---------- */
+let rTimer = null;
+function scheduleRender(header){
+  clearTimeout(rTimer);
+  rTimer = setTimeout(()=>{
+    if(!S) return;
+    if(header) renderHeader();
+    render();
+    if(ui.current && $("guestOverlay").classList.contains("open")) drawCard();
+  }, 80);
+}
+function remote(kind, payload){
+  if(!S || !currentId || !SYNC.last) return;
+  const del = payload.eventType === "DELETE", row = del ? payload.old : payload.new;
+  if(!row || !row.id) return;
+  if(!del && kind!=="events" && row.event_id !== currentId) return;
+  const last = SYNC.last;
+  if(kind === "events"){
+    if(row.id !== currentId) return;
+    if(del){ showToast("Este evento fue eliminado desde otro dispositivo.", false); currentId = null; S = null; showEvents(); return; }
+    if(JSON.stringify(rowEvent(currentId, S)) !== last.event) return; // hay cambios locales sin guardar
+    Object.assign(S.event, {name:row.name, type:row.type, date:row.event_date||"", time:(row.start_time||"").slice(0,5), theme:row.theme, planner:row.planner, sub:row.subtitle});
+    last.event = JSON.stringify(rowEvent(currentId, S));
+    scheduleRender(true); return;
+  }
+  const list = kind==="tables" ? S.tables : kind==="guests" ? S.guests : S.requests;
+  const keyOf = x => kind==="requests" ? x.id : x.uid;
+  const local = list.find(x=>keyOf(x)===row.id);
+  if(del){
+    if(local){
+      if(kind==="tables") S.tables = S.tables.filter(x=>x!==local);
+      else if(kind==="guests") S.guests = S.guests.filter(x=>x!==local);
+      else S.requests = S.requests.filter(x=>x!==local);
+    }
+    last[kind].delete(row.id); scheduleRender(); return;
+  }
+  if(local && JSON.stringify(ROW[kind](currentId, local)) !== last[kind].get(row.id)) return; // cambio local pendiente: gana el local
+  let t = local;
+  if(kind==="tables"){
+    if(!t){ t = {uid:row.id}; S.tables.push(t); }
+    Object.assign(t, {num:row.num, cap:row.capacity, extra:row.extra});
+    S.tables.sort((a,b)=>a.num-b.num);
+  } else if(kind==="guests"){
+    if(!t){
+      t = {uid:row.id};
+      t.id = (row.seq>0 && !S.guests.some(x=>x.id===row.seq)) ? row.seq : S.guests.reduce((m,x)=>Math.max(m,x.id||0),0)+1;
+      S.guests.push(t);
+    }
+    Object.assign(t, {name:row.name, persons:row.persons, table:row.table_num||0, arrived:row.arrived, at:msOf(row.arrived_at)});
+    S.guests.sort(byName);
+    S.requests.forEach(r=>{ if(r.guestUid===t.uid) r.guestId = t.id; });
+  } else {
+    if(!t){ t = {id:row.id}; S.requests.unshift(t); }
+    const g = S.guests.find(x=>x.uid===row.guest_id);
+    Object.assign(t, {kind:row.kind, guestUid:row.guest_id, guestId:g?g.id:undefined, name:row.name, persons:row.persons, table:row.table_num||0, status:row.status, mode:row.mode, resolution:row.resolution, at:msOf(row.created_at), resolvedAt:msOf(row.resolved_at)});
+    if(ui.req && ui.req.id===t.id && t.status!=="pending") ui.req = null;
+  }
+  last[kind].set(row.id, JSON.stringify(ROW[kind](currentId, t)));
+  scheduleRender();
+}
+function subscribe(id){
+  unsubscribe();
+  if(!sb) return;
+  SYNC.channel = sb.channel("evento-"+id)
+    .on("postgres_changes", {event:"*", schema:"public", table:"guests", filter:`event_id=eq.${id}`}, p=>remote("guests", p))
+    .on("postgres_changes", {event:"*", schema:"public", table:"event_tables", filter:`event_id=eq.${id}`}, p=>remote("tables", p))
+    .on("postgres_changes", {event:"*", schema:"public", table:"requests", filter:`event_id=eq.${id}`}, p=>remote("requests", p))
+    .on("postgres_changes", {event:"*", schema:"public", table:"events", filter:`id=eq.${id}`}, p=>remote("events", p))
+    .subscribe();
+}
+function unsubscribe(){ if(SYNC.channel && sb){ sb.removeChannel(SYNC.channel); } SYNC.channel = null; }
+const newId = () => uuid();
 
 /* ================= Utilidades ================= */
 let S = null;
@@ -974,7 +1184,8 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">"
 const norm = s => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 const fmtTime = ts => new Date(ts).toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});
 const plural = (n,a,b) => `${n} ${n===1?a:b}`;
-const pendingReq = g => S.requests.find(r=>r.status==="pending" && r.kind==="guest" && r.guestId===g.id);
+const reqGuest = r => r.kind==="guest" ? S.guests.find(g=>(r.guestUid && g.uid===r.guestUid) || (!r.guestUid && g.id===r.guestId)) || null : null;
+const pendingReq = g => S.requests.find(r=>r.status==="pending" && r.kind==="guest" && reqGuest(r)===g);
 const status = g => pendingReq(g) ? "review" : g.arrived<=0 ? "pending" : g.arrived<g.persons ? "partial" : "arrived";
 const initials = s => { const w = String(s).replace(/\+\d+/g,"").replace(/^familia\s+/i,"").trim().split(/\s+/).filter(Boolean); return ((w[0]||"")[0]||"").toUpperCase()+((w[1]||"")[0]||"").toUpperCase(); };
 function coupleMono(name){
@@ -1109,13 +1320,13 @@ function renderTables(){
 /* ---------- Solicitudes ---------- */
 const reasonText = r => {
   if(!r.table) return `Llegó sin mesa asignada. Necesita lugar para ${plural(r.persons,"persona","personas")}.`;
-  const f = Math.max(0, freeAt(r.table, r.kind==="guest" ? S.guests.find(g=>g.id===r.guestId) : null));
+  const f = Math.max(0, freeAt(r.table, reqGuest(r)));
   return f===0 ? `Pidió la Mesa ${r.table}, que está llena. Necesita lugar para ${plural(r.persons,"persona","personas")}.`
                : `Pidió la Mesa ${r.table}, que solo tiene ${plural(f,"lugar libre","lugares libres")}. Necesita ${r.persons}.`;
 };
 function reqForm(r){
   const st = ui.req; if(!st || st.id!==r.id) return "";
-  const ts = tableStats(), guest = r.kind==="guest" ? S.guests.find(g=>g.id===r.guestId) : null;
+  const ts = tableStats(), guest = reqGuest(r);
   if(st.mode==="chairs"){
     const f = Math.max(0, freeAt(st.table, guest)), need = Math.max(0, r.persons - f);
     if(st.n < need) st.n = need;
@@ -1184,7 +1395,7 @@ function showToast(msg, canUndo=true){
 $("toastUndo").onclick = () => { if(undo){ undo(); undo=null; } $("toast").classList.remove("show"); };
 
 function createRequest(r){
-  r.id = Date.now()+"-"+Math.floor(Math.random()*1e4); r.at = Date.now(); r.status = "pending";
+  r.id = uuid(); r.at = Date.now(); r.status = "pending";
   S.requests.unshift(r); store.save(); render();
   undo = () => { S.requests = S.requests.filter(x=>x!==r); store.save(); render(); };
   showToast(`${r.name} enviado a solicitudes. Pídele esperar con el coordinador.`);
@@ -1251,7 +1462,7 @@ $("guestCard").addEventListener("click", e=>{
     const act = c.dataset.act;
     if(act==="goreq"){ closeAll(false); setSection("requests"); return; }
     if(act==="request"){
-      createRequest({kind:"guest", guestId:g.id, name:g.name, persons:d.n, table:d.table});
+      createRequest({kind:"guest", guestId:g.id, guestUid:g.uid, name:g.name, persons:d.n, table:d.table});
       closeAll(); return;
     }
     const moved = d.table!==g.table; g.table = d.table;
@@ -1265,11 +1476,11 @@ $("guestCard").addEventListener("change", e=>{ if(e.target.id==="cardTable"){ ui
 /* ---------- Resolver solicitudes ---------- */
 function resolve(r, mode, table, chairs){
   const snap = JSON.stringify(S);
-  let guest = r.kind==="guest" ? S.guests.find(g=>g.id===r.guestId) : null;
+  let guest = reqGuest(r);
   if(mode==="chairs"){ const t = tableOf(table); t.cap += chairs; t.extra = (t.extra||0) + chairs; }
   if(mode!=="reject"){
     if(!guest){
-      guest = {id: Math.max(0,...S.guests.map(x=>x.id))+1, name:r.name, persons:r.persons, table, arrived:0, at:null};
+      guest = {id: Math.max(0,...S.guests.map(x=>x.id))+1, uid:uuid(), name:r.name, persons:r.persons, table, arrived:0, at:null};
       S.guests.push(guest); S.guests.sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:"base"}));
     }
     guest.table = table; guest.arrived = r.persons; guest.at = Date.now();
@@ -1320,7 +1531,7 @@ $("openSettings").onclick = ()=>{
 };
 $("saveSettings").onclick = ()=>{
   Object.assign(S.event,{planner:$("fPlanner").value.trim()||"Planner",sub:$("fSub").value.trim(),type:$("fType").value,name:$("fEvent").value.trim()||"Evento",date:$("fDate").value,time:$("fTime").value});
-  PROFILE = {planner:S.event.planner, sub:S.event.sub}; DB.set("app:perfil", PROFILE);
+  PROFILE = {planner:S.event.planner, sub:S.event.sub}; LS.set("perfil", PROFILE);
   store.save(); renderHeader(); closeAll(); undo=null; showToast("Datos del evento guardados", false);
 };
 $("resetBtn").onclick = ()=>{
@@ -1404,7 +1615,7 @@ $("saveAdd").onclick = ()=>{
   const p = Math.max(1,+$("aPers").value||1), t = +$("aTable").value;
   ui.q=""; $("q").value=""; $("searchBox").classList.remove("has-text");
   if(!fits(t, p, null)){ createRequest({kind:"new", name, persons:p, table:t||0}); closeAll(); return; }
-  const g = {id: Math.max(0,...S.guests.map(x=>x.id))+1, name, persons:p, table:t, arrived:p, at:Date.now()};
+  const g = {id: Math.max(0,...S.guests.map(x=>x.id))+1, uid:uuid(), name, persons:p, table:t, arrived:p, at:Date.now()};
   S.guests.push(g); S.guests.sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:"base"}));
   store.save(); render(); closeAll();
   undo = ()=>{ S.guests = S.guests.filter(x=>x!==g); store.save(); render(); };
@@ -1485,6 +1696,7 @@ $("lForgot").onclick = async ()=>{
   catch(err){ loginError(err.message); $("lEmail").focus(); }
 };
 $("logoutBtn").onclick = async ()=>{
+  await store.flush(); unsubscribe();
   await DB.signOut(); SESSION = null; showScreen("login"); setTimeout(()=>$("lEmail").focus(), 50);
 };
 
@@ -1503,7 +1715,7 @@ function whenLabel(date){
 function fmtDate(date){ if(!date) return "Sin fecha"; const s = new Date(date+"T12:00").toLocaleDateString("es-MX",{weekday:"short",day:"numeric",month:"short",year:"numeric"}); return s.charAt(0).toUpperCase()+s.slice(1); }
 function fmtHour(t){ if(!t) return ""; const [h,m] = t.split(":"); const x = new Date(); x.setHours(+h,+m); return x.toLocaleTimeString("es-MX",{hour:"numeric",minute:"2-digit"}); }
 async function showEvents(){
-  await store.flush(); currentId = null;
+  await store.flush(); unsubscribe(); currentId = null; SYNC.last = null;
   EVENTS = await DB.listEvents();
   $("eUser").textContent = SESSION?.email || "";
   paintBrand(); renderEvents(); showScreen("events");
@@ -1561,9 +1773,15 @@ $("newEventBtn").onclick = ()=>openNew();
 $("toEvents").onclick = ()=>showEvents();
 
 async function openEvent(id){
-  const st = await DB.loadEvent(id);
-  if(!st){ showToast("No se encontró ese evento.", false); return; }
-  S = migrate(st); currentId = id;
+  let res;
+  try{ res = await DB.loadEvent(id); }catch(e){ showToast("No se pudo abrir el evento. Revisa tu conexión.", false); return; }
+  if(!res){ showToast("No se encontró ese evento.", false); return; }
+  S = migrate(res.state); currentId = id;
+  if(res.fromServer) resetSyncFrom(id, S);
+  else SYNC.last = {event:"", tables:new Map(), guests:new Map(), requests:new Map()}; // copia local: se sube completa al reconectar
+  LS.set("cache:"+id, S);
+  subscribe(id); setSync(res.fromServer ? "ok" : "offline");
+  if(!res.fromServer) store.save();
   Object.assign(ui, {q:"", status:"all", table:null, current:null, draft:null, req:null});
   $("q").value = ""; $("searchBox").classList.remove("has-text");
   document.querySelectorAll("[data-status]").forEach(x=>x.setAttribute("aria-pressed", x.dataset.status==="all"));
@@ -1594,7 +1812,8 @@ $("createEvent").onclick = async ()=>{
   let st;
   if(document.querySelector('input[name="nStart"]:checked').value==="demo"){ st = demoState(newTheme); st.event = ev; }
   else st = emptyState(ev);
-  const id = newId(); await DB.saveEvent(id, st);
+  const id = newId();
+  try{ await DB.saveEventFull(id, st); }catch(e){ console.warn(e); $("nErr").innerHTML = `<div class="alert">${ic("alert")}<span>No se pudo crear el evento. Revisa tu conexión e inténtalo de nuevo.</span></div>`; return; }
   closeAll(false); await openEvent(id);
   showToast(`${name} creado`, false);
 };
@@ -1608,14 +1827,16 @@ async function openDup(id){
   $("dupOverlay").classList.add("open"); setTimeout(()=>{ $("dName").focus(); $("dName").select(); }, 30);
 }
 $("doDup").onclick = async ()=>{
-  const src = await DB.loadEvent(dupId); if(!src) return;
-  const st = migrate(JSON.parse(JSON.stringify(src)));
+  let res; try{ res = await DB.loadEvent(dupId); }catch(e){ showToast("No se pudo duplicar. Revisa tu conexión.", false); return; }
+  if(!res) return;
+  const st = migrate(JSON.parse(JSON.stringify(res.state)));
   st.event.name = $("dName").value.trim() || st.event.name + " (copia)";
   st.event.date = $("dDate").value; st.event.time = $("dTime").value;
-  st.tables.forEach(t=>{ t.cap -= (t.extra||0); t.extra = 0; });
-  st.guests = $("dGuests").checked ? finalize(st.guests.map(g=>({...g, arrived:0, at:null}))) : [];
+  st.tables.forEach(t=>{ t.cap -= (t.extra||0); t.extra = 0; delete t.uid; });
+  st.guests = $("dGuests").checked ? finalize(st.guests.map(g=>({name:g.name, persons:g.persons, table:g.table}))) : [];
   st.requests = [];
-  const id = newId(); await DB.saveEvent(id, st);
+  const id = newId();
+  try{ await DB.saveEventFull(id, st); }catch(e){ console.warn(e); showToast("No se pudo duplicar. Revisa tu conexión.", false); return; }
   EVENTS = await DB.listEvents(); renderEvents(); closeAll(false);
   undo = async ()=>{ await DB.deleteEvent(id); EVENTS = await DB.listEvents(); renderEvents(); };
   showToast(`${st.event.name} creado como copia`);
@@ -1625,34 +1846,40 @@ $("doDup").onclick = async ()=>{
 async function deleteEvent(id){
   const m = EVENTS.find(e=>e.id===id); if(!m) return;
   if(!confirm(`¿Eliminar “${m.name}”? Se borrarán su lista de invitados, mesas y llegadas.`)) return;
-  const snap = await DB.loadEvent(id);
-  await DB.deleteEvent(id); EVENTS = await DB.listEvents(); renderEvents();
-  undo = async ()=>{ if(snap){ await DB.saveEvent(id, snap); EVENTS = await DB.listEvents(); renderEvents(); } };
+  let snap = null; try{ const r = await DB.loadEvent(id); snap = r && r.fromServer ? r.state : null; }catch(e){}
+  try{ await DB.deleteEvent(id); }catch(e){ showToast("No se pudo eliminar. Revisa tu conexión.", false); return; }
+  EVENTS = await DB.listEvents(); renderEvents();
+  undo = async ()=>{ if(snap){ try{ await DB.saveEventFull(id, snap); }catch(e){ showToast("No se pudo restaurar.", false); } EVENTS = await DB.listEvents(); renderEvents(); } };
   showToast(`${m.name} eliminado`);
 }
 
-/* ---------- Primer uso: eventos de ejemplo ---------- */
-async function seedIfNeeded(){
-  if((await DB.listEvents()).length) return;
-  const old = await DB.get(KEY);
-  const boda = old ? migrate(old) : demoState("olivo");
-  boda.event.type = boda.event.type || "Boda";
-  await DB.saveEvent(newId(), boda);
-  await DB.saveEvent(newId(), emptyState({name:"XV años de Valeria", type:"XV años", date:"2026-11-14", time:"20:00", theme:"rosa"}));
-}
+/* ---------- Nueva contraseña (enlace de recuperación) ---------- */
+$("pwSave").onclick = async ()=>{
+  const v = $("pwNew").value;
+  if(v.length < 6){ $("pwErr").innerHTML = `<div class="alert">${ic("alert")}<span>La contraseña debe tener al menos 6 caracteres.</span></div>`; return; }
+  const {error} = await sb.auth.updateUser({password:v});
+  if(error){ $("pwErr").innerHTML = `<div class="alert">${ic("alert")}<span>No se pudo guardar: ${esc(error.message)}</span></div>`; return; }
+  $("pwNew").value = ""; $("pwErr").innerHTML = ""; $("pwOverlay").classList.remove("open");
+  showToast("Contraseña actualizada", false);
+  SESSION = await DB.getSession(); if(SESSION) showEvents();
+};
 
 /* ================= Inicio ================= */
 paintIcons();
 (async()=>{
-  PROFILE = (await DB.get("app:perfil")) || PROFILE;
+  PROFILE = LS.get("perfil") || PROFILE;
   paintBrand();
-  await seedIfNeeded();
   tick(); setInterval(tick, 15000);
+  if(!sb){ showScreen("login"); loginError("No se pudo conectar con el servidor. Revisa tu conexión a internet y recarga la página."); return; }
+  sb.auth.onAuthStateChange((event)=>{
+    if(event === "PASSWORD_RECOVERY"){ $("pwOverlay").classList.add("open"); setTimeout(()=>$("pwNew").focus(), 50); }
+    if(event === "SIGNED_OUT" && document.body.dataset.screen !== "login"){ unsubscribe(); currentId = null; S = null; showScreen("login"); }
+  });
   SESSION = await DB.getSession();
   if(SESSION) await showEvents();
   else { showScreen("login"); setTimeout(()=>$("lEmail").focus(), 50); }
 })();
-window.addEventListener("beforeunload", ()=>{ store.flush(); });
+window.addEventListener("beforeunload", ()=>{ if(currentId && S) LS.set("cache:"+currentId, S); store.flush(); });
 </script>
 </body>
 </html>

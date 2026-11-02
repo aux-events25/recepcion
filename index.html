@@ -35,6 +35,7 @@
   --blush:#C9A2A0; --leaf:#9DB089; --berry:#A8475A; --bloom:#E3C8C4;
   --ok:#5E8F5E; --ok-soft:#E1EEDC; --ok-ink:#3F6B40;
   --warn:#D9A900; --warn-soft:#FFF3BF; --warn-ink:#7A5F00;
+  --chg:#4A7FC1; --chg-soft:#E3EDFA; --chg-ink:#2B5591;
   --bad:#E02424; --bad-soft:#FFD6D3; --bad-ink:#B01717;
   --shadow:0 22px 50px -28px rgba(40,40,30,.55);
   --shadow-sm:0 6px 18px -12px rgba(40,40,30,.45);
@@ -51,6 +52,7 @@
     --blush:#B98D8B; --leaf:#7F9670; --berry:#B85A6C; --bloom:#C9A9A4;
     --ok:#7DBA80; --ok-soft:#213424; --ok-ink:#A8D8AA;
     --warn:#F2CC3D; --warn-soft:#3A3212; --warn-ink:#F7DC7A;
+    --chg:#7FA8E0; --chg-soft:#1C2838; --chg-ink:#A9C6EE;
     --bad:#FF4D45; --bad-soft:#4A1513; --bad-ink:#FF948E;
     --shadow:0 22px 50px -28px rgba(0,0,0,.85); --shadow-sm:0 6px 18px -12px rgba(0,0,0,.8);
   }
@@ -66,6 +68,7 @@ html[data-theme="negro"]{
   --blush:#8F8A82; --leaf:#5E5A52; --berry:#C9A96E; --bloom:#E8E2D6;
   --ok:#7DBA80; --ok-soft:#1C2B1E; --ok-ink:#A8D8AA;
   --warn:#F2CC3D; --warn-soft:#3A3212; --warn-ink:#F7DC7A;
+    --chg:#7FA8E0; --chg-soft:#1C2838; --chg-ink:#A9C6EE;
   --bad:#FF4D45; --bad-soft:#4A1513; --bad-ink:#FF948E;
   --shadow:0 22px 50px -28px rgba(0,0,0,.9); --shadow-sm:0 6px 18px -12px rgba(0,0,0,.85);
 }
@@ -634,9 +637,36 @@ body[data-role="hostess"] .admin-only{display:none !important}
 .rp-tb td{padding:7px 8px;border-bottom:1px solid var(--r-line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rp-tb tr.z td{background:var(--r-zebra)}
 .rp-tb tr.no td{background:#FBE7E4;color:#7A2E26;border-bottom-color:#F3D3CE}
+.rp-tb tr.chg td{background:#E8F0FB;border-bottom-color:#D3E1F4}
 .rp-pill{display:inline-block;padding:2px 11px;border-radius:99px;font-size:12.5px}
 @media (max-width:640px){ .rep-dl{width:100%} }
 
+
+/* ---------- Cambios (azul tenue) ---------- */
+.row.chg{background:var(--chg-soft)}
+.row.chg .rname small.note{color:var(--chg-ink)}
+.rname small.note{color:var(--chg-ink);font-weight:500}
+.seat.chg{background:var(--chg) !important;border-color:var(--chg) !important;border-style:solid !important}
+.chip.chg-chip[aria-pressed="true"]{background:var(--chg);border-color:var(--chg);color:#fff}
+.info{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:11px 14px;border-radius:14px;background:var(--chg-soft);color:var(--chg-ink);font-size:14.5px;line-height:1.4}
+.hist{padding:12px 0 2px}
+.hist p{margin:0 0 6px;font-size:14px;color:var(--muted);display:flex;align-items:center;gap:7px}
+.hist ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+.hist li{font-size:13.5px;padding:7px 10px;border-radius:10px;background:var(--chg-soft);color:var(--chg-ink)}
+.hist li small{display:block;opacity:.8;font-size:12px}
+.legend .lg-chg{background:var(--chg) !important;border-color:var(--chg) !important}
+
+/* ---------- Solicitudes: quién, motivo, validación ---------- */
+.req-top{position:relative}
+.req-by{display:inline-flex;align-items:center;gap:6px;font-size:14px;padding:6px 12px;border-radius:999px;background:var(--gold-soft);color:var(--ink)}
+.req-by b{font-weight:600}
+.req-reason{display:flex;gap:8px;align-items:flex-start;margin:8px 0 0;padding:9px 12px;border-radius:12px;background:var(--surface-2);font-size:14.5px}
+.req-reason svg{margin-top:2px;color:var(--gold)}
+.req-valid{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:12px;font-size:14.5px;color:var(--ink-soft)}
+.req-valid svg{color:var(--gold)}
+.req-valid select{height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 12px;min-width:260px}
+.done small b{font-weight:600;color:var(--ink)}
+@media (max-width:640px){ .req-valid select{min-width:0;width:100%} }
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -846,6 +876,7 @@ body[data-role="hostess"] .admin-only{display:none !important}
       <button class="chip" data-status="all" aria-pressed="true">Todos <span class="ct" id="cAll"></span></button>
       <button class="chip" data-status="pending" aria-pressed="false"><i data-icon="hourglass"></i>Pendientes <span class="ct" id="cPen"></span></button>
       <button class="chip" data-status="arrived" aria-pressed="false"><i data-icon="userCheck"></i>Ya llegaron <span class="ct" id="cArr"></span></button>
+      <button class="chip chg-chip" data-status="changed" aria-pressed="false"><i data-icon="move"></i>Cambios <span class="ct" id="cChg"></span></button>
       <span id="tableChip"></span>
       <span class="spacer"></span>
       <button class="add-btn" id="addGuest"><i data-icon="userPlus"></i>Agregar invitado</button>
@@ -865,6 +896,7 @@ body[data-role="hostess"] .admin-only{display:none !important}
         <span><i style="border-color:var(--ok);background:var(--ok-soft)"></i>Más de 4 libres</span>
         <span><i style="border-color:var(--warn);background:var(--warn-soft)"></i>4 o menos libres</span>
         <span><i style="border-color:var(--bad);background:var(--bad-soft)"></i>Llena</span>
+        <span><i class="lg-chg"></i>Cambio o agregado</span>
       </div>
     </div>
     <div class="cap" id="cap" hidden></div>
@@ -876,14 +908,15 @@ body[data-role="hostess"] .admin-only{display:none !important}
   <p class="req-intro">Genera el reporte final en PDF para entregar a la planner y a la familia: asistencia, horarios de llegada, observaciones, ocupación por mesa y la lista completa de invitados. Elige la paleta de colores y descárgalo.</p>
   <div class="rep-tools">
     <div class="pal-grid" id="palGrid"></div>
+    <button class="btn rep-dl" id="repCsv"><i data-icon="list"></i><span>Descargar lista</span></button>
     <button class="btn dark rep-dl" id="repDownload"><i data-icon="download"></i><span>Descargar PDF</span></button>
   </div>
   <div class="rep-prev" id="repPrev"></div>
 </section>
 
 <section id="requestsView" aria-label="Solicitudes">
-  <div class="panel-head"><h2><span class="hi"><i data-icon="inbox"></i></span>Solicitudes de lugar</h2><p id="reqInfo"></p></div>
-  <p class="req-intro">Aquí llegan los invitados que no cupieron en su mesa o que llegaron sin lugar asignado. La fila sigue avanzando mientras el coordinador decide: agregar sillas, reacomodar en otra mesa o marcar que no procede.</p>
+  <div class="panel-head"><h2><span class="hi"><i data-icon="inbox"></i></span>Solicitudes</h2><p id="reqInfo"></p></div>
+  <p class="req-intro">Aquí llegan los invitados que no están en la lista y los que no cupieron en su mesa. La fila sigue avanzando mientras un administrador decide: aprobar, agregar sillas, reacomodar en otra mesa o marcar que no procede. Queda registrado quién la solicitó y quién la liberó.</p>
   <div id="reqPending"></div>
   <h3 class="sub-h"><i data-icon="check"></i>Resueltas</h3>
   <div id="reqDone"></div>
@@ -917,7 +950,7 @@ body[data-role="hostess"] .admin-only{display:none !important}
     <div class="actions admin-only"><button class="btn" data-close>Cancelar</button><button class="btn dark" id="saveSettings"><i data-icon="check"></i>Guardar datos</button></div>
     <div class="tools">
       <button class="btn admin-only" id="importBtn"><i data-icon="upload"></i>Importar lista de Excel</button>
-      <button class="btn" id="exportBtn"><i data-icon="download"></i>Descargar reporte</button>
+      <button class="btn" id="exportBtn"><i data-icon="download"></i>Descargar lista</button>
       <button class="btn danger admin-only" id="resetBtn"><i data-icon="undo"></i>Reiniciar llegadas</button>
       <button class="btn admin-only" id="demoBtn"><i data-icon="sparkle"></i>Cargar lista de ejemplo</button>
     </div>
@@ -929,11 +962,12 @@ body[data-role="hostess"] .admin-only{display:none !important}
 <div class="overlay" id="addOverlay" role="dialog" aria-modal="true" aria-labelledby="addTitle">
   <div class="card sheet">
     <div class="sh"><span class="hi"><i data-icon="userPlus"></i></span><h3 id="addTitle">Agregar invitado</h3></div>
-    <p>Para invitados que no aparecen en la lista.</p>
+    <p>Para invitados que no aparecen en la lista. Se envía a <b>Solicitudes</b> y un administrador debe aprobarlo.</p>
     <div class="form">
       <label class="wide">Nombre<input id="aName" placeholder="Nombre y apellido"></label>
-      <label>Personas<input id="aPers" type="number" min="1" value="1"></label>
-      <label>Mesa<select id="aTable"></select></label>
+      <label>Personas<select id="aPers"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select></label>
+      <label>Mesa sugerida<select id="aTable"></select></label>
+      <label class="wide">Motivo por el que se agrega<select id="aReason"><option value="">Elige un motivo…</option></select></label>
     </div>
     <div id="aWarn"></div>
     <div class="actions"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="saveAdd"></button></div>
@@ -1072,6 +1106,7 @@ const ICONS = {
   edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
   arrowLeft:'<path d="M19 12H5M11 18l-6-6 6-6"/>',
   fileReport:'<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><path d="M9 17v-3M12 17v-5M15 17v-2"/>',
+  notes:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/>',
   sparkle:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>'
 };
 const ic = (n, sw=1.8) => `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
@@ -1133,7 +1168,7 @@ function demoState(theme){
 }
 function finalize(list){
   return list.sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:"base"}))
-    .map((g,i)=>({id:i+1,uid:g.uid||uuid(),name:String(g.name).trim(),persons:Math.max(1,+g.persons||1),table:+g.table||0,arrived:+g.arrived||0,at:g.at||null,walkIn:!!g.walkIn,orig:(g.orig!=null?+g.orig:(+g.table||0))}));
+    .map((g,i)=>({id:i+1,uid:g.uid||uuid(),name:String(g.name).trim(),persons:Math.max(1,+g.persons||1),table:+g.table||0,arrived:+g.arrived||0,at:g.at||null,walkIn:!!g.walkIn,orig:(g.orig!=null?+g.orig:(+g.table||0)),by:g.by||"",log:g.log||[]}));
 }
 function migrate(s){
   s.requests = s.requests || [];
@@ -1170,15 +1205,17 @@ function rowTable(id, t){ if(!t.uid) t.uid = uuid(); return {id:t.uid, event_id:
 function rowGuest(id, g){
   if(!g.uid) g.uid = uuid();
   const r = {id:g.uid, event_id:id, seq:g.id|0, name:g.name, persons:Math.max(1,g.persons|0), table_num:g.table||null, arrived:Math.max(0,g.arrived|0), arrived_at:isoOf(g.at)};
-  if(!NO_EXTRA){ r.walk_in = !!g.walkIn; r.original_table = g.orig || null; }
+  if(!NO_EXTRA){ r.walk_in = !!g.walkIn; r.original_table = g.orig || null; r.checked_by = g.by || null; r.changes = g.log || []; }
   return r;
 }
 function rowRequest(id, r){
   if(!r.guestUid && r.guestId){ const g = S && S.guests.find(x=>x.id===r.guestId); if(g) r.guestUid = g.uid; }
-  return {id:r.id, event_id:id, kind:r.kind, guest_id:r.guestUid||null, name:r.name, persons:Math.max(1,r.persons|0), table_num:r.table||null, status:r.status, mode:r.mode||null, resolution:r.resolution||null, created_at:isoOf(r.at), resolved_at:isoOf(r.resolvedAt)};
+  const o = {id:r.id, event_id:id, kind:r.kind, guest_id:r.guestUid||null, name:r.name, persons:Math.max(1,r.persons|0), table_num:r.table||null, status:r.status, mode:r.mode==="approve"?"move":(r.mode||null), resolution:r.resolution||null, created_at:isoOf(r.at), resolved_at:isoOf(r.resolvedAt)};
+  if(!NO_EXTRA){ o.created_by = r.createdBy || null; o.resolved_by = r.resolvedBy || null; o.reason = r.reason || null; o.validated_with = r.validatedWith || null; }
+  return o;
 }
 let NO_EXTRA = false; // si aún no existen las columnas nuevas en Supabase
-const isExtraErr = e => /walk_in|original_table/i.test((e && (e.message||e.details)) || "");
+const isExtraErr = e => /walk_in|original_table|checked_by|changes|created_by|resolved_by|reason|validated_with/i.test((e && (e.message||e.details)) || "");
 const TBL = {tables:"event_tables", guests:"guests", requests:"requests"};
 const ROW = {tables:rowTable, guests:rowGuest, requests:rowRequest};
 function rowsOf(id, s){ return {tables:s.tables.map(t=>rowTable(id,t)), guests:s.guests.map(g=>rowGuest(id,g)), requests:s.requests.map(r=>rowRequest(id,r))}; }
@@ -1247,15 +1284,15 @@ const DB = {
         fetchAll(()=>sb.from("requests").select("*").eq("event_id", id).order("created_at",{ascending:false}))
       ]);
       if(!ev) return null;
-      if(guests.length && !("walk_in" in guests[0])) NO_EXTRA = true;
-      const gl = guests.map(g=>({uid:g.id, seq:g.seq, name:g.name, persons:g.persons, table:g.table_num||0, arrived:g.arrived, at:msOf(g.arrived_at), walkIn:!!g.walk_in, orig:g.original_table||0})).sort(byName);
+      if(guests.length && (!("walk_in" in guests[0]) || !("changes" in guests[0]))) NO_EXTRA = true;
+      const gl = guests.map(g=>({uid:g.id, seq:g.seq, name:g.name, persons:g.persons, table:g.table_num||0, arrived:g.arrived, at:msOf(g.arrived_at), walkIn:!!g.walk_in, orig:g.original_table||0, by:g.checked_by||"", log:Array.isArray(g.changes)?g.changes:[]})).sort(byName);
       const used = new Set(); let max = gl.reduce((m,g)=>Math.max(m,g.seq||0),0);
       gl.forEach(g=>{ if(g.seq>0 && !used.has(g.seq)){ g.id = g.seq; } else { g.id = ++max; } used.add(g.id); delete g.seq; });
       const st = {
         event:{name:ev.name, type:ev.type, date:ev.event_date||"", time:(ev.start_time||"").slice(0,5), theme:ev.theme, planner:ev.planner, sub:ev.subtitle},
         tables: tables.map(t=>({uid:t.id, num:t.num, cap:t.capacity, extra:t.extra})),
         guests: gl,
-        requests: reqs.map(r=>({id:r.id, kind:r.kind, guestUid:r.guest_id, name:r.name, persons:r.persons, table:r.table_num||0, status:r.status, mode:r.mode, resolution:r.resolution, at:msOf(r.created_at), resolvedAt:msOf(r.resolved_at)}))
+        requests: reqs.map(r=>({id:r.id, kind:r.kind, guestUid:r.guest_id, name:r.name, persons:r.persons, table:r.table_num||0, status:r.status, mode:r.mode, resolution:r.resolution, at:msOf(r.created_at), resolvedAt:msOf(r.resolved_at), createdBy:r.created_by||"", resolvedBy:r.resolved_by||"", reason:r.reason||"", validatedWith:r.validated_with||""}))
       };
       st.requests.forEach(r=>{ const g = gl.find(x=>x.uid===r.guestUid); if(g) r.guestId = g.id; });
       return {state:st, fromServer:true};
@@ -1379,12 +1416,13 @@ function remote(kind, payload){
     }
     Object.assign(t, {name:row.name, persons:row.persons, table:row.table_num||0, arrived:row.arrived, at:msOf(row.arrived_at)});
     if("walk_in" in row){ t.walkIn = !!row.walk_in; t.orig = row.original_table || 0; }
+    if("changes" in row){ t.by = row.checked_by || ""; t.log = Array.isArray(row.changes) ? row.changes : []; }
     S.guests.sort(byName);
     S.requests.forEach(r=>{ if(r.guestUid===t.uid) r.guestId = t.id; });
   } else {
     if(!t){ t = {id:row.id}; S.requests.unshift(t); }
     const g = S.guests.find(x=>x.uid===row.guest_id);
-    Object.assign(t, {kind:row.kind, guestUid:row.guest_id, guestId:g?g.id:undefined, name:row.name, persons:row.persons, table:row.table_num||0, status:row.status, mode:row.mode, resolution:row.resolution, at:msOf(row.created_at), resolvedAt:msOf(row.resolved_at)});
+    Object.assign(t, {kind:row.kind, guestUid:row.guest_id, guestId:g?g.id:undefined, name:row.name, persons:row.persons, table:row.table_num||0, status:row.status, mode:row.mode, resolution:row.resolution, at:msOf(row.created_at), resolvedAt:msOf(row.resolved_at), createdBy:row.created_by||t.createdBy||"", resolvedBy:row.resolved_by||t.resolvedBy||"", reason:row.reason||t.reason||"", validatedWith:row.validated_with||t.validatedWith||""});
     if(ui.req && ui.req.id===t.id && t.status!=="pending") ui.req = null;
   }
   last[kind].set(row.id, JSON.stringify(ROW[kind](currentId, t)));
@@ -1430,6 +1468,30 @@ function freeAt(num, exceptGuest){
 }
 const fits = (num, n, g) => !!num && n <= freeAt(num, g);
 
+/* ================= Motivos y validaciones ================= */
+const REASONS = ["No había confirmado asistencia","Se invitó en la última semana","Acompañante no registrado en la invitación","Error u omisión en la lista","Invitado de último momento por la familia"];
+const VALIDATIONS = ["Decisión propia","Con los novios","Con los papás de los novios","Con un hermano o hermana de los novios","Con la wedding planner","Con otro familiar"];
+const VALID = {}; // validación elegida por solicitud (mientras el admin decide)
+
+/* ================= Cambios y quién los hizo ================= */
+const ME = () => (SESSION && SESSION.name) || "";
+function chgInfo(g){
+  const moved = !!(g.orig && g.table && g.orig!==g.table), extra = Math.max(0,(g.arrived|0)-(g.persons|0));
+  return {walk:!!g.walkIn, moved, extra, any: !!g.walkIn || moved || extra>0};
+}
+function chgNotes(g){
+  const c = chgInfo(g), n = [];
+  if(c.walk) n.push(`Agregado fuera de lista · Mesa ${g.table||"—"}`);
+  if(c.moved) n.push(`Cambio de mesa: original Mesa ${g.orig}, nueva ubicación Mesa ${g.table}`);
+  if(c.extra) n.push(`Tenía ${g.persons} en invitación, se ${c.extra===1?"agrega 1":"agregan "+c.extra} a Mesa ${g.table}`);
+  return n;
+}
+function chgBy(g){ const l = (g.log||[]).filter(x=>x.by); return l.length ? l[l.length-1].by : (g.by||""); }
+function logChange(g, k, txt){ g.log = (g.log||[]).concat({k, txt, by:ME(), at:Date.now()}); }
+function blueSeats(num){
+  return S.guests.reduce((a,g)=>{ if(g.table!==num || !g.arrived) return a; const c = chgInfo(g); return a + (c.walk||c.moved ? g.arrived : c.extra); }, 0);
+}
+
 /* ================= Render ================= */
 function renderHeader(){
   const e = S.event;
@@ -1463,6 +1525,7 @@ function renderStats(){
   $("cAll").textContent = S.guests.length;
   $("cPen").textContent = S.guests.filter(g=>status(g)!=="arrived").length;
   $("cArr").textContent = invArr;
+  $("cChg").textContent = S.guests.filter(g=>chgInfo(g).any).length;
 }
 
 function tokens(){ return norm(ui.q).split(/\s+/).filter(Boolean); }
@@ -1473,6 +1536,7 @@ function filtered(){
     const st = status(g);
     if(ui.status==="pending" && st==="arrived") return false;
     if(ui.status==="arrived" && (st==="pending"||st==="review")) return false;
+    if(ui.status==="changed" && !chgInfo(g).any) return false;
     if(!tk.length) return true;
     const hay = norm(g.name)+" mesa"+g.table+" mesa "+g.table+" #"+g.id;
     return tk.every(t=>hay.includes(t));
@@ -1503,10 +1567,13 @@ function renderList(){
   }
   $("rows").innerHTML = list.map((g,i)=>{
     const st = status(g);
-    const sub = st==="review" ? `${ic("inbox")}En revisión, mesa llena` : st==="pending" ? `${ic("hourglass")}Pendiente` : st==="partial" ? `${ic("clock")}Llegaron ${g.arrived} de ${g.persons} a las ${fmtTime(g.at)}` : `${ic("clock")}Llegó a las ${fmtTime(g.at)}`;
-    return `<div class="row ${st}${i===0&&ui.q?" first":""}" role="listitem" data-id="${g.id}">
+    const by = g.by && g.arrived>0 ? ` · ${esc(g.by)}` : "";
+    const sub = st==="review" ? `${ic("inbox")}En revisión, mesa llena` : st==="pending" ? `${ic("hourglass")}Pendiente` : st==="partial" ? `${ic("clock")}Llegaron ${g.arrived} de ${g.persons} a las ${fmtTime(g.at)}${by}` : `${ic("clock")}Llegó a las ${fmtTime(g.at)}${by}`;
+    const ci = chgInfo(g), notes = ci.any ? chgNotes(g) : [], cb = ci.any ? chgBy(g) : "";
+    const note = notes.length ? `<small class="note">${ic(ci.walk?"userPlus":ci.moved?"move":"users")}${esc(notes.join(" · "))}${cb?` · por ${esc(cb)}`:""}</small>` : "";
+    return `<div class="row ${st}${ci.any?" chg":""}${i===0&&ui.q?" first":""}" role="listitem" data-id="${g.id}">
       <span class="rid">${g.id}</span>
-      <span class="rname"><span class="avatar">${esc(initials(g.name))}</span><span class="tx">${highlight(g.name)}<small>${sub}</small></span></span>
+      <span class="rname"><span class="avatar">${esc(initials(g.name))}</span><span class="tx">${highlight(g.name)}<small>${sub}</small>${note}</span></span>
       <span class="rpers">${g.persons}</span>
       <span class="rmesa"><em>Mesa</em><b>${g.table||"—"}</b></span>
       <button class="check" data-check="${g.id}" aria-label="${st==="pending"?"Registrar llegada de":"Ver"} ${esc(g.name)}">${ic(st==="review"?"inbox":"check", st==="review"?2:3)}</button>
@@ -1524,11 +1591,11 @@ function tableStats(){
   });
 }
 function seats(t){
-  const n = Math.max(1, Math.min(t.cap, 26)), base = t.cap - (t.extra||0);
+  const n = Math.max(1, Math.min(t.cap, 26)), base = t.cap - (t.extra||0), on = Math.min(n, t.arrived), blue = Math.min(on, blueSeats(t.num));
   let out = "";
   for(let i=0;i<n;i++){
     const a = i/n*2*Math.PI - Math.PI/2, x = 50 + 44*Math.cos(a), y = 50 + 44*Math.sin(a);
-    out += `<span class="seat${i<t.arrived?" on":""}${i>=base?" extra":""}" style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%"></span>`;
+    out += `<span class="seat${i<on?" on":""}${i>=on-blue&&i<on?" chg":""}${i>=base?" extra":""}" style="left:${x.toFixed(2)}%;top:${y.toFixed(2)}%"></span>`;
   }
   return out;
 }
@@ -1546,10 +1613,12 @@ function renderTables(){
 
 /* ---------- Solicitudes ---------- */
 const reasonText = r => {
-  if(!r.table) return `Llegó sin mesa asignada. Necesita lugar para ${plural(r.persons,"persona","personas")}.`;
+  const pre = r.kind==="new" ? "No está en la lista de invitados. " : "";
+  if(!r.table) return `${pre}Sin mesa sugerida. Necesita lugar para ${plural(r.persons,"persona","personas")}.`;
   const f = Math.max(0, freeAt(r.table, reqGuest(r)));
-  return f===0 ? `Pidió la Mesa ${r.table}, que está llena. Necesita lugar para ${plural(r.persons,"persona","personas")}.`
-               : `Pidió la Mesa ${r.table}, que solo tiene ${plural(f,"lugar libre","lugares libres")}. Necesita ${r.persons}.`;
+  if(r.kind==="new" && f>=r.persons) return `${pre}Mesa sugerida: Mesa ${r.table}, con ${plural(f,"lugar libre","lugares libres")}. Necesita ${r.persons}.`;
+  return pre + (f===0 ? `Pidió la Mesa ${r.table}, que está llena. Necesita lugar para ${plural(r.persons,"persona","personas")}.`
+               : `Pidió la Mesa ${r.table}, que solo tiene ${plural(f,"lugar libre","lugares libres")}. Necesita ${r.persons}.`);
 };
 function reqForm(r){
   const st = ui.req; if(!st || st.id!==r.id) return "";
@@ -1589,17 +1658,22 @@ function renderRequests(){
   $("reqPending").innerHTML = pend.length ? pend.map(r=>`<article class="req" data-req="${r.id}">
       <div class="req-top"><span class="avatar">${esc(initials(r.name))}</span>
         <div class="who"><b>${esc(r.name)}</b><small><span>${ic("users")}${plural(r.persons,"persona","personas")}</span><span>${ic("clock")}Enviada a las ${fmtTime(r.at)}</span><span>${ic(r.kind==="guest"?"list":"userPlus")}${r.kind==="guest"?"En la lista":"No estaba en la lista"}</span></small></div>
+        <span class="req-by">${ic("user")}Solicitó: <b>${esc(r.createdBy||"—")}</b></span>
       </div>
       <p class="req-why">${ic("alert")}<span>${reasonText(r)}</span></p>
+      ${r.reason?`<p class="req-reason">${ic("notes")}<span><b>Motivo:</b> ${esc(r.reason)}</span></p>`:""}
+      ${isAdmin()?`<label class="req-valid">${ic("userCheck")}<span>¿Con quién se validó?</span><select data-rv="${r.id}"><option value="">Elige una opción…</option>${VALIDATIONS.map(v=>`<option ${VALID[r.id]===v?"selected":""}>${esc(v)}</option>`).join("")}</select></label>
       <div class="req-actions">
+        ${r.table && fits(r.table, r.persons, reqGuest(r)) ? `<button class="btn primary" data-rdo="approve" style="flex:0 1 auto">${ic("check",2.4)}Aprobar en Mesa ${r.table}</button>` : ""}
         <button class="btn" data-rmode="chairs" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="chairs"}">${ic("chairPlus")}Agregar sillas</button>
         <button class="btn" data-rmode="move" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="move"}">${ic("move")}Reacomodar en otra mesa</button>
         <button class="btn danger" data-rmode="reject" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="reject"}">${ic("ban")}No procede</button>
-      </div>${reqForm(r)}</article>`).join("")
-    : `<div class="empty" style="background:var(--surface);border:1px solid var(--line);border-radius:16px"><div class="ei">${ic("check",1.5)}</div><b>Todo en orden</b>Cuando una mesa esté llena, la solicitud aparecerá aquí.</div>`;
+      </div>${reqForm(r)}` : `<div class="info">${ic("hourglass")}<span>Esperando la aprobación de un administrador.</span></div>`}</article>`).join("")
+    : `<div class="empty" style="background:var(--surface);border:1px solid var(--line);border-radius:16px"><div class="ei">${ic("check",1.5)}</div><b>Todo en orden</b>Aquí aparecen los invitados fuera de lista y las mesas llenas para que un administrador los apruebe.</div>`;
   $("reqDone").innerHTML = done.length ? `<div class="done-list">${done.map(r=>`<div class="done"><b>${esc(r.name)}</b>
-      <span class="pill ${r.status==="rejected"?"full":"ok"}">${r.status==="rejected"?"No procede":r.mode==="chairs"?"Sillas agregadas":"Reacomodado"}</span>
-      <small>${esc(r.resolution)} · ${fmtTime(r.resolvedAt)}</small></div>`).join("")}</div>`
+      <span class="pill ${r.status==="rejected"?"full":"ok"}">${r.status==="rejected"?"No procede":r.mode==="chairs"?"Sillas agregadas":/^Aprobad/.test(r.resolution||"")?"Aprobado":"Reacomodado"}</span>
+      <small>${esc(r.resolution)} · ${fmtTime(r.resolvedAt)}</small>
+      <small>${r.reason?`Motivo: ${esc(r.reason)} · `:""}Solicitó <b>${esc(r.createdBy||"—")}</b> · ${r.status==="rejected"?"Rechazó":"Liberó"} <b>${esc(r.resolvedBy||"—")}</b>${r.validatedWith?` · Validado: ${esc(r.validatedWith)}`:""}</small></div>`).join("")}</div>`
     : `<p class="req-intro">Aún no hay solicitudes resueltas.</p>`;
 }
 function render(){ renderStats(); renderList(); renderTables(); renderRequests(); if(document.body.dataset.section==="reports") scheduleReport(); }
@@ -1607,11 +1681,13 @@ function render(){ renderStats(); renderList(); renderTables(); renderRequests()
 /* ================= Acciones ================= */
 let undo = null, toastT = null;
 function setArrival(g, n, msg){
-  const prev = {arrived:g.arrived, at:g.at};
+  const prev = {arrived:g.arrived, at:g.at, by:g.by};
   g.arrived = Math.max(0,n);
   g.at = g.arrived>0 ? (prev.arrived>0 && prev.at ? prev.at : Date.now()) : null;
+  if(g.arrived>0 && (g.arrived!==prev.arrived || !g.by)) g.by = ME();
+  if(g.arrived===0) g.by = "";
   store.save(); render();
-  undo = () => { g.arrived = prev.arrived; g.at = prev.at; store.save(); render(); };
+  undo = () => { g.arrived = prev.arrived; g.at = prev.at; g.by = prev.by; store.save(); render(); };
   showToast(msg);
 }
 function showToast(msg, canUndo=true){
@@ -1622,10 +1698,10 @@ function showToast(msg, canUndo=true){
 $("toastUndo").onclick = () => { if(undo){ undo(); undo=null; } $("toast").classList.remove("show"); };
 
 function createRequest(r){
-  r.id = uuid(); r.at = Date.now(); r.status = "pending";
+  r.id = uuid(); r.at = Date.now(); r.status = "pending"; r.createdBy = ME();
   S.requests.unshift(r); store.save(); render();
   undo = () => { S.requests = S.requests.filter(x=>x!==r); store.save(); render(); };
-  showToast(`${r.name} enviado a solicitudes. Pídele esperar con el coordinador.`);
+  showToast(`${r.name} enviado a solicitudes. Un administrador debe aprobarlo.`);
 }
 function quickToggle(id){
   const g = S.guests.find(x=>x.id===id);
@@ -1671,8 +1747,11 @@ function drawCard(){
       ${!req?`<div class="field"><label>${ic("userCheck")}¿Cuántos llegaron?</label>
         <div class="stepper"><button data-step="-1" aria-label="Uno menos">−</button><output>${d.n} de ${g.persons}</output><button data-step="1" aria-label="Uno más">+</button></div>
       </div>
+      ${d.n>g.persons?`<div class="info">${ic("userPlus")}<span>Se registrará${d.n-g.persons===1?" 1 persona adicional":"n "+(d.n-g.persons)+" personas adicionales"} a la invitación (tenía ${g.persons}). Quedará marcado en azul como cambio.</span></div>`:""}
+      ${d.table!==g.table?`<div class="info">${ic("move")}<span>Cambio de mesa: original Mesa ${g.orig||g.table}, nueva ubicación Mesa ${d.table}. Quedará marcado en azul.</span></div>`:""}
       <div class="field"><label for="cardTable">${ic("table")}Mesa asignada</label><select id="cardTable">${opts}</select></div>`:""}
       ${!ok&&!req?`<div class="alert">${ic("alert")}<span>La Mesa ${d.table} ${free===0?"está llena":`solo tiene ${plural(free,"lugar libre","lugares libres")}`} y llegan ${d.n}. Envía la solicitud para que el coordinador lo resuelva y sigue con la fila.</span></div>`:""}
+      ${(g.log||[]).length?`<div class="hist"><p>${ic("clock")}Historial de cambios</p><ul>${g.log.slice().reverse().map(l=>`<li>${esc(l.txt)}<small>${l.by?"por "+esc(l.by)+" · ":""}${fmtTime(l.at)}</small></li>`).join("")}</ul></div>`:""}
       ${mates.length?`<div class="mates"><p>${ic("users")}Comparte mesa con</p><ul>${mates.map(m=>`<li class="${m.arrived>0?"ok":""}">${m.arrived>0?ic("check",2.4):""}${esc(m.name)}</li>`).join("")}</ul></div>`:""}
       <div class="actions">
         ${(st==="arrived"||st==="partial")?`<button class="btn danger" id="undoArrival">${ic("undo")}Quitar llegada</button>`:`<button class="btn" data-close>Cerrar</button>`}
@@ -1689,11 +1768,17 @@ $("guestCard").addEventListener("click", e=>{
     const act = c.dataset.act;
     if(act==="goreq"){ closeAll(false); setSection("requests"); return; }
     if(act==="request"){
-      createRequest({kind:"guest", guestId:g.id, guestUid:g.uid, name:g.name, persons:d.n, table:d.table});
+      createRequest({kind:"guest", guestId:g.id, guestUid:g.uid, name:g.name, persons:d.n, table:d.table, reason: d.n>g.persons ? `Llegó con ${d.n} personas (invitación de ${g.persons})` : "Mesa sin lugares suficientes"});
       closeAll(); return;
     }
-    const moved = d.table!==g.table; if(moved && !g.orig) g.orig = g.table; g.table = d.table;
-    setArrival(g, d.n, `${g.name} registrado en la Mesa ${g.table}${moved?" (mesa cambiada)":""}`);
+    const prevTable = g.table, prevOrig = g.orig, prevLog = (g.log||[]).slice();
+    const moved = d.table!==g.table;
+    if(moved){ if(!g.orig) g.orig = g.table; logChange(g, "move", `Cambio de mesa: original Mesa ${g.orig}, nueva ubicación Mesa ${d.table}`); }
+    g.table = d.table;
+    const extra = d.n - g.persons;
+    if(extra>0 && d.n!==g.arrived) logChange(g, "extra", `Tenía ${g.persons} en invitación, se ${extra===1?"agrega 1":"agregan "+extra} a Mesa ${g.table}`);
+    setArrival(g, d.n, `${g.name} registrado en la Mesa ${g.table}${moved?" (mesa cambiada)":""}${extra>0?` (+${extra})`:""}`);
+    const u = undo; undo = ()=>{ g.table = prevTable; g.orig = prevOrig; g.log = prevLog; u(); };
     closeAll(); return;
   }
   if(e.target.closest("#undoArrival")){ setArrival(g,0,`${g.name}: llegada quitada`); closeAll(); }
@@ -1704,22 +1789,28 @@ $("guestCard").addEventListener("change", e=>{ if(e.target.id==="cardTable"){ ui
 function resolve(r, mode, table, chairs){
   const snap = JSON.stringify(S);
   let guest = reqGuest(r);
+  r.validatedWith = VALID[r.id] || r.validatedWith || "";
+  const who = `${r.reason && r.kind==="new" ? ` · motivo: ${r.reason}` : ""}${r.createdBy ? ` · solicitó ${r.createdBy}` : ""}${r.validatedWith ? ` · validado: ${r.validatedWith.replace(/^Con /,"con ")}` : ""}`;
   if(mode==="chairs"){ const t = tableOf(table); t.cap += chairs; t.extra = (t.extra||0) + chairs; }
   if(mode!=="reject"){
     if(!guest){
-      guest = {id: Math.max(0,...S.guests.map(x=>x.id))+1, uid:uuid(), name:r.name, persons:r.persons, table, arrived:0, at:null, walkIn:true, orig:table};
+      guest = {id: Math.max(0,...S.guests.map(x=>x.id))+1, uid:uuid(), name:r.name, persons:r.persons, table, arrived:0, at:null, walkIn:true, orig:table, log:[]};
+      logChange(guest, "add", `Agregado fuera de lista en Mesa ${table}${guest.persons>1?` (${guest.persons} personas)`:""}${who}`);
       S.guests.push(guest); S.guests.sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:"base"}));
     }
-    if(guest.table!==table && !guest.orig) guest.orig = guest.table;
-    guest.table = table; guest.arrived = r.persons; guest.at = Date.now();
+    if(guest.table!==table){ if(!guest.orig) guest.orig = guest.table; if(!guest.walkIn || guest.orig!==table) logChange(guest, "move", `Cambio de mesa: original Mesa ${guest.orig}, nueva ubicación Mesa ${table}`); }
+    if(mode==="chairs") logChange(guest, "chairs", `Se ${chairs===1?"agregó 1 silla":"agregaron "+chairs+" sillas"} a la Mesa ${table}`);
+    if(r.persons>guest.persons && !guest.walkIn) logChange(guest, "extra", `Tenía ${guest.persons} en invitación, se ${r.persons-guest.persons===1?"agrega 1":"agregan "+(r.persons-guest.persons)} a Mesa ${table}`);
+    guest.table = table; guest.arrived = r.persons; guest.at = Date.now(); guest.by = r.createdBy || ME();
   }
-  r.status = mode==="reject" ? "rejected" : "done"; r.mode = mode; r.resolvedAt = Date.now();
-  r.resolution = mode==="chairs" ? `Se agregaron ${plural(chairs,"silla","sillas")} a la Mesa ${table} y se registró su llegada`
+  r.status = mode==="reject" ? "rejected" : "done"; r.mode = mode; r.resolvedAt = Date.now(); r.resolvedBy = ME(); delete VALID[r.id];
+  r.resolution = mode==="approve" ? `Aprobado en la Mesa ${table} y llegada registrada`
+               : mode==="chairs" ? `Se agregaron ${plural(chairs,"silla","sillas")} a la Mesa ${table} y se registró su llegada`
                : mode==="move" ? `Reacomodado en la Mesa ${table} y llegada registrada`
                : `No procede${ui.req.note?": "+ui.req.note:""}`;
   ui.req = null; store.save(); render();
   undo = () => { S = JSON.parse(snap); store.save(); render(); };
-  showToast(mode==="reject" ? `${r.name}: solicitud marcada como no procede` : `${r.name} asignado a la Mesa ${table}`);
+  showToast(mode==="reject" ? `${r.name}: solicitud marcada como no procede` : mode==="approve" ? `${r.name} aprobado en la Mesa ${table}` : `${r.name} asignado a la Mesa ${table}`);
 }
 $("reqPending").addEventListener("click", e=>{
   const card = e.target.closest("[data-req]"); if(!card) return;
@@ -1733,8 +1824,14 @@ $("reqPending").addEventListener("click", e=>{
   const s = e.target.closest("[data-rstep]");
   if(s){ ui.req.n = Math.max(1, ui.req.n + +s.dataset.rstep); renderRequests(); return; }
   const go = e.target.closest("[data-rdo]");
-  if(go){ resolve(r, go.dataset.rdo, ui.req.table, ui.req.n); }
+  if(go){
+    if(!isAdmin()){ showToast("Solo un administrador puede liberar solicitudes.", false); return; }
+    if(!VALID[r.id]){ showToast("Elige con quién se validó antes de liberar la solicitud.", false); const s = card.querySelector("[data-rv]"); if(s) s.focus(); return; }
+    if(go.dataset.rdo==="approve") resolve(r, "approve", r.table, 0);
+    else resolve(r, go.dataset.rdo, ui.req.table, ui.req.n);
+  }
 });
+$("reqPending").addEventListener("change", e=>{ const v = e.target.closest("[data-rv]"); if(v){ VALID[v.dataset.rv] = v.value; return; } });
 $("reqPending").addEventListener("change", e=>{ const f = e.target.closest("[data-rf]"); if(f && f.dataset.rf==="table"){ ui.req.table = +f.value; ui.req.n = 1; renderRequests(); } });
 $("reqPending").addEventListener("input", e=>{ const f = e.target.closest("[data-rf]"); if(f && f.dataset.rf==="note") ui.req.note = f.value; });
 
@@ -1764,7 +1861,7 @@ $("saveSettings").onclick = ()=>{
 $("resetBtn").onclick = ()=>{
   if(!confirm("¿Quitar todas las llegadas y solicitudes registradas? La lista de invitados se conserva.")) return;
   const snap = JSON.stringify(S);
-  S.guests.forEach(g=>{g.arrived=0;g.at=null;}); S.requests = []; store.save(); render(); closeAll();
+  S.guests.forEach(g=>{ g.arrived=0; g.at=null; g.by=""; g.log=(g.log||[]).filter(x=>x.k!=="extra"); }); S.requests = []; store.save(); render(); closeAll();
   undo = ()=>{ S = JSON.parse(snap); store.save(); render(); };
   showToast("Llegadas reiniciadas");
 };
@@ -1806,47 +1903,49 @@ $("fileIn").onchange = async e=>{
 };
 $("exportBtn").onclick = ()=>{
   const lab = {pending:"Pendiente",partial:"Parcial",arrived:"Llegó",review:"En revisión"};
-  const rows = [["ID","Nombre","Personas","Mesa","Llegaron","Estado","Hora de llegada"]].concat(
-    S.guests.map(g=>[g.id,g.name,g.persons,"Mesa "+g.table,g.arrived,lab[status(g)],g.at?fmtTime(g.at):""]));
+  const rows = [["ID","Nombre","Personas","Mesa","Llegaron","Estado","Hora de llegada","Registró","Cambios"]].concat(
+    S.guests.slice().sort(byName).map(g=>{ const c = chgInfo(g); return [g.id,g.name,g.persons,g.table?"Mesa "+g.table:"Sin mesa",g.arrived,c.walk?"Agregado":lab[status(g)],g.at?fmtTime(g.at):"",g.by||"",c.any?chgNotes(g).join(" · ")+(chgBy(g)?" · por "+chgBy(g):""):""]; }));
   if(S.requests.length){
-    rows.push([]); rows.push(["Solicitudes","Nombre","Personas","Mesa pedida","Estado","Resolución","Hora"]);
-    S.requests.forEach(r=>rows.push(["",r.name,r.persons,r.table?"Mesa "+r.table:"Sin mesa",r.status==="pending"?"Pendiente":r.status==="rejected"?"No procede":"Resuelta",r.resolution||"",fmtTime(r.at)]));
+    rows.push([]); rows.push(["Solicitudes","Nombre","Personas","Mesa pedida","Estado","Resolución","Hora","Solicitó","Liberó","Motivo","Validado con"]);
+    S.requests.forEach(r=>rows.push(["",r.name,r.persons,r.table?"Mesa "+r.table:"Sin mesa",r.status==="pending"?"Pendiente":r.status==="rejected"?"No procede":"Resuelta",r.resolution||"",fmtTime(r.at),r.createdBy||"",r.resolvedBy||"",r.reason||"",r.validatedWith||""]));
   }
   const csv = "\ufeff"+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));
-  a.download = `Reporte ${S.event.name}.csv`; a.click(); URL.revokeObjectURL(a.href);
+  a.download = `Lista ${S.event.name}.csv`; a.click(); URL.revokeObjectURL(a.href);
+  showToast("Lista descargada", false);
 };
+$("repCsv").onclick = ()=>$("exportBtn").click();
 
 /* ---------- Agregar invitado ---------- */
 function updateAdd(){
   const p = Math.max(1,+$("aPers").value||1), t = +$("aTable").value;
   const ok = fits(t, p, null);
   const free = t ? Math.max(0, freeAt(t, null)) : 0;
-  $("aWarn").innerHTML = ok ? "" : `<div class="alert">${ic("alert")}<span>${t ? `La Mesa ${t} ${free===0?"está llena":`solo tiene ${plural(free,"lugar libre","lugares libres")}`}.` : "No tiene mesa asignada."} Se enviará a solicitudes para que el coordinador lo resuelva sin detener la fila.</span></div>`;
+  $("aWarn").innerHTML = ok ? `<div class="info">${ic("inbox")}<span>La Mesa ${t} tiene lugar. Pídele al invitado esperar un momento mientras un administrador aprueba la solicitud.</span></div>`
+    : `<div class="alert">${ic("alert")}<span>${t ? `La Mesa ${t} ${free===0?"está llena":`solo tiene ${plural(free,"lugar libre","lugares libres")}`}.` : "Sin mesa sugerida."} El administrador decidirá dónde ubicarlo al aprobar.</span></div>`;
   const b = $("saveAdd");
-  b.className = "btn " + (ok ? "primary" : "request");
-  b.innerHTML = ok ? `${ic("userCheck")}Agregar y registrar llegada` : `${ic("send")}Enviar a solicitudes`;
+  b.className = "btn request";
+  b.innerHTML = `${ic("send")}Enviar a solicitudes`;
 }
 $("addGuest").onclick = ()=>{
   $("aName").value = ui.q; $("aPers").value = 1;
+  $("aReason").innerHTML = `<option value="">Elige un motivo…</option>` + REASONS.map(x=>`<option>${esc(x)}</option>`).join("");
   $("aTable").innerHTML = `<option value="0">Sin mesa (enviar a revisión)</option>` + tableStats().map(t=>`<option value="${t.num}">Mesa ${t.num} · ${t.free<=0?"llena":plural(t.free,"libre","libres")}</option>`).join("");
   const best = tableStats().filter(t=>t.free>0).sort((a,b)=>b.free-a.free)[0];
   $("aTable").value = best ? best.num : 0;
   updateAdd(); $("addOverlay").classList.add("open"); setTimeout(()=>$("aName").focus(),30);
 };
-$("aPers").addEventListener("input", updateAdd);
+$("aPers").addEventListener("change", updateAdd);
 $("aTable").addEventListener("change", updateAdd);
 $("saveAdd").onclick = ()=>{
   const name = $("aName").value.trim(); if(!name){ $("aName").focus(); return; }
   const p = Math.max(1,+$("aPers").value||1), t = +$("aTable").value;
   ui.q=""; $("q").value=""; $("searchBox").classList.remove("has-text");
-  if(!fits(t, p, null)){ createRequest({kind:"new", name, persons:p, table:t||0}); closeAll(); return; }
-  const g = {id: Math.max(0,...S.guests.map(x=>x.id))+1, uid:uuid(), name, persons:p, table:t, arrived:p, at:Date.now(), walkIn:true, orig:t};
-  S.guests.push(g); S.guests.sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:"base"}));
-  store.save(); render(); closeAll();
-  undo = ()=>{ S.guests = S.guests.filter(x=>x!==g); store.save(); render(); };
-  showToast(`${name} agregado en la Mesa ${t}`);
+  const reason = $("aReason").value;
+  if(!reason){ $("aWarn").innerHTML = `<div class="alert">${ic("alert")}<span>Elige el motivo por el que se agrega al invitado.</span></div>`; $("aReason").focus(); return; }
+  createRequest({kind:"new", name, persons:p, table:t||0, reason});
+  closeAll();
 };
 
 /* ---------- Navegación, búsqueda y filtros ---------- */
@@ -2270,13 +2369,14 @@ function reportData(){
     pts.forEach(p=>{ slots[Math.min(slots.length-1, Math.floor((p.t-start)/ms))].n += p.n; });
     peak = slots.reduce((m,s)=>s.n>m.n?s:m, slots[0]);
   }
-  const ts = S.tables.map(t=>{ const arr = S.guests.reduce((a,g)=>a+(g.table===t.num?g.arrived:0),0); return {num:t.num, cap:t.cap, base:t.cap-(t.extra||0), extra:t.extra||0, arr}; });
+  const ts = S.tables.map(t=>{ const arr = S.guests.reduce((a,g)=>a+(g.table===t.num?g.arrived:0),0); return {num:t.num, cap:t.cap, base:t.cap-(t.extra||0), extra:t.extra||0, arr, blue:blueSeats(t.num)}; });
   return {
     invited, came, missed:Math.max(0, invited-came), pct: invited ? Math.round(came/invited*100) : 0,
     first: pts.length ? pts[0].t : null, last: pts.length ? pts[pts.length-1].t : null, slots, peak,
     full: reg.filter(g=>g.arrived>=g.persons).length, partial: reg.filter(g=>g.arrived>0 && g.arrived<g.persons).length, none: reg.filter(g=>g.arrived===0).length, invCount: reg.length,
     walk, walkPersons: walk.reduce((a,g)=>a+g.persons,0),
     moves: S.guests.filter(g=>g.orig && g.table && g.orig!==g.table),
+    plus: S.guests.filter(g=>!g.walkIn && g.arrived>g.persons),
     extras: ts.filter(t=>t.extra>0), rejected: S.requests.filter(r=>r.status==="rejected"),
     tables: ts, libres: ts.reduce((a,t)=>a+Math.max(0,t.cap-t.arr),0),
     complete: ts.filter(t=>t.cap>0 && t.arr>=t.cap).map(t=>t.num),
@@ -2320,9 +2420,10 @@ function buildReport(key){
     <div style="display:flex;height:16px;border-radius:8px;overflow:hidden;background:#E6E3DC"><i style="width:${D.full/D.invCount*100}%;background:${P.dark}"></i><i style="width:${D.partial/D.invCount*100}%;background:${P.accent}"></i></div>
     <div style="display:flex;gap:18px" class="rp-mu"><span><b style="color:${P.dark};font-weight:500">${D.full}</b> completas</span><span><b style="color:${P.accentText};font-weight:500">${D.partial}</b> parciales</span><span><b style="color:#5F5E5A;font-weight:500">${D.none}</b> no llegaron</span></div>` : "";
   let obs = "";
-  if(D.walk.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Fuera de lista (${plural(D.walkPersons,"persona","personas")})</b>${D.walk.slice(0,6).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}${g.persons>1?` (${g.persons})`:""} → Mesa ${g.table||"—"}</div>`).join("")}${D.walk.length>6?`<div class="rp-mu">y ${D.walk.length-6} más (ver lista)</div>`:""}</div>`;
-  if(D.moves.length || D.extras.length) obs += `<div class="rp-obs"><b>${ri("move",P.accentText)}Cambios de mesa</b>${D.moves.slice(0,5).map(g=>`<div>${ri("move",P.accentText)}${esc(g.name)}: Mesa ${g.orig} → Mesa ${g.table}</div>`).join("")}${D.moves.length>5?`<div class="rp-mu">y ${D.moves.length-5} cambios más</div>`:""}${D.extras.map(t=>`<div>${ri("chair",P.accentText)}Mesa ${t.num}: se ${t.extra===1?"agregó 1 silla":`agregaron ${t.extra} sillas`}</div>`).join("")}</div>`;
-  if(D.rejected.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Solicitudes que no procedieron</b>${D.rejected.slice(0,4).map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)}${r.resolution&&r.resolution!=="No procede"?` · ${esc(r.resolution.replace(/^No procede:\s*/,""))}`:""}</div>`).join("")}</div>`;
+  if(D.walk.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Fuera de lista (${plural(D.walkPersons,"persona","personas")})</b>${D.walk.slice(0,6).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}${g.persons>1?` (${g.persons})`:""} → Mesa ${g.table||"—"}${(()=>{ const rq = S.requests.find(r=>r.kind==="new" && r.status==="done" && r.name===g.name); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· aprobó ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${D.walk.length>6?`<div class="rp-mu">y ${D.walk.length-6} más (ver lista)</div>`:""}</div>`;
+  if(D.moves.length || D.extras.length) obs += `<div class="rp-obs"><b>${ri("move",P.accentText)}Cambios de mesa</b>${D.moves.slice(0,5).map(g=>`<div>${ri("move",P.accentText)}${esc(g.name)}: Mesa ${g.orig} → Mesa ${g.table}${chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""}</div>`).join("")}${D.moves.length>5?`<div class="rp-mu">y ${D.moves.length-5} cambios más</div>`:""}${D.extras.map(t=>`<div>${ri("chair",P.accentText)}Mesa ${t.num}: se ${t.extra===1?"agregó 1 silla":`agregaron ${t.extra} sillas`}</div>`).join("")}</div>`;
+  if(D.plus.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Personas adicionales a la invitación</b>${D.plus.slice(0,5).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}: tenía ${g.persons}, llegaron ${g.arrived} (+${g.arrived-g.persons}) · Mesa ${g.table}${chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""}</div>`).join("")}${D.plus.length>5?`<div class="rp-mu">y ${D.plus.length-5} más (ver lista)</div>`:""}</div>`;
+  if(D.rejected.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Solicitudes que no procedieron</b>${D.rejected.slice(0,4).map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)}${r.resolution&&r.resolution!=="No procede"?` · ${esc(r.resolution.replace(/^No procede:\s*/,""))}`:""}${r.resolvedBy?` <span class="rp-mu">· rechazó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}</div>`;
   if(!obs) obs = `<div class="rp-obs" style="display:flex;flex-direction:row;align-items:center;gap:8px">${ri("check",P.dark)}Sin observaciones: todo salió según lo planeado.</div>`;
   const barTotal = Math.max(1, D.invited);
   pages.push(`<div class="rp-page" style="${vars}">
@@ -2361,9 +2462,9 @@ function buildReport(key){
       const cells = chunk.map(t=>{
         const p = t.cap ? t.arr/t.cap : 0;
         const st = p>=.9 ? [P.dark,P.okBg,P.okTx] : p>=.7 ? [P.mid,P.midBg,P.midTx] : [P.accent,P.lowBg,P.lowTx];
-        const n = Math.max(1, Math.min(t.cap, 30)); let s = "";
-        for(let k=0;k<n;k++){ const an = k/n*2*Math.PI-Math.PI/2, x = 50+44*Math.cos(an), y = 50+44*Math.sin(an), on = k<t.arr, ex = k>=t.base;
-          s += `<span class="rp-seat${ex?" ex":""}" style="width:${seat}px;height:${seat}px;margin:-${seat/2}px 0 0 -${seat/2}px;left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;${ex?`border-color:${P.accentText};`:""}${on?`background:${st[0]};border-color:${st[0]};border-style:solid`:""}"></span>`; }
+        const n = Math.max(1, Math.min(t.cap, 30)), onN = Math.min(n, t.arr), bl = Math.min(onN, t.blue); let s = "";
+        for(let k=0;k<n;k++){ const an = k/n*2*Math.PI-Math.PI/2, x = 50+44*Math.cos(an), y = 50+44*Math.sin(an), on = k<onN, ex = k>=t.base, blue = on && k>=onN-bl, c = blue ? "#4A7FC1" : st[0];
+          s += `<span class="rp-seat${ex?" ex":""}" style="width:${seat}px;height:${seat}px;margin:-${seat/2}px 0 0 -${seat/2}px;left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;${ex?`border-color:${P.accentText};`:""}${on?`background:${c};border-color:${c};border-style:solid`:""}"></span>`; }
         return `<div class="rp-tbl"><div class="rp-plate" style="width:${size}px;height:${size}px">${s}<div class="rp-disc" style="background:${st[1]};border-color:${st[0]};color:${st[2]}"><em>Mesa</em><b style="font-size:${size>120?34:28}px">${t.num}</b></div></div><span style="color:${st[2]};font-size:13.5px">${t.arr} de ${t.cap}${t.extra?` · +${t.extra} ${t.extra===1?"silla":"sillas"}`:""}</span></div>`;
       }).join("");
       pages.push(`<div class="rp-page" style="${vars}"><div class="rp-band"></div><div class="rp-inner">
@@ -2375,6 +2476,7 @@ function buildReport(key){
           <span class="rp-lg"><i style="border-color:${P.mid};background:${P.midBg}"></i>70–89%</span>
           <span class="rp-lg"><i style="border-color:${P.accent};background:${P.lowBg}"></i>menos de 70%</span>
           <span class="rp-lg"><i style="border-color:${P.accentText};border-style:dashed;background:#FFF"></i>silla extra</span>
+          <span class="rp-lg"><i style="border-color:#4A7FC1;background:#4A7FC1"></i>cambio o agregado</span>
         </div>
       </div>${foot()}</div>`);
     }
@@ -2384,19 +2486,23 @@ function buildReport(key){
   const lab = {ok:"Llegó", part:"Parcial", no:"No asistió", add:"Agregado"};
   const pill = {ok:[P.okBg,P.okTx], part:["#F7ECD3","#7A5A10"], no:["#F4C9C2","#8A2F25"], add:["#F3EAD6","#7A5A2E"]};
   const stOf = g => g.walkIn ? "add" : g.arrived===0 ? "no" : g.arrived<g.persons ? "part" : "ok";
-  const PER = 22;
-  for(let i=0;i<D.list.length || i===0;i+=PER){
-    const rows = D.list.slice(i,i+PER), more = i+PER < D.list.length;
+  const BUDGET = 790, ROW = 33, ROWN = 52;
+  const chunks2 = []; let cur = [], used = 0;
+  D.list.forEach(g=>{ const hgt = chgInfo(g).any ? ROWN : ROW; if(used + hgt > BUDGET && cur.length){ chunks2.push(cur); cur = []; used = 0; } cur.push(g); used += hgt; });
+  if(cur.length || !chunks2.length) chunks2.push(cur);
+  chunks2.forEach((rows, ci)=>{
+    const more = ci < chunks2.length-1;
     pages.push(`<div class="rp-page" style="${vars}"><div class="rp-band"></div><div class="rp-inner">
       <div class="rp-hd"><span class="rp-sv" style="font-size:32px">Lista de invitados</span>${headRight}</div>
-      <table class="rp-tb"><tr><th style="width:17%">Estatus</th><th>Nombre</th><th style="width:9%">Mesa</th><th style="width:11%">Invitados</th><th style="width:10%">Asistió</th><th style="width:10%">Hora</th></tr>
-      ${rows.map((g,j)=>{ const s = stOf(g); return `<tr class="${s==="no"?"no":j%2?"z":""}"><td><span class="rp-pill" style="background:${pill[s][0]};color:${pill[s][1]}">${lab[s]}</span></td><td>${esc(g.name)}</td><td>${g.table||"—"}</td><td>${g.persons}</td><td>${g.arrived}</td><td>${g.at?hhmm(g.at):"—"}</td></tr>`; }).join("")}
+      <table class="rp-tb"><tr><th style="width:15%">Estatus</th><th>Nombre</th><th style="width:7%">Mesa</th><th style="width:9%">Invitados</th><th style="width:8%">Asistió</th><th style="width:9%">Hora</th><th style="width:13%">Registró</th></tr>
+      ${rows.map((g,j)=>{ const s = stOf(g), c = chgInfo(g), nt = c.any ? chgNotes(g).join(" · ") : "";
+        const cls = s==="no" ? "no" : c.any ? "chg" : j%2 ? "z" : "";
+        return `<tr class="${cls}"><td><span class="rp-pill" style="background:${pill[s][0]};color:${pill[s][1]}">${lab[s]}</span></td><td style="white-space:normal">${esc(g.name)}${nt?`<div style="font-size:11.5px;color:#2B5591;line-height:1.3;margin-top:2px">${esc(nt)}</div>`:""}</td><td>${g.table||"—"}</td><td>${g.persons}</td><td>${g.arrived}</td><td>${g.at?hhmm(g.at):"—"}</td><td>${esc(g.by||"—")}</td></tr>`; }).join("")}
       </table>
       ${more?`<div class="rp-mu" style="text-align:right;font-size:13px;font-style:italic">Continúa en la siguiente hoja…</div>`:""}
       ${!D.list.length?`<div class="rp-mu" style="text-align:center;padding:30px">Este evento aún no tiene invitados.</div>`:""}
     </div>${foot()}</div>`);
-    if(!D.list.length) break;
-  }
+  });
   return pages.map((pg,i)=>pg.replace("{{P}}", `${i+1} de ${pages.length}`));
 }
 

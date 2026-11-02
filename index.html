@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Recepción de invitados · Mariana Gómez Wedding Planner</title>
+<title>AUX Events · Recepción de invitados</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -131,7 +131,7 @@ svg.i{width:1.15em;height:1.15em;flex:none;vertical-align:-.2em}
 .band .sprig.l{left:30%;bottom:-48px;width:150px;opacity:.28}
 .band .sprig.r{right:-46px;bottom:-46px;width:160px;opacity:.4;transform:scale(-1,-1)}
 .brand{position:relative;display:flex;align-items:center;gap:12px;z-index:1}
-.mono{width:46px;height:46px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:18px;color:var(--gold);letter-spacing:.04em}
+.mono{width:46px;height:46px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:15px;color:var(--gold);letter-spacing:.04em}
 .brand b{display:block;font-family:var(--serif);font-weight:700;font-size:clamp(18px,1.9vw,23px);letter-spacing:.08em;line-height:1}
 .brand span{display:block;font-family:var(--script);font-size:21px;color:var(--gold);line-height:1.1;margin-top:2px}
 .event{position:relative;text-align:center;z-index:1}
@@ -416,7 +416,7 @@ body[data-screen="event"] #eventApp{display:block}
 .login-art .sprig{width:min(340px,48%);opacity:.5}
 .login-art .sprig.l{left:-30px;top:-20px}
 .login-art .sprig.r{right:-30px;bottom:-24px;transform:scale(-1,-1)}
-.big-mono{position:relative;width:118px;height:118px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:42px;color:var(--gold);letter-spacing:.04em;box-shadow:inset 0 0 0 6px color-mix(in srgb,var(--band) 60%, transparent),inset 0 0 0 7px color-mix(in srgb,var(--gold) 45%, transparent)}
+.big-mono{position:relative;width:118px;height:118px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:34px;color:var(--gold);letter-spacing:.04em;box-shadow:inset 0 0 0 6px color-mix(in srgb,var(--band) 60%, transparent),inset 0 0 0 7px color-mix(in srgb,var(--gold) 45%, transparent)}
 .login-art h1{position:relative;margin:26px 0 0;font-family:var(--serif);font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:.1em;line-height:1;color:var(--band-title)}
 .login-art .script{position:relative;font-family:var(--script);font-size:clamp(30px,3vw,40px);color:var(--gold);line-height:1.1;margin-top:6px}
 .login-art .rule{position:relative;width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:26px auto}
@@ -502,6 +502,47 @@ body[data-screen="event"] #eventApp{display:block}
   .ev-tools .btn.dark{flex:1 1 100%}
 }
 
+
+/* ---------- PIN ---------- */
+.pin-dots{display:flex;justify-content:center;gap:18px;padding:16px 0 6px;cursor:text}
+.pin-dots i{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);background:var(--surface);transition:background .15s,border-color .15s,transform .15s}
+.pin-dots i.on{background:var(--primary);border-color:var(--primary);transform:scale(1.08)}
+.pin-dots.err i{border-color:var(--bad);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.pin-input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.pin-focus .pin-dots i:not(.on){border-color:color-mix(in srgb,var(--primary) 55%, var(--line))}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+.keypad button{height:62px;border-radius:16px;border:1px solid var(--line);background:var(--surface);font-family:var(--serif);font-weight:600;font-size:28px;color:var(--ink);transition:background .15s,transform .1s}
+.keypad button:hover{background:var(--surface-2)}
+.keypad button:active{transform:scale(.95)}
+.keypad button[data-k="del"]{font-family:var(--sans);font-size:22px;color:var(--muted)}
+.keypad .go{background:var(--primary);border-color:var(--primary);color:var(--on-primary);font-size:26px}
+.keypad .go:hover{background:var(--primary);filter:brightness(1.08)}
+.login-help{margin:16px 0 0;text-align:center;color:var(--muted);font-size:13.5px}
+/* ---------- Roles ---------- */
+body[data-role="hostess"] .admin-only{display:none !important}
+.role-pill{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;padding:3px 10px;border-radius:999px;font-weight:500}
+.role-pill.admin{background:var(--gold-soft);color:var(--gold)}
+.role-pill.hostess{background:var(--primary-soft);color:var(--primary-ink)}
+/* ---------- Usuarios ---------- */
+.users{border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:4px}
+.urow{display:grid;grid-template-columns:42px minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.urow:last-child{border-bottom:0}
+.urow .avatar{width:40px;height:40px}
+.urow b{display:block;font-weight:500;font-size:16px}
+.urow small{color:var(--muted);font-size:13px}
+.urow .st{font-size:12.5px;color:var(--muted);text-align:right}
+.urow .st.off{color:var(--bad-ink)}
+.urow .btn{height:40px;padding:0 12px;font-size:14px;flex:none}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;height:48px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font-size:14.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.15}
+.seg button small{font-size:11.5px;color:var(--muted)}
+.seg button[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.pin-field{display:flex;gap:8px}
+.pin-field input{flex:1;letter-spacing:.5em;font-size:20px;text-align:center;font-variant-numeric:tabular-nums}
+.pin-field .btn{flex:none;height:44px;padding:0 14px;font-size:14px}
+@media (max-width:640px){ .urow{grid-template-columns:38px minmax(0,1fr) auto} .urow .st{display:none} }
+
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -576,25 +617,31 @@ body[data-screen="event"] #eventApp{display:block}
   <div class="login-art">
     <svg class="sprig l" aria-hidden="true"><use href="#sprig"/></svg>
     <svg class="sprig r" aria-hidden="true"><use href="#sprig"/></svg>
-    <div class="big-mono" id="lMono">MG</div>
-    <h1 id="lName">MARIANA GÓMEZ</h1>
-    <div class="script" id="lSub">Wedding Planner</div>
+    <div class="big-mono" id="lMono">AUX</div>
+    <h1 id="lName">AUX EVENTS</h1>
+    <div class="script" id="lSub">Recepción de invitados</div>
     <div class="rule"></div>
     <p class="motto">Cada invitado, recibido con su nombre y llevado a su lugar.</p>
   </div>
   <div class="login-pane">
-    <form class="login-card" id="loginForm" novalidate>
+    <form class="login-card" id="loginForm" novalidate autocomplete="off">
       <h2>Inicia sesión</h2>
-      <p>Entra para abrir tus eventos y empezar la recepción.</p>
-      <label class="lfield"><span>Correo</span>
-        <span class="box"><i data-icon="mail"></i><input id="lEmail" type="email" autocomplete="username" placeholder="tu@correo.com" required></span></label>
-      <label class="lfield"><span>Contraseña</span>
-        <span class="box"><i data-icon="lock"></i><input id="lPass" type="password" autocomplete="current-password" placeholder="Tu contraseña" required>
-        <button type="button" class="eye" id="lEye" aria-label="Mostrar contraseña"><i data-icon="eye"></i></button></span></label>
+      <p>Escribe tu usuario y tu PIN de 4 números.</p>
+      <label class="lfield"><span>Usuario</span>
+        <span class="box"><i data-icon="user"></i><input id="lUser" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Ej. andrea"></span></label>
+      <div class="lfield"><span id="pinLbl">PIN</span>
+        <div class="pin-dots" id="pinDots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <input id="lPin" class="pin-input" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="current-password" aria-labelledby="pinLbl">
+      </div>
       <div class="login-err" id="lErr" role="alert"></div>
-      <button class="btn dark" type="submit" id="lSubmit"><i data-icon="lock"></i>Entrar</button>
-      <button type="button" class="link-btn" id="lForgot">¿Olvidaste tu contraseña?</button>
-      <div class="demo-note" id="lDemo" hidden><i data-icon="sparkle"></i><span>Versión de prueba: los datos se guardan solo en este dispositivo y aún no hay cuentas reales. Entra con cualquier correo y una contraseña de 6 caracteres o más.</span></div>
+      <div class="keypad" id="keypad">
+        <button type="button" data-k="1">1</button><button type="button" data-k="2">2</button><button type="button" data-k="3">3</button>
+        <button type="button" data-k="4">4</button><button type="button" data-k="5">5</button><button type="button" data-k="6">6</button>
+        <button type="button" data-k="7">7</button><button type="button" data-k="8">8</button><button type="button" data-k="9">9</button>
+        <button type="button" data-k="del" aria-label="Borrar">←</button><button type="button" data-k="0">0</button>
+        <button type="submit" class="go" id="lSubmit" aria-label="Entrar"><i data-icon="check"></i></button>
+      </div>
+      <p class="login-help">¿Olvidaste tu PIN? Pídele al administrador que te asigne uno nuevo.</p>
     </form>
   </div>
 </section>
@@ -605,12 +652,13 @@ body[data-screen="event"] #eventApp{display:block}
     <svg class="sprig l" aria-hidden="true"><use href="#sprig"/></svg>
     <svg class="sprig r" aria-hidden="true"><use href="#sprig"/></svg>
     <div class="brand">
-      <div class="mono" id="eMono">MG</div>
-      <div><b id="eName">MARIANA GÓMEZ</b><span id="eSub">Wedding Planner</span></div>
+      <div class="mono" id="eMono">AUX</div>
+      <div><b id="eName">AUX EVENTS</b><span id="eSub">Recepción de invitados</span></div>
     </div>
     <div class="event"><h1>Mis eventos</h1><div class="meta"><span id="eCount"></span></div></div>
     <div class="band-right">
-      <div class="who-chip"><span>Sesión iniciada</span><b id="eUser"></b></div>
+      <div class="who-chip"><span id="eRole">Sesión iniciada</span><b id="eUser"></b></div>
+      <button class="icon-btn admin-only" id="usersBtn" aria-label="Usuarios"><i data-icon="users"></i><span class="lbl">Usuarios</span></button>
       <button class="icon-btn" id="logoutBtn" aria-label="Cerrar sesión"><i data-icon="logout"></i><span class="lbl">Salir</span></button>
     </div>
   </header>
@@ -625,7 +673,7 @@ body[data-screen="event"] #eventApp{display:block}
       <button class="chip" data-evf="past" aria-pressed="false">Pasados <span class="ct" id="evcPast"></span></button>
       <button class="chip" data-evf="all" aria-pressed="false">Todos <span class="ct" id="evcAll"></span></button>
       <span class="spacer" style="flex:1"></span>
-      <button class="btn dark" id="newEventBtn"><i data-icon="plus"></i>Nuevo evento</button>
+      <button class="btn dark admin-only" id="newEventBtn"><i data-icon="plus"></i>Nuevo evento</button>
     </div>
     <div class="ev-grid" id="evGrid"></div>
   </div>
@@ -638,7 +686,7 @@ body[data-screen="event"] #eventApp{display:block}
   <svg class="sprig r" aria-hidden="true"><use href="#sprig"/></svg>
   <div class="brand">
     <div class="mono" id="plannerMono">MG</div>
-    <div><b id="plannerName">MARIANA GÓMEZ</b><span id="plannerSub">Wedding Planner</span></div>
+    <div><b id="plannerName">AUX EVENTS</b><span id="plannerSub">Recepción de invitados</span></div>
   </div>
   <div class="event">
     <h1 id="eventName">Boda Ana &amp; Luis</h1>
@@ -647,7 +695,7 @@ body[data-screen="event"] #eventApp{display:block}
   <div class="band-right">
     <div class="clock"><b id="clock"></b><small id="syncState">Conectando…</small></div>
     <button class="icon-btn" id="toEvents" aria-label="Volver a mis eventos"><i data-icon="grid"></i><span class="lbl">Eventos</span></button>
-    <button class="icon-btn" id="openThemes" aria-label="Cambiar diseño"><i data-icon="palette"></i><span class="lbl">Diseño</span></button>
+    <button class="icon-btn admin-only" id="openThemes" aria-label="Cambiar diseño"><i data-icon="palette"></i><span class="lbl">Diseño</span></button>
     <button class="icon-btn" id="openSettings" aria-label="Ajustes del evento"><i data-icon="sliders"></i><span class="lbl">Evento</span></button>
   </div>
 </header>
@@ -739,8 +787,8 @@ body[data-screen="event"] #eventApp{display:block}
 <div class="overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="setTitle">
   <div class="card sheet">
     <div class="sh"><span class="hi"><i data-icon="sliders"></i></span><h3 id="setTitle">Datos del evento</h3></div>
-    <p>Estos datos aparecen en el encabezado durante la recepción.</p>
-    <div class="form">
+    <p class="admin-only">Estos datos aparecen en el encabezado durante la recepción.</p>
+    <div class="form admin-only">
       <label>Planner<input id="fPlanner"></label>
       <label>Subtítulo<input id="fSub"></label>
       <label class="wide">Tipo de evento<select id="fType"></select></label>
@@ -748,14 +796,14 @@ body[data-screen="event"] #eventApp{display:block}
       <label>Fecha<input id="fDate" type="date"></label>
       <label>Hora<input id="fTime" type="time"></label>
     </div>
-    <div class="actions"><button class="btn" data-close>Cancelar</button><button class="btn dark" id="saveSettings"><i data-icon="check"></i>Guardar datos</button></div>
+    <div class="actions admin-only"><button class="btn" data-close>Cancelar</button><button class="btn dark" id="saveSettings"><i data-icon="check"></i>Guardar datos</button></div>
     <div class="tools">
-      <button class="btn" id="importBtn"><i data-icon="upload"></i>Importar lista de Excel</button>
+      <button class="btn admin-only" id="importBtn"><i data-icon="upload"></i>Importar lista de Excel</button>
       <button class="btn" id="exportBtn"><i data-icon="download"></i>Descargar reporte</button>
-      <button class="btn danger" id="resetBtn"><i data-icon="undo"></i>Reiniciar llegadas</button>
-      <button class="btn" id="demoBtn"><i data-icon="sparkle"></i>Cargar lista de ejemplo</button>
+      <button class="btn danger admin-only" id="resetBtn"><i data-icon="undo"></i>Reiniciar llegadas</button>
+      <button class="btn admin-only" id="demoBtn"><i data-icon="sparkle"></i>Cargar lista de ejemplo</button>
     </div>
-    <p class="hint">Usa la plantilla de Excel: columnas <b>Nombre</b>, <b>Personas</b> y <b>Mesa</b>, y la hoja <b>Mesas</b> con su <b>Capacidad</b>.</p>
+    <p class="hint admin-only">Usa la plantilla de Excel: columnas <b>Nombre</b>, <b>Personas</b> y <b>Mesa</b>, y la hoja <b>Mesas</b> con su <b>Capacidad</b>.</p>
     <input type="file" id="fileIn" accept=".xlsx,.xls,.csv" hidden>
   </div>
 </div>
@@ -815,13 +863,37 @@ body[data-screen="event"] #eventApp{display:block}
   </div>
 </div>
 
-<div class="overlay" id="pwOverlay" role="dialog" aria-modal="true" aria-labelledby="pwTitle">
+<div class="overlay" id="usersOverlay" role="dialog" aria-modal="true" aria-labelledby="usersTitle">
+  <div class="card wide sheet">
+    <div class="sh"><span class="hi"><i data-icon="users"></i></span><h3 id="usersTitle">Usuarios</h3></div>
+    <p>Los <b>administradores</b> crean, duplican y borran eventos y manejan usuarios. Las <b>hostess</b> abren los eventos y hacen la recepción.</p>
+    <div id="userList"></div>
+    <div class="actions"><button class="btn" data-close>Cerrar</button><button class="btn dark" id="newUserBtn"><i data-icon="userPlus"></i>Nuevo usuario</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="userFormOverlay" data-stack role="dialog" aria-modal="true" aria-labelledby="ufTitle">
   <div class="card sheet">
-    <div class="sh"><span class="hi"><i data-icon="lock"></i></span><h3 id="pwTitle">Nueva contraseña</h3></div>
-    <p>Escribe tu nueva contraseña para entrar a la recepción.</p>
-    <div class="form"><label class="wide">Nueva contraseña<input id="pwNew" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres"></label></div>
-    <div id="pwErr"></div>
-    <div class="actions"><button class="btn dark" id="pwSave"><i data-icon="check"></i>Guardar contraseña</button></div>
+    <div class="sh"><span class="hi"><i data-icon="userPlus"></i></span><h3 id="ufTitle">Nuevo usuario</h3></div>
+    <p id="ufHint">Comparte el usuario y el PIN con la persona para que pueda entrar.</p>
+    <div class="form">
+      <label class="wide">Nombre<input id="ufName" placeholder="Ej. Andrea López"></label>
+      <label class="wide">Usuario (para iniciar sesión)<input id="ufUser" autocapitalize="none" spellcheck="false" placeholder="Ej. andrea"></label>
+      <div class="wide lbl-t">Perfil</div>
+      <div class="wide seg" id="ufRole">
+        <button type="button" data-role="hostess">Hostess<small>Recepción en eventos</small></button>
+        <button type="button" data-role="admin">Administrador<small>Acceso a todo</small></button>
+      </div>
+      <label class="wide"><span id="ufPinLbl">PIN de 4 números</span>
+        <span class="pin-field"><input id="ufPin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="••••"><button type="button" class="btn" id="ufGen"><i data-icon="sparkle"></i>Generar</button></span></label>
+      <label class="wide opt" id="ufActiveWrap"><input type="checkbox" id="ufActive" checked>Usuario activo (puede iniciar sesión)</label>
+    </div>
+    <div id="ufErr"></div>
+    <div class="actions">
+      <button class="btn danger" id="ufDelete"><i data-icon="trash"></i>Borrar</button>
+      <button class="btn" id="ufCancel">Cancelar</button>
+      <button class="btn dark" id="ufSave"><i data-icon="check"></i>Guardar</button>
+    </div>
   </div>
 </div>
 
@@ -862,6 +934,8 @@ const ICONS = {
   lock:'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
   eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
   eyeOff:'<path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.2M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.8 9.8 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
   sparkle:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>'
 };
 const ic = (n, sw=1.8) => `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
@@ -915,7 +989,7 @@ function demoState(theme){
     }
   });
   return {
-    event:{planner:"Mariana Gómez",sub:"Wedding Planner",name:"Boda Ana & Luis",date:"2026-10-31",time:"18:30",theme:theme||"olivo"},
+    event:{planner:"AUX Events",sub:"Recepción de invitados",name:"Boda Ana & Luis",date:"2026-10-31",time:"18:30",theme:theme||"olivo"},
     tables: CAPS.map((c,i)=>({num:i+1,cap:c,extra:0})),
     guests: finalize(guests),
     requests: []
@@ -966,13 +1040,15 @@ const TBL = {tables:"event_tables", guests:"guests", requests:"requests"};
 const ROW = {tables:rowTable, guests:rowGuest, requests:rowRequest};
 function rowsOf(id, s){ return {tables:s.tables.map(t=>rowTable(id,t)), guests:s.guests.map(g=>rowGuest(id,g)), requests:s.requests.map(r=>rowRequest(id,r))}; }
 
-class NoAccess extends Error {}
-async function assertTeam(user){
-  const tm = await must(sb.from("team_members").select("role").eq("user_id", user.id).maybeSingle());
-  if(!tm){ await sb.auth.signOut(); throw new NoAccess("Tu usuario existe pero todavía no tiene acceso a los eventos. Pide que te agreguen al equipo."); }
-  return {email:user.email, role:tm.role};
+async function ensureAnon(){
+  const {data:{session}} = await sb.auth.getSession();
+  if(session) return session;
+  const {data, error} = await sb.auth.signInAnonymously();
+  if(error) throw new Error(/disabled|not enabled|signups/i.test(error.message)
+    ? "Falta activar el acceso anónimo en Supabase (Authentication → Sign In / Providers)."
+    : "No se pudo conectar con el servidor: " + error.message);
+  return data.session;
 }
-
 const DB = {
   mode:"supabase",
   async get(k){ return LS.get(k); },
@@ -981,23 +1057,25 @@ const DB = {
     if(!sb) return null;
     const {data:{session}} = await sb.auth.getSession();
     if(!session) return null;
-    try{ return await assertTeam(session.user); }
-    catch(e){ if(e instanceof NoAccess) return null; return {email:session.user.email, role:"?"}; } // sin internet: confía en la sesión guardada
+    try{
+      const {data, error} = await sb.rpc("aux_me");
+      if(error) throw error;
+      if(data) LS.set("yo", data); else LS.set("yo", null);
+      return data || null;
+    }catch(e){ return LS.get("yo"); } // sin internet: usa el último usuario de este dispositivo
   },
-  async signIn(email, pass){
+  async signIn(username, pin){
     if(!sb) throw new Error("No se pudo conectar con el servidor. Revisa tu conexión a internet y recarga la página.");
-    if(!/^\S+@\S+\.\S+$/.test(email)) throw new Error("Escribe un correo válido, por ejemplo nombre@correo.com.");
-    if(!pass) throw new Error("Escribe tu contraseña.");
-    const {data, error} = await sb.auth.signInWithPassword({email, password:pass});
-    if(error) throw new Error(/invalid/i.test(error.message) ? "Correo o contraseña incorrectos." : "No se pudo iniciar sesión: "+error.message);
-    return await assertTeam(data.user);
+    if(!username) throw new Error("Escribe tu usuario.");
+    if(!/^\d{4}$/.test(pin)) throw new Error("El PIN debe tener 4 números.");
+    await ensureAnon();
+    const {data, error} = await sb.rpc("aux_login", {p_username:username, p_pin:pin});
+    if(error) throw new Error(/function|schema cache/i.test(error.message) ? "Falta correr el SQL de usuarios en Supabase." : "No se pudo iniciar sesión. Revisa tu conexión.");
+    if(!data || !data.ok) throw new Error((data && data.error) || "Usuario o PIN incorrectos.");
+    LS.set("yo", data.user); LS.set("ultimo-usuario", username);
+    return data.user;
   },
-  async signOut(){ if(sb) await sb.auth.signOut(); },
-  async resetPassword(email){
-    if(!/^\S+@\S+\.\S+$/.test(email)) throw new Error("Escribe tu correo arriba para enviarte el enlace.");
-    const {error} = await sb.auth.resetPasswordForEmail(email, {redirectTo: location.origin + location.pathname});
-    if(error) throw new Error("No se pudo enviar el enlace: "+error.message);
-  },
+  async signOut(){ try{ if(sb) await sb.rpc("aux_logout"); }catch(e){} LS.set("yo", null); },
   async listEvents(){
     try{
       const [evs, gs, ts] = await Promise.all([
@@ -1056,7 +1134,8 @@ function metaOf(id, s){
   return {id, name:s.event.name, type:s.event.type||"Boda", date:s.event.date, time:s.event.time, theme:s.event.theme||"olivo", guests:s.guests.length, persons, arrived, tables:s.tables.length};
 }
 let currentId = null, SESSION = null, EVENTS = [];
-let PROFILE = {planner:"Mariana Gómez", sub:"Wedding Planner"};
+const BRAND = {name:"AUX Events", sub:"Recepción de invitados"};
+let PROFILE = {planner:BRAND.name, sub:BRAND.sub};
 
 /* ---------- Sincronización del evento abierto ---------- */
 const SYNC = {last:null, busy:false, again:false, channel:null, retry:null};
@@ -1080,7 +1159,7 @@ const store = {
     const id = currentId, last = SYNC.last;
     try{
       const ev = rowEvent(id, S), evJ = JSON.stringify(ev);
-      if(evJ !== last.event){ await must(sb.from("events").upsert(ev)); last.event = evJ; }
+      if(evJ !== last.event){ const {id:_x, ...upd} = ev; await must(sb.from("events").update(upd).eq("id", id)); last.event = evJ; }
       const cur = rowsOf(id, S);
       for(const k of ["tables","guests","requests"]){
         const changed = cur[k].filter(r=>JSON.stringify(r)!==last[k].get(r.id));
@@ -1208,7 +1287,7 @@ function renderHeader(){
   const e = S.event;
   $("plannerName").textContent = e.planner.toUpperCase();
   $("plannerSub").textContent = e.sub;
-  $("plannerMono").textContent = initials(e.planner);
+  $("plannerMono").textContent = /^aux/i.test(e.planner) ? "AUX" : initials(e.planner);
   $("eventName").textContent = e.name;
   let d = "";
   if(e.date){ d = new Date(e.date+"T12:00").toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"}); d = d.charAt(0).toUpperCase()+d.slice(1); }
@@ -1265,7 +1344,7 @@ function renderList(){
   const list = filtered();
   $("listInfo").textContent = `${list.length} de ${S.guests.length} invitaciones`;
   if(!S.guests.length){
-    $("rows").innerHTML = `<div class="empty"><div class="ei">${ic("upload",1.5)}</div><b>Este evento aún no tiene invitados</b>Importa la lista desde la plantilla de Excel para empezar.<br><button class="btn dark" data-import>${ic("upload")}Importar lista de Excel</button></div>`;
+    $("rows").innerHTML = `<div class="empty"><div class="ei">${ic("upload",1.5)}</div><b>Este evento aún no tiene invitados</b>${isAdmin()?`Importa la lista desde la plantilla de Excel para empezar.<br><button class="btn dark" data-import>${ic("upload")}Importar lista de Excel</button>`:"El administrador debe importar la lista de invitados."}</div>`;
     return;
   }
   if(!list.length){
@@ -1516,7 +1595,7 @@ function closeAll(refocus=true){
   ui.current = null;
   if(refocus && document.body.dataset.screen==="event" && document.body.dataset.section==="reception" && window.matchMedia("(pointer:fine)").matches){ $("q").focus(); $("q").select(); }
 }
-document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click", e=>{ if(e.target===o || e.target.closest("[data-close]")) closeAll(); }));
+document.querySelectorAll(".overlay").forEach(o=>o.addEventListener("click", e=>{ if(e.target===o || e.target.closest("[data-close]")){ if(o.hasAttribute("data-stack")) o.classList.remove("open"); else closeAll(); } }));
 
 $("openThemes").onclick = ()=>{ renderThemes(); $("themeOverlay").classList.add("open"); };
 $("themeGrid").addEventListener("click", e=>{
@@ -1531,7 +1610,6 @@ $("openSettings").onclick = ()=>{
 };
 $("saveSettings").onclick = ()=>{
   Object.assign(S.event,{planner:$("fPlanner").value.trim()||"Planner",sub:$("fSub").value.trim(),type:$("fType").value,name:$("fEvent").value.trim()||"Evento",date:$("fDate").value,time:$("fTime").value});
-  PROFILE = {planner:S.event.planner, sub:S.event.sub}; LS.set("perfil", PROFILE);
   store.save(); renderHeader(); closeAll(); undo=null; showToast("Datos del evento guardados", false);
 };
 $("resetBtn").onclick = ()=>{
@@ -1657,7 +1735,7 @@ document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>setView(b.dat
 
 document.addEventListener("keydown", e=>{
   const open = document.querySelector(".overlay.open");
-  if(e.key==="Escape" && open){ closeAll(); return; }
+  if(e.key==="Escape" && open){ const top = [...document.querySelectorAll(".overlay.open")].pop(); if(top.hasAttribute("data-stack")) top.classList.remove("open"); else closeAll(); return; }
   if(open && e.key==="Enter" && open.id==="guestOverlay" && !e.target.closest("select,button")){ e.preventDefault(); $("confirmArrival").click(); return; }
   if(!open && e.key==="/" && document.body.dataset.screen==="event" && document.activeElement!==$("q")){ e.preventDefault(); setSection("reception"); $("q").focus(); }
 });
@@ -1671,34 +1749,111 @@ function showScreen(name){
   window.scrollTo(0,0);
 }
 function paintBrand(){
-  const n = PROFILE.planner, s = PROFILE.sub, mono = initials(n);
+  const n = BRAND.name, s = BRAND.sub, mono = "AUX";
   $("lName").textContent = n.toUpperCase(); $("lSub").textContent = s; $("lMono").textContent = mono;
   $("eName").textContent = n.toUpperCase(); $("eSub").textContent = s; $("eMono").textContent = mono;
 }
 
 /* ---------- Inicio de sesión ---------- */
 function loginError(msg){ const el = $("lErr"); el.innerHTML = msg ? ic("alert")+`<span>${esc(msg)}</span>` : ""; el.classList.toggle("show", !!msg); }
-$("loginForm").addEventListener("submit", async e=>{
-  e.preventDefault(); loginError("");
-  const b = $("lSubmit"); b.disabled = true;
-  try{ SESSION = await DB.signIn($("lEmail").value.trim(), $("lPass").value); $("lPass").value = ""; await showEvents(); }
-  catch(err){ loginError(err.message || "No se pudo iniciar sesión. Inténtalo de nuevo."); }
-  finally{ b.disabled = false; }
+function paintPin(err){
+  const n = $("lPin").value.length;
+  document.querySelectorAll("#pinDots i").forEach((d,i)=>d.classList.toggle("on", i<n));
+  const box = $("pinDots"); box.classList.remove("err"); if(err){ void box.offsetWidth; box.classList.add("err"); }
+}
+let logging = false;
+async function doLogin(){
+  if(logging) return;
+  const user = $("lUser").value.trim(), pin = $("lPin").value;
+  if(!user){ loginError("Escribe tu usuario."); $("lUser").focus(); return; }
+  if(pin.length<4){ loginError("Escribe los 4 números de tu PIN."); return; }
+  logging = true; loginError(""); $("lSubmit").disabled = true;
+  try{ SESSION = await DB.signIn(user, pin); $("lPin").value = ""; paintPin(); await showEvents(); }
+  catch(err){ $("lPin").value = ""; paintPin(true); loginError(err.message || "No se pudo iniciar sesión."); }
+  finally{ logging = false; $("lSubmit").disabled = false; }
+}
+$("loginForm").addEventListener("submit", e=>{ e.preventDefault(); doLogin(); });
+$("lPin").addEventListener("input", ()=>{ $("lPin").value = $("lPin").value.replace(/\D/g,"").slice(0,4); paintPin(); loginError(""); if($("lPin").value.length===4) doLogin(); });
+$("lPin").addEventListener("focus", ()=>$("loginForm").classList.add("pin-focus"));
+$("lPin").addEventListener("blur", ()=>$("loginForm").classList.remove("pin-focus"));
+$("pinDots").onclick = ()=>$("lPin").focus();
+$("lUser").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); $("lPin").focus(); } });
+$("keypad").addEventListener("click", e=>{
+  const k = e.target.closest("[data-k]"); if(!k) return;
+  const i = $("lPin");
+  if(k.dataset.k==="del") i.value = i.value.slice(0,-1);
+  else if(i.value.length<4) i.value += k.dataset.k;
+  paintPin(); loginError("");
+  if(i.value.length===4) doLogin();
 });
-$("lEye").onclick = ()=>{
-  const i = $("lPass"), show = i.type==="password";
-  i.type = show ? "text" : "password";
-  $("lEye").innerHTML = ic(show?"eyeOff":"eye"); $("lEye").setAttribute("aria-label", show?"Ocultar contraseña":"Mostrar contraseña");
-};
-$("lForgot").onclick = async ()=>{
-  loginError("");
-  try{ await DB.resetPassword($("lEmail").value.trim()); showToast("Te enviamos un enlace para cambiar tu contraseña.", false); }
-  catch(err){ loginError(err.message); $("lEmail").focus(); }
-};
+if(window.matchMedia("(pointer:coarse)").matches) $("lPin").setAttribute("inputmode","none"); // en touch se usa el teclado de la pantalla
+function showLogin(){
+  showScreen("login"); $("lPin").value = ""; paintPin();
+  const last = LS.get("ultimo-usuario"); if(last) $("lUser").value = last;
+  setTimeout(()=>{ (last ? $("lPin") : $("lUser")).focus(); }, 50);
+}
+function applyRole(){ document.body.dataset.role = SESSION && SESSION.role==="admin" ? "admin" : "hostess"; }
+const isAdmin = () => SESSION && SESSION.role === "admin";
 $("logoutBtn").onclick = async ()=>{
   await store.flush(); unsubscribe();
-  await DB.signOut(); SESSION = null; showScreen("login"); setTimeout(()=>$("lEmail").focus(), 50);
+  await DB.signOut(); SESSION = null; showLogin();
 };
+
+/* ---------- Usuarios (solo administrador) ---------- */
+let USERS = [], ufEdit = null, ufRole = "hostess";
+async function loadUsers(){
+  $("userList").innerHTML = `<p class="hint">Cargando…</p>`;
+  const {data, error} = await sb.rpc("aux_list_users");
+  if(error){ $("userList").innerHTML = `<div class="alert">${ic("alert")}<span>${esc(error.message)}</span></div>`; return; }
+  USERS = data || [];
+  $("userList").innerHTML = `<div class="users">${USERS.map(u=>`<div class="urow">
+    <span class="avatar">${esc(initials(u.name))}</span>
+    <div><b>${esc(u.name)}${SESSION && u.id===SESSION.id?" (tú)":""}</b><small>@${esc(u.username)} · <span class="role-pill ${u.role}">${u.role==="admin"?"Administrador":"Hostess"}</span></small></div>
+    <span class="st ${!u.active||u.locked?"off":""}">${!u.active?"Inactivo":u.locked?"Bloqueado":u.last_login?"Último acceso "+new Date(u.last_login).toLocaleDateString("es-MX",{day:"numeric",month:"short"}):"Nunca ha entrado"}</span>
+    <button class="btn" data-uedit="${u.id}">${ic("edit")}Editar</button></div>`).join("")}</div>`;
+}
+$("usersBtn").onclick = ()=>{ $("usersOverlay").classList.add("open"); loadUsers(); };
+function paintRole(){ document.querySelectorAll("#ufRole [data-role]").forEach(b=>b.setAttribute("aria-pressed", b.dataset.role===ufRole)); }
+$("ufRole").addEventListener("click", e=>{ const b = e.target.closest("[data-role]"); if(b){ ufRole = b.dataset.role; paintRole(); } });
+const randomPin = () => String(crypto.getRandomValues(new Uint16Array(1))[0] % 10000).padStart(4,"0");
+$("ufGen").onclick = ()=>{ $("ufPin").value = randomPin(); };
+$("ufPin").addEventListener("input", ()=>{ $("ufPin").value = $("ufPin").value.replace(/\D/g,"").slice(0,4); });
+function openUserForm(u){
+  ufEdit = u || null; ufRole = u ? u.role : "hostess"; paintRole();
+  $("ufTitle").textContent = u ? "Editar usuario" : "Nuevo usuario";
+  $("ufHint").textContent = u ? "Deja el PIN vacío para conservar el actual, o escribe uno nuevo para cambiarlo." : "Comparte el usuario y el PIN con la persona para que pueda entrar.";
+  $("ufName").value = u ? u.name : ""; $("ufUser").value = u ? u.username : "";
+  $("ufPin").value = u ? "" : randomPin(); $("ufPin").placeholder = u ? "Sin cambio" : "••••";
+  $("ufPinLbl").textContent = u ? "Nuevo PIN (opcional)" : "PIN de 4 números";
+  $("ufActive").checked = u ? u.active : true; $("ufActiveWrap").style.display = u ? "" : "none";
+  $("ufDelete").style.display = u && !(SESSION && u.id===SESSION.id) ? "" : "none";
+  $("ufErr").innerHTML = "";
+  $("userFormOverlay").classList.add("open"); setTimeout(()=>$("ufName").focus(), 30);
+}
+$("newUserBtn").onclick = ()=>openUserForm(null);
+$("userList").addEventListener("click", e=>{ const b = e.target.closest("[data-uedit]"); if(b) openUserForm(USERS.find(u=>u.id===b.dataset.uedit)); });
+$("ufCancel").onclick = ()=>$("userFormOverlay").classList.remove("open");
+const ufError = m => { $("ufErr").innerHTML = `<div class="alert">${ic("alert")}<span>${esc(m)}</span></div>`; };
+$("ufSave").onclick = async ()=>{
+  const name = $("ufName").value.trim(), username = $("ufUser").value.trim().toLowerCase(), pin = $("ufPin").value;
+  if(!name) return ufError("Escribe el nombre de la persona.");
+  if(!/^[a-z0-9._-]{3,30}$/.test(username)) return ufError("El usuario debe tener de 3 a 30 caracteres: letras sin acentos, números, punto o guion. Sin espacios.");
+  if((!ufEdit || pin) && !/^\d{4}$/.test(pin)) return ufError("El PIN debe tener exactamente 4 números.");
+  $("ufSave").disabled = true;
+  const {error} = await sb.rpc("aux_save_user", {p_id: ufEdit ? ufEdit.id : null, p_username:username, p_name:name, p_role:ufRole, p_pin: pin || null, p_active: ufEdit ? $("ufActive").checked : true});
+  $("ufSave").disabled = false;
+  if(error) return ufError(error.message);
+  $("userFormOverlay").classList.remove("open"); await loadUsers();
+  if(ufEdit && SESSION && ufEdit.id===SESSION.id){ SESSION.role = ufRole; SESSION.name = name; applyRole(); paintWho(); }
+  showToast(pin ? `Listo. Usuario: ${username} · PIN: ${pin}` : `${name} actualizado`, false);
+};
+$("ufDelete").onclick = async ()=>{
+  if(!ufEdit || !confirm(`¿Borrar el usuario de ${ufEdit.name}? Ya no podrá iniciar sesión.`)) return;
+  const {error} = await sb.rpc("aux_delete_user", {p_id: ufEdit.id});
+  if(error) return ufError(error.message);
+  $("userFormOverlay").classList.remove("open"); await loadUsers(); showToast(`${ufEdit.name} borrado`, false);
+};
+function paintWho(){ $("eUser").textContent = SESSION ? SESSION.name : ""; $("eRole").textContent = SESSION ? (SESSION.role==="admin"?"Administrador":"Hostess") : ""; }
 
 /* ---------- Mis eventos ---------- */
 const evUi = {q:"", f:"upcoming"};
@@ -1717,7 +1872,7 @@ function fmtHour(t){ if(!t) return ""; const [h,m] = t.split(":"); const x = new
 async function showEvents(){
   await store.flush(); unsubscribe(); currentId = null; SYNC.last = null;
   EVENTS = await DB.listEvents();
-  $("eUser").textContent = SESSION?.email || "";
+  applyRole(); paintWho();
   paintBrand(); renderEvents(); showScreen("events");
 }
 function renderEvents(){
@@ -1748,15 +1903,16 @@ function renderEvents(){
         <div class="ev-bar" aria-hidden="true"><i style="width:${pct}%"></i></div>
         <div class="ev-actions">
           <button class="btn dark" data-open="${e.id}">${ic("userCheck")}Abrir recepción</button>
-          <button class="btn icon" data-dup="${e.id}" aria-label="Duplicar ${esc(e.name)}" title="Duplicar">${ic("copy")}</button>
-          <button class="btn icon danger" data-del="${e.id}" aria-label="Eliminar ${esc(e.name)}" title="Eliminar">${ic("trash")}</button>
+          ${isAdmin()?`<button class="btn icon" data-dup="${e.id}" aria-label="Duplicar ${esc(e.name)}" title="Duplicar">${ic("copy")}</button>
+          <button class="btn icon danger" data-del="${e.id}" aria-label="Eliminar ${esc(e.name)}" title="Eliminar">${ic("trash")}</button>`:""}
         </div>
       </div>
     </article>`;
   }).join("");
   const nuevo = `<button class="ev-new" data-new><span class="plus">${ic("plus",2.2)}</span><b>Nuevo evento</b><small>Boda, XV años, cumpleaños y más</small></button>`;
   const empty = !list.length && EVENTS.length ? `<div class="empty ev-empty"><div class="ei">${ic("search",1.5)}</div><b>No hay eventos en esta vista</b>Cambia el filtro o busca con otro nombre.</div>` : "";
-  $("evGrid").innerHTML = empty + cards + (evUi.f!=="past" || !EVENTS.length ? nuevo : "");
+  const none = !EVENTS.length && !isAdmin() ? `<div class="empty ev-empty"><div class="ei">${ic("heart",1.5)}</div><b>Aún no hay eventos</b>Cuando el administrador cree un evento aparecerá aquí.</div>` : "";
+  $("evGrid").innerHTML = none + empty + cards + (isAdmin() && (evUi.f!=="past" || !EVENTS.length) ? nuevo : "");
 }
 $("evQ").addEventListener("input", e=>{ evUi.q = e.target.value; renderEvents(); });
 document.querySelectorAll("[data-evf]").forEach(b=>b.onclick=()=>{
@@ -1853,31 +2009,15 @@ async function deleteEvent(id){
   showToast(`${m.name} eliminado`);
 }
 
-/* ---------- Nueva contraseña (enlace de recuperación) ---------- */
-$("pwSave").onclick = async ()=>{
-  const v = $("pwNew").value;
-  if(v.length < 6){ $("pwErr").innerHTML = `<div class="alert">${ic("alert")}<span>La contraseña debe tener al menos 6 caracteres.</span></div>`; return; }
-  const {error} = await sb.auth.updateUser({password:v});
-  if(error){ $("pwErr").innerHTML = `<div class="alert">${ic("alert")}<span>No se pudo guardar: ${esc(error.message)}</span></div>`; return; }
-  $("pwNew").value = ""; $("pwErr").innerHTML = ""; $("pwOverlay").classList.remove("open");
-  showToast("Contraseña actualizada", false);
-  SESSION = await DB.getSession(); if(SESSION) showEvents();
-};
-
 /* ================= Inicio ================= */
 paintIcons();
 (async()=>{
-  PROFILE = LS.get("perfil") || PROFILE;
   paintBrand();
   tick(); setInterval(tick, 15000);
-  if(!sb){ showScreen("login"); loginError("No se pudo conectar con el servidor. Revisa tu conexión a internet y recarga la página."); return; }
-  sb.auth.onAuthStateChange((event)=>{
-    if(event === "PASSWORD_RECOVERY"){ $("pwOverlay").classList.add("open"); setTimeout(()=>$("pwNew").focus(), 50); }
-    if(event === "SIGNED_OUT" && document.body.dataset.screen !== "login"){ unsubscribe(); currentId = null; S = null; showScreen("login"); }
-  });
+  if(!sb){ showLogin(); loginError("No se pudo conectar con el servidor. Revisa tu conexión a internet y recarga la página."); return; }
   SESSION = await DB.getSession();
   if(SESSION) await showEvents();
-  else { showScreen("login"); setTimeout(()=>$("lEmail").focus(), 50); }
+  else showLogin();
 })();
 window.addEventListener("beforeunload", ()=>{ if(currentId && S) LS.set("cache:"+currentId, S); store.flush(); });
 </script>

@@ -674,6 +674,17 @@ a.ev-map{position:relative;display:inline-flex;align-items:center;gap:6px;color:
 a.ev-map svg:last-child{width:.9em;height:.9em;opacity:.7}
 a.ev-map:hover{text-decoration-color:currentColor}
 a.ev-map[hidden]{display:none}
+/* ---------- Mis eventos: el próximo activo, los demás con velo ---------- */
+.ev-card{position:relative}
+.ev-veil{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:20px;
+  background:rgba(14,16,13,.68);backdrop-filter:blur(1.5px) grayscale(.35);-webkit-backdrop-filter:blur(1.5px) grayscale(.35);color:#F6F1E7;pointer-events:none;transition:opacity .25s}
+.ev-veil .vk{font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;color:#D7B87F}
+.ev-veil b{font-family:var(--serif);font-weight:600;font-size:46px;line-height:1}
+.ev-veil .vv{display:inline-flex;align-items:center;gap:6px;font-size:16px;margin-top:4px}
+.ev-veil .vd{font-size:13.5px;opacity:.8}
+.ev-card:hover .ev-veil,.ev-card:focus-within .ev-veil{opacity:.18}
+.ev-next{box-shadow:0 0 0 2px var(--gold),var(--shadow)}
+.ev-next::before{content:"Siguiente evento";position:absolute;top:-1px;left:50%;transform:translateX(-50%);z-index:6;background:var(--gold);color:#fff;font-size:12px;font-weight:600;letter-spacing:.08em;padding:3px 12px;border-radius:0 0 10px 10px}
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -2240,10 +2251,19 @@ function renderEvents(){
   const tk = norm(evUi.q).split(/\s+/).filter(Boolean);
   let list = (evUi.f==="upcoming" ? up : evUi.f==="past" ? past : EVENTS).filter(e=>tk.every(t=>norm(e.name+" "+e.type+" "+(e.venue||"")).includes(t)));
   list.sort((a,b)=>{ const pa=isPast(a), pb=isPast(b); if(pa!==pb) return pa?1:-1; const da=a.date||"9999", db=b.date||"9999"; return pa ? db.localeCompare(da) : da.localeCompare(db); });
+  // El evento más próximo (o los de ese mismo día) se ve activo; los demás, con velo oscuro
+  const nextDate = EVENTS.filter(e=>!isPast(e)).map(e=>e.date||"9999-12-31").sort()[0];
+  const isNext = e => !isPast(e) && (e.date||"9999-12-31")===nextDate;
   const cards = list.map(e=>{
     const t = THEMES.find(x=>x.id===e.theme) || THEMES[0], w = whenLabel(e.date);
+    const veil = isNext(e) ? "" : `<div class="ev-veil" aria-hidden="true">
+        <span class="vk">${isPast(e)?"Evento pasado":"Próximamente"}</span>
+        <b>${isPast(e)?esc(fmtDate(e.date)):w.txt==="Mañana"?"Mañana":esc(w.txt)}</b>
+        ${e.venue?`<span class="vv">${ic("pin")}${esc(e.venue)}</span>`:""}
+        ${!isPast(e)?`<span class="vd">${esc(fmtDate(e.date))}${e.time?" · "+fmtHour(e.time):""}</span>`:""}
+      </div>`;
     const pct = e.persons ? Math.round(e.arrived/e.persons*100) : 0;
-    return `<article class="ev-card" data-open="${e.id}" tabindex="0" aria-label="Abrir ${esc(e.name)}" style="--ev-band:${t.band};--ev-band2:${t.band2};--ev-title:${t.title};--ev-acc:${t.sw[t.id==="blanco"?1:0]}">
+    return `<article class="ev-card${isNext(e)?" ev-next":""}" data-open="${e.id}" tabindex="0" aria-label="Abrir ${esc(e.name)}" style="--ev-band:${t.band};--ev-band2:${t.band2};--ev-title:${t.title};--ev-acc:${t.sw[t.id==="blanco"?1:0]}">
       <div class="ev-top ${t.id==="blanco"?"light":""}">
         <svg class="sprig" aria-hidden="true"><use href="#sprig"/></svg>
         <span class="stat-pill ${w.cls}">${w.txt}</span>
@@ -2264,7 +2284,7 @@ function renderEvents(){
           <button class="btn icon danger" data-del="${e.id}" aria-label="Eliminar ${esc(e.name)}" title="Eliminar">${ic("trash")}</button>`:""}
         </div>
       </div>
-    </article>`;
+    ${veil}</article>`;
   }).join("");
   const nuevo = `<button class="ev-new" data-new><span class="plus">${ic("plus",2.2)}</span><b>Nuevo evento</b><small>Boda, XV años, cumpleaños y más</small></button>`;
   const empty = !list.length && EVENTS.length ? `<div class="empty ev-empty"><div class="ei">${ic("search",1.5)}</div><b>No hay eventos en esta vista</b>Cambia el filtro o busca con otro nombre.</div>` : "";

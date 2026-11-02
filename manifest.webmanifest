@@ -1,17 +1,17 @@
 {
   "name": "AUX Events · Recepción de invitados",
-  "short_name": "AUX Events",
+  "short_name": "AUX Recepción",
   "description": "Recepción de invitados para bodas, XV años y eventos.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#3E4936",
+  "background_color": "#6E2233",
   "theme_color": "#3E4936",
   "lang": "es-MX",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "rec-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "rec-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "rec-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

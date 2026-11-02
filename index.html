@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>AUX Events · Recepción de invitados</title>
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="rec-favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="rec-apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#3E4936">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="AUX Events">
+<meta name="apple-mobile-web-app-title" content="AUX Recepción">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet">
@@ -2058,7 +2058,7 @@ const firstName = n => String(n||"").trim().split(/\s+/)[0] || n;
 function renderWho(){
   if(!LOGIN_USERS.length){ $("whoGrid").innerHTML = `<p class="login-help">No se pudo cargar la lista de usuarios. Usa “Escribir mi usuario”.</p>`; return; }
   $("whoGrid").innerHTML = LOGIN_USERS.map(u=>`<button type="button" class="who-tile ${u.role}" data-u="${esc(u.username)}">
-    <span class="who-av">${esc(initials(u.name))}</span><b>${esc(u.name)}</b><small>${u.role==="admin"?"Administrador":"Hostess"}</small></button>`).join("");
+    <span class="who-av">${esc(initials(u.name))}</span><b>${esc(u.name)}</b></button>`).join("");
 }
 async function loadLoginUsers(){
   try{
@@ -2075,7 +2075,7 @@ function showWho(){
 function selectUser(u){
   $("lUser").value = u.username; $("lPin").value = ""; paintPin(); loginError("");
   $("whoSel").className = "who-sel show " + u.role;
-  $("whoSel").innerHTML = `<span class="who-av">${esc(initials(u.name))}</span><div><b>${esc(u.name)}</b><small>${u.role==="admin"?"Administrador":"Hostess"}</small></div>`;
+  $("whoSel").innerHTML = `<span class="who-av">${esc(initials(u.name))}</span><div><b>${esc(u.name)}</b></div>`;
   $("pinTitle").textContent = `Hola, ${firstName(u.name)}`;
   $("pinSub").textContent = "Escribe tu PIN de 4 números.";
   $("lUserWrap").hidden = true;

@@ -57,41 +57,6 @@
     --shadow:0 22px 50px -28px rgba(0,0,0,.85); --shadow-sm:0 6px 18px -12px rgba(0,0,0,.8);
   }
 }
-html[data-theme="negro"]{
-  color-scheme: dark;
-  --paper:#0D0D0D; --surface:#161616; --surface-2:#202020;
-  --ink:#F3EFE7; --ink-soft:#CFCAC0; --muted:#8F8A82; --line:#2B2B2B;
-  --band:#000000; --band-2:#141414; --on-band:#F3EFE7; --band-title:#F3EFE7;
-  --primary:#C9A96E; --primary-soft:#2A2418; --primary-ink:#E2C893; --on-primary:#0D0D0D;
-  --gold:#C9A96E; --gold-soft:#2A2418;
-  --seal:#262626; --seal-2:#3A3A3A; --on-seal:#C9A96E;
-  --blush:#8F8A82; --leaf:#5E5A52; --berry:#C9A96E; --bloom:#E8E2D6;
-  --ok:#7DBA80; --ok-soft:#1C2B1E; --ok-ink:#A8D8AA;
-  --warn:#F2CC3D; --warn-soft:#3A3212; --warn-ink:#F7DC7A;
-    --chg:#7FA8E0; --chg-soft:#1C2838; --chg-ink:#A9C6EE;
-  --bad:#FF4D45; --bad-soft:#4A1513; --bad-ink:#FF948E;
-  --shadow:0 22px 50px -28px rgba(0,0,0,.9); --shadow-sm:0 6px 18px -12px rgba(0,0,0,.85);
-}
-html[data-theme="blanco"]{
-  color-scheme: light;
-  --paper:#F7F6F3; --surface:#FFFFFF; --surface-2:#F1F0EC;
-  --ink:#151515; --ink-soft:#444444; --muted:#858378; --line:#E4E2DC;
-  --band:#FFFFFF; --band-2:#FAF9F6; --on-band:#151515; --band-title:#151515;
-  --primary:#151515; --primary-soft:#EDEDEA; --primary-ink:#151515; --on-primary:#FFFFFF;
-  --gold:#A88A55; --gold-soft:#F4EEE2;
-  --seal:#151515; --seal-2:#3A3A3A; --on-seal:#E8D9B5;
-  --blush:#D9D3C7; --leaf:#BDB9AC; --berry:#A88A55; --bloom:#E9E4D8;
-}
-html[data-theme="rosa"]{
-  color-scheme: light;
-  --paper:#F8F1EF; --surface:#FFFCFB; --surface-2:#F3E6E3;
-  --ink:#3A2A2E; --ink-soft:#5E4A4F; --muted:#9A8589; --line:#EAD8D4;
-  --band:#7A4B57; --band-2:#8E5B68; --on-band:#FBF1EE; --band-title:#FFFFFF;
-  --primary:#8E5B68; --primary-soft:#F4E3E6; --primary-ink:#6E4150; --on-primary:#FFFFFF;
-  --gold:#B8925A; --gold-soft:#F5EADA;
-  --seal:#A07B44; --seal-2:#C29A5E; --on-seal:#FFF8EC;
-  --blush:#E5B9BE; --leaf:#D7AEB5; --berry:#E7C9A0; --bloom:#F7E3E5;
-}
 html[data-theme="marino"]{
   color-scheme: light;
   --paper:#F3F2EE; --surface:#FFFEFB; --surface-2:#ECEAE3;
@@ -104,13 +69,63 @@ html[data-theme="marino"]{
 }
 html[data-theme="vino"]{
   color-scheme: light;
-  --paper:#F5EFEA; --surface:#FFFCF9; --surface-2:#EFE5DE;
-  --ink:#2E2224; --ink-soft:#574548; --muted:#917E80; --line:#E6D7CF;
-  --band:#5A1A28; --band-2:#6E2233; --on-band:#F8EDE6; --band-title:#FFFFFF;
-  --primary:#6E2233; --primary-soft:#F4E3E5; --primary-ink:#5A1A28; --on-primary:#FFFFFF;
-  --gold:#B08D52; --gold-soft:#F3E9D6;
-  --seal:#B08D52; --seal-2:#C9A66B; --on-seal:#5A1A28;
-  --blush:#D9A5AE; --leaf:#A4B08F; --berry:#E7C9A0; --bloom:#F1D9DC;
+  --paper:#F4EBDF; --surface:#FFFBF5; --surface-2:#EEE3D3;
+  --ink:#3A2A2A; --ink-soft:#5E4A48; --muted:#8E7B72; --line:#E7D9C6;
+  --band:#6B2737; --band-2:#7E3244; --on-band:#F7EDE3; --band-title:#FFF8F0;
+  --primary:#7A2E40; --primary-soft:#F3E2E3; --primary-ink:#6B2737; --on-primary:#FFFFFF;
+  --gold:#B8925E; --gold-soft:#F1E4CF;
+  --seal:#B8925E; --seal-2:#CFAB75; --on-seal:#6B2737;
+  --blush:#D9A5AE; --leaf:#A9B08E; --berry:#E7C9A0; --bloom:#F1D9DC;
+}
+html[data-theme="rosa"]{
+  color-scheme: light;
+  --paper:#F8F0EC; --surface:#FFFCFA; --surface-2:#F1E4DF;
+  --ink:#4A3437; --ink-soft:#6B5457; --muted:#9C8589; --line:#EDDCD6;
+  --band:#9E6870; --band-2:#B07A82; --on-band:#FFF5F2; --band-title:#FFFFFF;
+  --primary:#9E6870; --primary-soft:#F5E6E8; --primary-ink:#7E4F57; --on-primary:#FFFFFF;
+  --gold:#BE9A6C; --gold-soft:#F5E8DA;
+  --seal:#BE9A6C; --seal-2:#D2B184; --on-seal:#FFF8EC;
+  --blush:#E5B9BE; --leaf:#C9A7AD; --berry:#E7C9A0; --bloom:#F7E3E5;
+}
+html[data-theme="lavanda"]{
+  color-scheme: light;
+  --paper:#F3F1F6; --surface:#FFFFFF; --surface-2:#EAE7F0;
+  --ink:#2F2C3D; --ink-soft:#545069; --muted:#878399; --line:#E1DDE9;
+  --band:#6D6888; --band-2:#807A9C; --on-band:#F6F3FB; --band-title:#FFFFFF;
+  --primary:#6D6888; --primary-soft:#ECEAF3; --primary-ink:#545069; --on-primary:#FFFFFF;
+  --gold:#B79E6E; --gold-soft:#F2EADB;
+  --seal:#B79E6E; --seal-2:#CDB685; --on-seal:#FFFFFF;
+  --blush:#C9C3DC; --leaf:#A7A2C0; --berry:#D9C39A; --bloom:#EDE8F5;
+}
+html[data-theme="eucalipto"]{
+  color-scheme: light;
+  --paper:#F1F2EC; --surface:#FFFFFB; --surface-2:#E7EAE2;
+  --ink:#27332F; --ink-soft:#4A5752; --muted:#7F8B86; --line:#DDE2D8;
+  --band:#58766F; --band-2:#6A8880; --on-band:#F2F6F2; --band-title:#FFFFFF;
+  --primary:#58766F; --primary-soft:#E3ECE9; --primary-ink:#3F5A54; --on-primary:#FFFFFF;
+  --gold:#B39663; --gold-soft:#EFE7D6;
+  --seal:#B39663; --seal-2:#C9AE7C; --on-seal:#FFFFFF;
+  --blush:#B9CBC5; --leaf:#8FAAA2; --berry:#D6BE90; --bloom:#E7EFEC;
+}
+html[data-theme="moka"]{
+  color-scheme: light;
+  --paper:#F4EEE6; --surface:#FFFCF8; --surface-2:#ECE4D9;
+  --ink:#33281F; --ink-soft:#5A4B40; --muted:#8C7D70; --line:#E5DACC;
+  --band:#5E4A3E; --band-2:#735C4E; --on-band:#F7EFE6; --band-title:#FFF9F2;
+  --primary:#6B5546; --primary-soft:#EFE6DC; --primary-ink:#5E4A3E; --on-primary:#FFFFFF;
+  --gold:#C3A06A; --gold-soft:#F3E7D4;
+  --seal:#C3A06A; --seal-2:#D6B887; --on-seal:#3B2E25;
+  --blush:#D5BFAE; --leaf:#B4A08C; --berry:#E3C9A0; --bloom:#F2E6DA;
+}
+html[data-theme="champana"]{
+  color-scheme: light;
+  --paper:#FAF6EE; --surface:#FFFFFF; --surface-2:#F3ECDF;
+  --ink:#3B3226; --ink-soft:#5F5443; --muted:#958973; --line:#EDE3D1;
+  --band:#9E7B45; --band-2:#B5935C; --on-band:#FFFBF3; --band-title:#FFFFFF;
+  --primary:#A8864F; --primary-soft:#F3EAD8; --primary-ink:#7A5F33; --on-primary:#FFFFFF;
+  --gold:#8E6E3C; --gold-soft:#F4EADA;
+  --seal:#8E6E3C; --seal-2:#A8864F; --on-seal:#FFF8EC;
+  --blush:#E7D6B8; --leaf:#E9D9B6; --berry:#FFFFFF; --bloom:#F7EEDD;
 }
 
 /* =====================================================
@@ -216,7 +231,7 @@ body:not([data-section="reports"]) #reportsView{display:none}
 .chip.table-chip{background:var(--gold-soft);border-color:var(--gold);color:var(--ink)}
 .filters .spacer{flex:1}
 .add-btn{border:1px solid var(--seal-2);background:transparent;color:var(--seal-2);border-radius:999px;padding:8px 15px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:7px}
-html[data-theme="negro"] .add-btn,html[data-theme="marino"] .add-btn,html[data-theme="vino"] .add-btn,html[data-theme="rosa"] .add-btn{border-color:var(--gold);color:var(--gold)}
+html[data-theme="marino"] .add-btn,html[data-theme="vino"] .add-btn,html[data-theme="rosa"] .add-btn,html[data-theme="lavanda"] .add-btn,html[data-theme="eucalipto"] .add-btn,html[data-theme="moka"] .add-btn,html[data-theme="champana"] .add-btn{border-color:var(--gold);color:var(--gold)}
 .add-btn:hover{background:var(--surface-2)}
 
 /* ---------- Lista ---------- */
@@ -1138,14 +1153,17 @@ function paintIcons(root=document){ root.querySelectorAll("i[data-icon]").forEac
 
 /* ================= Temas ================= */
 const THEMES = [
-  {id:"olivo",  name:"Jardín olivo",   desc:"Verde olivo, vino y champaña. Se oscurece solo de noche.", band:"#3E4936", band2:"#4B5841", paper:"#F4EFE6", title:"#FFFFFF", sw:["#5A6A4C","#6E2233","#B08D52"]},
-  {id:"negro",  name:"Negro elegante", desc:"Negro profundo con detalles dorados. Ideal para salones de noche.", band:"#000000", band2:"#1C1C1C", paper:"#161616", title:"#F3EFE7", sw:["#C9A96E","#3A3A3A","#E8E2D6"]},
-  {id:"blanco", name:"Blanco elegante",desc:"Blanco limpio, tinta negra y dorado discreto.", band:"#FFFFFF", band2:"#F4F2EC", paper:"#F7F6F3", title:"#151515", sw:["#151515","#A88A55","#D9D3C7"]},
-  {id:"rosa",   name:"Rosa palo",      desc:"Rosa empolvado y oro. Perfecto para XV años.", band:"#7A4B57", band2:"#8E5B68", paper:"#F8F1EF", title:"#FFFFFF", sw:["#8E5B68","#B8925A","#E5B9BE"]},
-  {id:"marino", name:"Marino y oro",   desc:"Azul marino con dorado. Formal y clásico.", band:"#1C2A48", band2:"#26375C", paper:"#F3F2EE", title:"#FFFFFF", sw:["#26375C","#B8975A","#9AA7C2"]},
-  {id:"vino",   name:"Borgoña",        desc:"Vino intenso y champaña, para eventos de otoño.", band:"#5A1A28", band2:"#6E2233", paper:"#F5EFEA", title:"#FFFFFF", sw:["#6E2233","#B08D52","#D9A5AE"]}
+  {id:"olivo",     name:"Jardín olivo",          desc:"Verde olivo, vino y champaña. Se oscurece solo de noche.", band:"#3E4936", band2:"#4B5841", paper:"#F4EFE6", title:"#FFFFFF", sw:["#5A6A4C","#6E2233","#B08D52"]},
+  {id:"marino",    name:"Marino y oro",          desc:"Azul marino con dorado. Formal y clásico.", band:"#1C2A48", band2:"#26375C", paper:"#F3F2EE", title:"#FFFFFF", sw:["#26375C","#B8975A","#9AA7C2"]},
+  {id:"vino",      name:"Vino y beige",          desc:"Vino profundo sobre beige cálido, con detalles dorados.", band:"#6B2737", band2:"#7E3244", paper:"#F4EBDF", title:"#FFF8F0", sw:["#7A2E40","#B8925E","#F4EBDF"]},
+  {id:"rosa",      name:"Rosa empolvado y lino", desc:"Rosa suave con fondo lino. Ideal para XV años.", band:"#9E6870", band2:"#B07A82", paper:"#F8F0EC", title:"#FFFFFF", sw:["#9E6870","#BE9A6C","#F8F0EC"]},
+  {id:"lavanda",   name:"Lavanda y perla",       desc:"Lila grisáceo con fondo perla. Tenue y moderno.", band:"#6D6888", band2:"#807A9C", paper:"#F3F1F6", title:"#FFFFFF", sw:["#6D6888","#B79E6E","#F3F1F6"]},
+  {id:"eucalipto", name:"Eucalipto y crema",     desc:"Verde azulado suave con fondo crema.", band:"#58766F", band2:"#6A8880", paper:"#F1F2EC", title:"#FFFFFF", sw:["#58766F","#B39663","#F1F2EC"]},
+  {id:"moka",      name:"Moka y champaña",       desc:"Café suave con fondo champaña. Sobrio y cálido.", band:"#5E4A3E", band2:"#735C4E", paper:"#F4EEE6", title:"#FFF9F2", sw:["#6B5546","#C3A06A","#F4EEE6"]},
+  {id:"champana",  name:"Champaña y marfil",     desc:"Dorado champaña con fondo marfil. Luminoso y de gala.", band:"#9E7B45", band2:"#B5935C", paper:"#FAF6EE", title:"#FFFFFF", sw:["#A8864F","#8E6E3C","#FAF6EE"]}
 ];
-function applyTheme(id){ document.documentElement.dataset.theme = THEMES.some(t=>t.id===id) ? id : "olivo"; }
+const LEGACY_THEME = {negro:"moka", blanco:"champana"};
+function applyTheme(id){ id = LEGACY_THEME[id] || id; document.documentElement.dataset.theme = THEMES.some(t=>t.id===id) ? id : "olivo"; }
 function renderThemes(){
   const cur = S.event.theme || "olivo";
   $("themeGrid").innerHTML = THEMES.map(t=>`<button class="theme" data-theme-id="${t.id}" aria-pressed="${t.id===cur}">
@@ -2255,7 +2273,7 @@ function renderEvents(){
   const nextDate = EVENTS.filter(e=>!isPast(e)).map(e=>e.date||"9999-12-31").sort()[0];
   const isNext = e => !isPast(e) && (e.date||"9999-12-31")===nextDate;
   const cards = list.map(e=>{
-    const t = THEMES.find(x=>x.id===e.theme) || THEMES[0], w = whenLabel(e.date);
+    const t = THEMES.find(x=>x.id===(LEGACY_THEME[e.theme]||e.theme)) || THEMES[0], w = whenLabel(e.date);
     const veil = isNext(e) ? "" : `<div class="ev-veil" aria-hidden="true">
         <span class="vk">${isPast(e)?"Evento pasado":"Próximamente"}</span>
         <b>${isPast(e)?esc(fmtDate(e.date)):w.txt==="Mañana"?"Mañana":esc(w.txt)}</b>
@@ -2391,9 +2409,12 @@ async function deleteEvent(id){
 /* ================= Reporte PDF ================= */
 const PALETTES = {
   clasico:{name:"Clásico olivo", side:"#3E4936", sideText:"#F3EEE2", accent:"#C9A96E", accentText:"#9C7A3C", dark:"#3E4936", light:"#C9D3BC", mid:"#7E9470", panel:"#F3F1EA", miss:"#8A6458", missIcon:"#E2B8AC", ink:"#26302A", muted:"#7D8689", line:"#E7E5DE", zebra:"#F8F7F3", okBg:"#E1EAD9", okTx:"#3E4936", midBg:"#EEF2E8", midTx:"#4F6545", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#3E4936"},
-  negro:{name:"Negro elegante", side:"#141414", sideText:"#F3EFE7", accent:"#C9A96E", accentText:"#8E6F38", dark:"#1F1F1F", light:"#DAD5CB", mid:"#8C877E", panel:"#F4F2EE", miss:"#6E5F58", missIcon:"#D9B3A8", ink:"#1A1A1A", muted:"#7C7870", line:"#E6E3DD", zebra:"#F8F7F4", okBg:"#ECE9E2", okTx:"#1F1F1F", midBg:"#F3F1EC", midTx:"#55524C", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#1A1A1A"},
-  blanco:{name:"Blanco elegante", side:"#F5F3EE", sideText:"#1E1E1E", accent:"#A88A55", accentText:"#8A6E3E", dark:"#2A2A2A", light:"#DCD8CE", mid:"#8F8B82", panel:"#F6F5F1", miss:"#C9B3AA", missIcon:"#A0675C", ink:"#1E1E1E", muted:"#7E7B74", line:"#E6E3DD", zebra:"#FAF9F6", okBg:"#EDEBE5", okTx:"#2A2A2A", midBg:"#F4F2EE", midTx:"#5A574F", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#1E1E1E", sideLine:"#A88A55"},
-  rosa:{name:"Rosa palo", side:"#7A4B57", sideText:"#FBF1EE", accent:"#D4AE78", accentText:"#9C7A3C", dark:"#7A4B57", light:"#EBD3D6", mid:"#B98591", panel:"#F8EFEF", miss:"#C98D99", missIcon:"#F3D3D7", ink:"#3A2A2E", muted:"#9A8589", line:"#EFE1DF", zebra:"#FCF7F6", okBg:"#F4E3E6", okTx:"#6E4150", midBg:"#F8EEF0", midTx:"#8E5B68", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#7A4B57"},
+  vino:{name:"Vino y beige", side:"#6B2737", sideText:"#F7EDE3", accent:"#C9A36E", accentText:"#8E6A3A", dark:"#6B2737", light:"#E7D3D2", mid:"#A86B76", panel:"#F6EEE4", miss:"#B88A8F", missIcon:"#F1D3D3", ink:"#3A2A2A", muted:"#8E7B72", line:"#EADFD2", zebra:"#FBF7F1", okBg:"#F3E2E3", okTx:"#6B2737", midBg:"#F8EEEE", midTx:"#8E4A57", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#6B2737"},
+  rosa:{name:"Rosa empolvado y lino", side:"#9E6870", sideText:"#FFF5F2", accent:"#D9B98A", accentText:"#9C7A4C", dark:"#8A5A62", light:"#EBD3D6", mid:"#C2949B", panel:"#F8EFEF", miss:"#D7AEB4", missIcon:"#FFE3E6", ink:"#4A3437", muted:"#9C8589", line:"#EFE1DF", zebra:"#FCF7F6", okBg:"#F5E6E8", okTx:"#7E4F57", midBg:"#FAF0F1", midTx:"#9E6870", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#8A5A62"},
+  lavanda:{name:"Lavanda y perla", side:"#6D6888", sideText:"#F6F3FB", accent:"#CDB685", accentText:"#8E7746", dark:"#5C5777", light:"#DCD8E8", mid:"#9A95B5", panel:"#F4F2F8", miss:"#A9A3BF", missIcon:"#E9E4F5", ink:"#2F2C3D", muted:"#878399", line:"#E5E2EC", zebra:"#FAF9FC", okBg:"#ECEAF3", okTx:"#545069", midBg:"#F3F1F8", midTx:"#6D6888", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#5C5777"},
+  eucalipto:{name:"Eucalipto y crema", side:"#58766F", sideText:"#F2F6F2", accent:"#CDB27F", accentText:"#8A7140", dark:"#4C6962", light:"#CFDDD8", mid:"#8AA59E", panel:"#F2F4EF", miss:"#A3B5AF", missIcon:"#E2EEEA", ink:"#27332F", muted:"#7F8B86", line:"#E1E6DD", zebra:"#F9FAF7", okBg:"#E3ECE9", okTx:"#3F5A54", midBg:"#EEF3F1", midTx:"#58766F", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#4C6962"},
+  moka:{name:"Moka y champaña", side:"#5E4A3E", sideText:"#F7EFE6", accent:"#C9A66E", accentText:"#8E6F3E", dark:"#5E4A3E", light:"#E2D6CA", mid:"#9C8371", panel:"#F5F0E9", miss:"#A48E80", missIcon:"#EBDDD2", ink:"#33281F", muted:"#8C7D70", line:"#E8DFD3", zebra:"#FBF8F4", okBg:"#EFE6DC", okTx:"#5E4A3E", midBg:"#F5EFE8", midTx:"#735C4E", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#5E4A3E"},
+  champana:{name:"Champaña y marfil", side:"#A8864F", sideText:"#FFFBF3", accent:"#E6D2A8", accentText:"#8E6E3C", dark:"#8E6E3C", light:"#EFE3CA", mid:"#C4A673", panel:"#FAF5EA", miss:"#C9B38A", missIcon:"#FFF3DA", ink:"#3B3226", muted:"#958973", line:"#EEE5D3", zebra:"#FDFAF4", okBg:"#F3EAD8", okTx:"#7A5F33", midBg:"#F8F1E4", midTx:"#8E6E3C", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#8E6E3C"},
   marino:{name:"Marino y oro", side:"#1C2A48", sideText:"#F4EFE4", accent:"#C9A96E", accentText:"#8E6F38", dark:"#1C2A48", light:"#C9D2E3", mid:"#6F81A6", panel:"#F2F3F6", miss:"#6B5A68", missIcon:"#E2B8AC", ink:"#1C2333", muted:"#7F8596", line:"#E3E5EA", zebra:"#F8F9FB", okBg:"#E3E8F2", okTx:"#1C2A48", midBg:"#EEF1F7", midTx:"#3B4E78", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#1C2A48"}
 };
 let repPal = LS.get("rep-paleta") || "clasico"; if(!PALETTES[repPal]) repPal = "clasico";

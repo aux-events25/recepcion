@@ -670,6 +670,10 @@ body[data-role="hostess"] .admin-only{display:none !important}
 .field.col{flex-direction:column;align-items:stretch;gap:8px}
 .field.col select{width:100%;max-width:none !important}
 .field select{max-width:62%}
+a.ev-map{position:relative;display:inline-flex;align-items:center;gap:6px;color:inherit;text-decoration:underline;text-decoration-color:color-mix(in srgb,currentColor 40%, transparent);text-underline-offset:3px;z-index:2}
+a.ev-map svg:last-child{width:.9em;height:.9em;opacity:.7}
+a.ev-map:hover{text-decoration-color:currentColor}
+a.ev-map[hidden]{display:none}
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -830,7 +834,7 @@ body[data-role="hostess"] .admin-only{display:none !important}
   </div>
   <div class="event">
     <h1 id="eventName">Boda Ana &amp; Luis</h1>
-    <div class="meta"><span><i data-icon="calendar"></i><span id="eventDate"></span></span><span><i data-icon="clock"></i><span id="eventTime"></span></span><span id="eventVenueWrap" hidden><i data-icon="pin"></i><span id="eventVenue"></span></span></div>
+    <div class="meta"><span><i data-icon="calendar"></i><span id="eventDate"></span></span><span><i data-icon="clock"></i><span id="eventTime"></span></span><a id="eventVenueWrap" class="ev-map" target="_blank" rel="noopener" hidden><i data-icon="pin"></i><span id="eventVenue"></span></a></div>
   </div>
   <div class="band-right">
     <div class="clock"><b id="clock"></b><small id="syncState">Conectando…</small></div>
@@ -949,7 +953,8 @@ body[data-role="hostess"] .admin-only{display:none !important}
       <label class="wide">Nombre del evento<input id="fEvent"></label>
       <label>Fecha<input id="fDate" type="date"></label>
       <label>Hora<input id="fTime" type="time"></label>
-      <label class="wide">Ubicación<input id="fVenue" placeholder="Salón, jardín o dirección del evento"></label>
+      <label class="wide">Nombre del lugar<input id="fVenue" placeholder="Ej. Hacienda Los Olivos"></label>
+      <label class="wide">Link de ubicación (Google Maps o Waze)<input id="fVenueUrl" inputmode="url" placeholder="Pega aquí el link completo"></label>
     </div>
     <div class="actions admin-only"><button class="btn" data-close>Cancelar</button><button class="btn dark" id="saveSettings"><i data-icon="check"></i>Guardar datos</button></div>
     <div class="tools">
@@ -989,7 +994,8 @@ body[data-role="hostess"] .admin-only{display:none !important}
       <label>Hora<input id="nTime" type="time" value="19:00"></label>
       <label class="wide">Nombre del evento<input id="nName" placeholder="Boda Ana &amp; Luis"></label>
       <label class="wide">Fecha<input id="nDate" type="date"></label>
-      <label class="wide">Ubicación<input id="nVenue" placeholder="Salón, jardín o dirección del evento"></label>
+      <label class="wide">Nombre del lugar<input id="nVenue" placeholder="Ej. Hacienda Los Olivos"></label>
+      <label class="wide">Link de ubicación (Google Maps o Waze)<input id="nVenueUrl" inputmode="url" placeholder="Pega aquí el link completo"></label>
       <div class="wide lbl-t">Diseño</div>
       <div class="wide theme-pick" id="nTheme"></div>
       <div class="wide lbl-t">Empezar con</div>
@@ -1113,6 +1119,7 @@ const ICONS = {
   fileReport:'<path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2z"/><path d="M9 17v-3M12 17v-5M15 17v-2"/>',
   notes:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/>',
   pin:'<path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+  external:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
   sparkle:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>'
 };
 const ic = (n, sw=1.8) => `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]}</svg>`;
@@ -1207,7 +1214,7 @@ const LS = { get(k){ try{ const v = localStorage.getItem("recepcion:"+k); return
 
 /* Filas de la base de datos */
 let NO_VENUE = false; // si aún no existe la columna "venue" en Supabase
-function rowEvent(id, s){ const e = s.event; const r = {id, name:e.name, type:e.type||"Boda", event_date:e.date||null, start_time:e.time||null, theme:e.theme||"olivo", planner:e.planner||"", subtitle:e.sub||""}; if(!NO_VENUE) r.venue = e.venue||null; return r; }
+function rowEvent(id, s){ const e = s.event; const r = {id, name:e.name, type:e.type||"Boda", event_date:e.date||null, start_time:e.time||null, theme:e.theme||"olivo", planner:e.planner||"", subtitle:e.sub||""}; if(!NO_VENUE){ r.venue = e.venue||null; r.venue_url = e.venueUrl||null; } return r; }
 function rowTable(id, t){ if(!t.uid) t.uid = uuid(); return {id:t.uid, event_id:id, num:t.num, capacity:Math.max(0,t.cap|0), extra:Math.max(0,t.extra|0)}; }
 function rowGuest(id, g){
   if(!g.uid) g.uid = uuid();
@@ -1273,7 +1280,7 @@ const DB = {
       const list = evs.map(e=>{
         const g = gs.filter(x=>x.event_id===e.id);
         if(!("venue" in e)) NO_VENUE = true;
-        return {id:e.id, name:e.name, type:e.type, date:e.event_date||"", time:(e.start_time||"").slice(0,5), theme:e.theme, venue:e.venue||"",
+        return {id:e.id, name:e.name, type:e.type, date:e.event_date||"", time:(e.start_time||"").slice(0,5), theme:e.theme, venue:e.venue||"", venueUrl:e.venue_url||"",
           guests:g.length, persons:g.reduce((a,x)=>a+x.persons,0), arrived:g.reduce((a,x)=>a+Math.min(x.arrived,x.persons),0),
           tables:ts.filter(x=>x.event_id===e.id).length};
       });
@@ -1298,7 +1305,7 @@ const DB = {
       const used = new Set(); let max = gl.reduce((m,g)=>Math.max(m,g.seq||0),0);
       gl.forEach(g=>{ if(g.seq>0 && !used.has(g.seq)){ g.id = g.seq; } else { g.id = ++max; } used.add(g.id); delete g.seq; });
       const st = {
-        event:{name:ev.name, type:ev.type, date:ev.event_date||"", time:(ev.start_time||"").slice(0,5), theme:ev.theme, planner:ev.planner, sub:ev.subtitle, venue:ev.venue||""},
+        event:{name:ev.name, type:ev.type, date:ev.event_date||"", time:(ev.start_time||"").slice(0,5), theme:ev.theme, planner:ev.planner, sub:ev.subtitle, venue:ev.venue||"", venueUrl:ev.venue_url||""},
         tables: tables.map(t=>({uid:t.id, num:t.num, cap:t.capacity, extra:t.extra})),
         guests: gl,
         requests: reqs.map(r=>({id:r.id, kind:r.kind, guestUid:r.guest_id, name:r.name, persons:r.persons, table:r.table_num||0, status:r.status, mode:r.mode, resolution:r.resolution, at:msOf(r.created_at), resolvedAt:msOf(r.resolved_at), createdBy:r.created_by||"", resolvedBy:r.resolved_by||"", reason:r.reason||"", validatedWith:r.validated_with||"", fromTable:r.from_table||0}))
@@ -1324,7 +1331,7 @@ const DB = {
 };
 function metaOf(id, s){
   const persons = s.guests.reduce((a,g)=>a+g.persons,0), arrived = s.guests.reduce((a,g)=>a+Math.min(g.arrived,g.persons),0);
-  return {id, name:s.event.name, type:s.event.type||"Boda", date:s.event.date, time:s.event.time, theme:s.event.theme||"olivo", venue:s.event.venue||"", guests:s.guests.length, persons, arrived, tables:s.tables.length};
+  return {id, name:s.event.name, type:s.event.type||"Boda", date:s.event.date, time:s.event.time, theme:s.event.theme||"olivo", venue:s.event.venue||"", venueUrl:s.event.venueUrl||"", guests:s.guests.length, persons, arrived, tables:s.tables.length};
 }
 let currentId = null, SESSION = null, EVENTS = [];
 const BRAND = {name:"AUX Events", sub:"Recepción de invitados"};
@@ -1398,7 +1405,7 @@ function remote(kind, payload){
     if(row.id !== currentId) return;
     if(del){ showToast("Este evento fue eliminado desde otro dispositivo.", false); currentId = null; S = null; showEvents(); return; }
     if(JSON.stringify(rowEvent(currentId, S)) !== last.event) return; // hay cambios locales sin guardar
-    Object.assign(S.event, {name:row.name, type:row.type, date:row.event_date||"", time:(row.start_time||"").slice(0,5), theme:row.theme, planner:row.planner, sub:row.subtitle, venue:row.venue||S.event.venue||""});
+    Object.assign(S.event, {name:row.name, type:row.type, date:row.event_date||"", time:(row.start_time||"").slice(0,5), theme:row.theme, planner:row.planner, sub:row.subtitle, venue:row.venue||S.event.venue||"", venueUrl:row.venue_url||S.event.venueUrl||""});
     last.event = JSON.stringify(rowEvent(currentId, S));
     scheduleRender(true); return;
   }
@@ -1517,7 +1524,8 @@ function renderHeader(){
   let t = "";
   if(e.time){ const [h,m] = e.time.split(":"); const x = new Date(); x.setHours(+h,+m); t = x.toLocaleTimeString("es-MX",{hour:"numeric",minute:"2-digit"}); }
   $("eventTime").textContent = t || "Sin hora";
-  $("eventVenue").textContent = e.venue || ""; $("eventVenueWrap").hidden = !e.venue;
+  $("eventVenue").textContent = e.venue || (e.venueUrl ? "Ver ubicación" : ""); $("eventVenueWrap").hidden = !(e.venue || e.venueUrl);
+  if(e.venue || e.venueUrl) $("eventVenueWrap").href = mapUrl(e.venue, e.venueUrl);
   applyTheme(e.theme);
 }
 function tick(){ $("clock").textContent = new Date().toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"}); }
@@ -1877,11 +1885,11 @@ $("themeGrid").addEventListener("click", e=>{
 $("openSettings").onclick = ()=>{
   const e = S.event;
   $("fType").innerHTML = TYPES.map(t=>`<option ${t===(e.type||"Boda")?"selected":""}>${t}</option>`).join("");
-  $("fPlanner").value=e.planner; $("fSub").value=e.sub; $("fEvent").value=e.name; $("fDate").value=e.date; $("fTime").value=e.time; $("fVenue").value=e.venue||"";
+  $("fPlanner").value=e.planner; $("fSub").value=e.sub; $("fEvent").value=e.name; $("fDate").value=e.date; $("fTime").value=e.time; $("fVenue").value=e.venue||""; $("fVenueUrl").value=e.venueUrl||"";
   $("settingsOverlay").classList.add("open");
 };
 $("saveSettings").onclick = ()=>{
-  Object.assign(S.event,{planner:$("fPlanner").value.trim()||"Planner",sub:$("fSub").value.trim(),type:$("fType").value,name:$("fEvent").value.trim()||"Evento",date:$("fDate").value,time:$("fTime").value,venue:$("fVenue").value.trim()});
+  Object.assign(S.event,{planner:$("fPlanner").value.trim()||"Planner",sub:$("fSub").value.trim(),type:$("fType").value,name:$("fEvent").value.trim()||"Evento",date:$("fDate").value,time:$("fTime").value,venue:$("fVenue").value.trim(),venueUrl:cleanUrl($("fVenueUrl").value)});
   store.save(); renderHeader(); closeAll(); undo=null; showToast("Datos del evento guardados", false);
 };
 $("resetBtn").onclick = ()=>{
@@ -2241,7 +2249,7 @@ function renderEvents(){
         <span class="stat-pill ${w.cls}">${w.txt}</span>
         <span class="type">${ic("heart")}${esc(e.type||"Evento")}</span>
         <h3>${esc(e.name)}</h3>
-        <div class="when"><span>${ic("calendar")}${fmtDate(e.date)}</span>${e.time?`<span>${ic("clock")}${fmtHour(e.time)}</span>`:""}${e.venue?`<span>${ic("pin")}${esc(e.venue)}</span>`:""}</div>
+        <div class="when"><span>${ic("calendar")}${fmtDate(e.date)}</span>${e.time?`<span>${ic("clock")}${fmtHour(e.time)}</span>`:""}${e.venue||e.venueUrl?`<a class="ev-map" href="${esc(mapUrl(e.venue,e.venueUrl))}" target="_blank" rel="noopener">${ic("pin")}${esc(e.venue||"Ver ubicación")}${ic("external")}</a>`:""}</div>
       </div>
       <div class="ev-body">
         <div class="ev-stats">
@@ -2268,6 +2276,7 @@ document.querySelectorAll("[data-evf]").forEach(b=>b.onclick=()=>{
   evUi.f = b.dataset.evf; document.querySelectorAll("[data-evf]").forEach(x=>x.setAttribute("aria-pressed", x===b)); renderEvents();
 });
 $("evGrid").addEventListener("click", e=>{
+  if(e.target.closest("a.ev-map")){ e.stopPropagation(); return; }
   const dup = e.target.closest("[data-dup]"); if(dup){ e.stopPropagation(); openDup(dup.dataset.dup); return; }
   const del = e.target.closest("[data-del]"); if(del){ e.stopPropagation(); deleteEvent(del.dataset.del); return; }
   if(e.target.closest("[data-new]")){ openNew(); return; }
@@ -2303,7 +2312,7 @@ function paintThemePick(){
 function openNew(){
   $("nType").innerHTML = TYPES.map(t=>`<option>${t}</option>`).join("");
   $("nName").value = ""; $("nName").placeholder = NAME_HINT["Boda"];
-  $("nDate").value = ""; $("nVenue").value = ""; $("nTime").value = "19:00"; $("nErr").innerHTML = "";
+  $("nDate").value = ""; $("nVenue").value = ""; $("nVenueUrl").value = ""; $("nTime").value = "19:00"; $("nErr").innerHTML = "";
   document.querySelector('input[name="nStart"][value="empty"]').checked = true;
   newTheme = "olivo"; paintThemePick();
   $("newOverlay").classList.add("open"); setTimeout(()=>$("nName").focus(), 30);
@@ -2313,7 +2322,7 @@ $("nTheme").addEventListener("click", e=>{ const b = e.target.closest("[data-nt]
 $("createEvent").onclick = async ()=>{
   const name = $("nName").value.trim();
   if(!name){ $("nErr").innerHTML = `<div class="alert">${ic("alert")}<span>Escribe el nombre del evento, por ejemplo “${esc($("nName").placeholder)}”.</span></div>`; $("nName").focus(); return; }
-  const ev = {name, type:$("nType").value, date:$("nDate").value, time:$("nTime").value, venue:$("nVenue").value.trim(), theme:newTheme, planner:PROFILE.planner, sub:PROFILE.sub};
+  const ev = {name, type:$("nType").value, date:$("nDate").value, time:$("nTime").value, venue:$("nVenue").value.trim(), venueUrl:cleanUrl($("nVenueUrl").value), theme:newTheme, planner:PROFILE.planner, sub:PROFILE.sub};
   let st;
   if(document.querySelector('input[name="nStart"]:checked').value==="demo"){ st = demoState(newTheme); st.event = ev; }
   else st = emptyState(ev);
@@ -2409,6 +2418,8 @@ function reportData(){
     list: S.guests.slice().sort(byName)
   };
 }
+function cleanUrl(u){ u = String(u||"").trim(); if(!u) return ""; const m = u.match(/https?:\/\/\S+/i); if(m) return m[0]; return /^[\w.-]+\.[a-z]{2,}(\/|$)/i.test(u) ? "https://"+u : ""; }
+function mapUrl(name, url){ return url || (name ? "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(name) : ""); }
 function longDate(){
   const e = S.event; let s = "";
   if(e.date){ s = new Date(e.date+"T12:00").toLocaleDateString("es-MX",{weekday:"long",day:"numeric",month:"long",year:"numeric"}); s = s.charAt(0).toUpperCase()+s.slice(1); }

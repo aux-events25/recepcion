@@ -527,7 +527,7 @@ body[data-role="hostess"] .admin-only{display:none !important}
 .role-pill.hostess{background:var(--primary-soft);color:var(--primary-ink)}
 /* ---------- Usuarios ---------- */
 .users{border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-top:4px}
-.urow{display:grid;grid-template-columns:42px minmax(0,1fr) auto auto;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
+.urow{display:grid;grid-template-columns:42px minmax(0,1fr) auto auto auto;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
 .urow:last-child{border-bottom:0}
 .urow .avatar{width:40px;height:40px}
 .urow b{display:block;font-weight:500;font-size:16px}
@@ -542,7 +542,11 @@ body[data-role="hostess"] .admin-only{display:none !important}
 .pin-field{display:flex;gap:8px}
 .pin-field input{flex:1;letter-spacing:.5em;font-size:20px;text-align:center;font-variant-numeric:tabular-nums}
 .pin-field .btn{flex:none;height:44px;padding:0 14px;font-size:14px}
-@media (max-width:640px){ .urow{grid-template-columns:38px minmax(0,1fr) auto} .urow .st{display:none} }
+.pin-show{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 10px;border:1px dashed var(--line);border-radius:10px;background:var(--surface);font-size:14px;color:var(--ink-soft);font-variant-numeric:tabular-nums;letter-spacing:.12em;min-width:96px;justify-content:center}
+.pin-show.none{letter-spacing:0;font-size:12.5px;color:var(--muted)}
+.pin-now{margin:-4px 0 0;font-size:13px;color:var(--muted)}
+.pin-now b{color:var(--ink);letter-spacing:.15em;font-weight:500}
+@media (max-width:640px){ .urow{grid-template-columns:38px minmax(0,1fr) auto;row-gap:8px} .urow .st{display:none} .urow .pin-show{grid-column:2} }
 
 
 /* ---------- ¿Quién eres? ---------- */
@@ -688,6 +692,7 @@ body[data-role="hostess"] .admin-only{display:none !important}
     <div class="event"><h1>Mis eventos</h1><div class="meta"><span id="eCount"></span></div></div>
     <div class="band-right">
       <div class="who-chip"><span id="eRole">Sesión iniciada</span><b id="eUser"></b></div>
+      <button class="icon-btn" id="meBtn" aria-label="Mi perfil"><i data-icon="user"></i><span class="lbl">Mi perfil</span></button>
       <button class="icon-btn admin-only" id="usersBtn" aria-label="Usuarios"><i data-icon="users"></i><span class="lbl">Usuarios</span></button>
       <button class="icon-btn" id="logoutBtn" aria-label="Cerrar sesión"><i data-icon="logout"></i><span class="lbl">Salir</span></button>
     </div>
@@ -914,6 +919,7 @@ body[data-role="hostess"] .admin-only{display:none !important}
         <button type="button" data-role="hostess">Hostess<small>Recepción en eventos</small></button>
         <button type="button" data-role="admin">Administrador<small>Acceso a todo</small></button>
       </div>
+      <p class="wide pin-now" id="ufPinNow"></p>
       <label class="wide"><span id="ufPinLbl">PIN de 4 números</span>
         <span class="pin-field"><input id="ufPin" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="••••"><button type="button" class="btn" id="ufGen"><i data-icon="sparkle"></i>Generar</button></span></label>
       <label class="wide opt" id="ufActiveWrap"><input type="checkbox" id="ufActive" checked>Usuario activo (puede iniciar sesión)</label>
@@ -924,6 +930,21 @@ body[data-role="hostess"] .admin-only{display:none !important}
       <button class="btn" id="ufCancel">Cancelar</button>
       <button class="btn dark" id="ufSave"><i data-icon="check"></i>Guardar</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="meOverlay" role="dialog" aria-modal="true" aria-labelledby="meTitle">
+  <div class="card sheet">
+    <div class="sh"><span class="hi"><i data-icon="user"></i></span><h3 id="meTitle">Mi perfil</h3></div>
+    <p id="meUser"></p>
+    <div class="form">
+      <label class="wide">Mi nombre<input id="meName" placeholder="Ej. Andrea López"></label>
+      <div class="wide lbl-t">Cambiar mi PIN (opcional)</div>
+      <label>PIN actual<input id="meCur" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="••••"></label>
+      <label>PIN nuevo<input id="meNew" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="4 números"></label>
+    </div>
+    <div id="meErr"></div>
+    <div class="actions"><button class="btn" data-close>Cancelar</button><button class="btn dark" id="meSave"><i data-icon="check"></i>Guardar</button></div>
   </div>
 </div>
 
@@ -1883,6 +1904,7 @@ async function loadUsers(){
     <span class="avatar">${esc(initials(u.name))}</span>
     <div><b>${esc(u.name)}${SESSION && u.id===SESSION.id?" (tú)":""}</b><small>@${esc(u.username)} · <span class="role-pill ${u.role}">${u.role==="admin"?"Administrador":"Hostess"}</span></small></div>
     <span class="st ${!u.active||u.locked?"off":""}">${!u.active?"Inactivo":u.locked?"Bloqueado":u.last_login?"Último acceso "+new Date(u.last_login).toLocaleDateString("es-MX",{day:"numeric",month:"short"}):"Nunca ha entrado"}</span>
+    ${u.pin ? `<button class="pin-show" data-upin="${u.id}" aria-label="Ver PIN de ${esc(u.name)}">${ic("eye")}<span>••••</span></button>` : `<span class="pin-show none" title="Asígnale un PIN nuevo para poder verlo">PIN no visible</span>`}
     <button class="btn" data-uedit="${u.id}">${ic("edit")}Editar</button></div>`).join("")}</div>`;
 }
 $("usersBtn").onclick = ()=>{ $("usersOverlay").classList.add("open"); loadUsers(); };
@@ -1898,13 +1920,20 @@ function openUserForm(u){
   $("ufName").value = u ? u.name : ""; $("ufUser").value = u ? u.username : "";
   $("ufPin").value = u ? "" : randomPin(); $("ufPin").placeholder = u ? "Sin cambio" : "••••";
   $("ufPinLbl").textContent = u ? "Nuevo PIN (opcional)" : "PIN de 4 números";
+  $("ufPinNow").innerHTML = u ? (u.pin ? `PIN actual: <b>${esc(u.pin)}</b>` : "El PIN actual no se puede mostrar porque se creó antes de esta función. Asigna uno nuevo para verlo después.") : "";
+  $("ufPinNow").hidden = !u;
   $("ufActive").checked = u ? u.active : true; $("ufActiveWrap").style.display = u ? "" : "none";
   $("ufDelete").style.display = u && !(SESSION && u.id===SESSION.id) ? "" : "none";
   $("ufErr").innerHTML = "";
   $("userFormOverlay").classList.add("open"); setTimeout(()=>$("ufName").focus(), 30);
 }
 $("newUserBtn").onclick = ()=>openUserForm(null);
-$("userList").addEventListener("click", e=>{ const b = e.target.closest("[data-uedit]"); if(b) openUserForm(USERS.find(u=>u.id===b.dataset.uedit)); });
+$("userList").addEventListener("click", e=>{
+  const pb = e.target.closest("[data-upin]");
+  if(pb){ const u = USERS.find(x=>x.id===pb.dataset.upin), s = pb.querySelector("span"), show = s.textContent==="••••";
+    s.textContent = show ? u.pin : "••••"; pb.querySelector("svg").outerHTML = ic(show?"eyeOff":"eye"); return; }
+  const b = e.target.closest("[data-uedit]"); if(b) openUserForm(USERS.find(u=>u.id===b.dataset.uedit));
+});
 $("ufCancel").onclick = ()=>$("userFormOverlay").classList.remove("open");
 const ufError = m => { $("ufErr").innerHTML = `<div class="alert">${ic("alert")}<span>${esc(m)}</span></div>`; };
 $("ufSave").onclick = async ()=>{
@@ -1925,6 +1954,30 @@ $("ufDelete").onclick = async ()=>{
   const {error} = await sb.rpc("aux_delete_user", {p_id: ufEdit.id});
   if(error) return ufError(error.message);
   $("userFormOverlay").classList.remove("open"); await loadUsers(); showToast(`${ufEdit.name} borrado`, false);
+};
+/* ---------- Mi perfil ---------- */
+$("meBtn").onclick = ()=>{
+  $("meName").value = SESSION ? SESSION.name : ""; $("meCur").value = ""; $("meNew").value = ""; $("meErr").innerHTML = "";
+  $("meUser").textContent = SESSION ? `Usuario: ${SESSION.username} · ${SESSION.role==="admin"?"Administrador":"Hostess"}` : "";
+  $("meOverlay").classList.add("open"); setTimeout(()=>$("meName").focus(), 30);
+};
+["meCur","meNew"].forEach(id=>$(id).addEventListener("input", ()=>{ $(id).value = $(id).value.replace(/\D/g,"").slice(0,4); }));
+const meError = m => { $("meErr").innerHTML = `<div class="alert">${ic("alert")}<span>${esc(m)}</span></div>`; };
+$("meSave").onclick = async ()=>{
+  const name = $("meName").value.trim(), cur = $("meCur").value, nw = $("meNew").value;
+  if(!name) return meError("Escribe tu nombre.");
+  if(nw || cur){
+    if(!/^\d{4}$/.test(cur)) return meError("Para cambiar tu PIN, escribe primero tu PIN actual.");
+    if(!/^\d{4}$/.test(nw)) return meError("El PIN nuevo debe tener exactamente 4 números.");
+  }
+  $("meSave").disabled = true;
+  const {data, error} = await sb.rpc("aux_update_me", {p_name:name, p_current_pin: cur || null, p_new_pin: nw || null});
+  $("meSave").disabled = false;
+  if(error) return meError(/function|schema cache/i.test(error.message) ? "Falta correr el SQL de “Mi perfil” en Supabase." : error.message);
+  if(data && data.ok === false) return meError(data.error);
+  SESSION.name = name; LS.set("yo", SESSION); paintWho();
+  const lu = LS.get("login-users"); if(lu){ lu.forEach(u=>{ if(u.username===SESSION.username) u.name = name; }); LS.set("login-users", lu); }
+  closeAll(); showToast(nw ? "Nombre y PIN actualizados" : "Nombre actualizado", false);
 };
 function paintWho(){ $("eUser").textContent = SESSION ? SESSION.name : ""; $("eRole").textContent = SESSION ? (SESSION.role==="admin"?"Administrador":"Hostess") : ""; }
 

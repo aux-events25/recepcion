@@ -667,6 +667,9 @@ body[data-role="hostess"] .admin-only{display:none !important}
 .req-valid select{height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 12px;min-width:260px}
 .done small b{font-weight:600;color:var(--ink)}
 @media (max-width:640px){ .req-valid select{min-width:0;width:100%} }
+.field.col{flex-direction:column;align-items:stretch;gap:8px}
+.field.col select{width:100%;max-width:none !important}
+.field select{max-width:62%}
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1211,11 +1214,11 @@ function rowGuest(id, g){
 function rowRequest(id, r){
   if(!r.guestUid && r.guestId){ const g = S && S.guests.find(x=>x.id===r.guestId); if(g) r.guestUid = g.uid; }
   const o = {id:r.id, event_id:id, kind:r.kind, guest_id:r.guestUid||null, name:r.name, persons:Math.max(1,r.persons|0), table_num:r.table||null, status:r.status, mode:r.mode==="approve"?"move":(r.mode||null), resolution:r.resolution||null, created_at:isoOf(r.at), resolved_at:isoOf(r.resolvedAt)};
-  if(!NO_EXTRA){ o.created_by = r.createdBy || null; o.resolved_by = r.resolvedBy || null; o.reason = r.reason || null; o.validated_with = r.validatedWith || null; }
+  if(!NO_EXTRA){ o.created_by = r.createdBy || null; o.resolved_by = r.resolvedBy || null; o.reason = r.reason || null; o.validated_with = r.validatedWith || null; o.from_table = r.fromTable || null; }
   return o;
 }
 let NO_EXTRA = false; // si aún no existen las columnas nuevas en Supabase
-const isExtraErr = e => /walk_in|original_table|checked_by|changes|created_by|resolved_by|reason|validated_with/i.test((e && (e.message||e.details)) || "");
+const isExtraErr = e => /walk_in|original_table|checked_by|changes|created_by|resolved_by|reason|validated_with|from_table/i.test((e && (e.message||e.details)) || "");
 const TBL = {tables:"event_tables", guests:"guests", requests:"requests"};
 const ROW = {tables:rowTable, guests:rowGuest, requests:rowRequest};
 function rowsOf(id, s){ return {tables:s.tables.map(t=>rowTable(id,t)), guests:s.guests.map(g=>rowGuest(id,g)), requests:s.requests.map(r=>rowRequest(id,r))}; }
@@ -1292,7 +1295,7 @@ const DB = {
         event:{name:ev.name, type:ev.type, date:ev.event_date||"", time:(ev.start_time||"").slice(0,5), theme:ev.theme, planner:ev.planner, sub:ev.subtitle},
         tables: tables.map(t=>({uid:t.id, num:t.num, cap:t.capacity, extra:t.extra})),
         guests: gl,
-        requests: reqs.map(r=>({id:r.id, kind:r.kind, guestUid:r.guest_id, name:r.name, persons:r.persons, table:r.table_num||0, status:r.status, mode:r.mode, resolution:r.resolution, at:msOf(r.created_at), resolvedAt:msOf(r.resolved_at), createdBy:r.created_by||"", resolvedBy:r.resolved_by||"", reason:r.reason||"", validatedWith:r.validated_with||""}))
+        requests: reqs.map(r=>({id:r.id, kind:r.kind, guestUid:r.guest_id, name:r.name, persons:r.persons, table:r.table_num||0, status:r.status, mode:r.mode, resolution:r.resolution, at:msOf(r.created_at), resolvedAt:msOf(r.resolved_at), createdBy:r.created_by||"", resolvedBy:r.resolved_by||"", reason:r.reason||"", validatedWith:r.validated_with||"", fromTable:r.from_table||0}))
       };
       st.requests.forEach(r=>{ const g = gl.find(x=>x.uid===r.guestUid); if(g) r.guestId = g.id; });
       return {state:st, fromServer:true};
@@ -1422,7 +1425,7 @@ function remote(kind, payload){
   } else {
     if(!t){ t = {id:row.id}; S.requests.unshift(t); }
     const g = S.guests.find(x=>x.uid===row.guest_id);
-    Object.assign(t, {kind:row.kind, guestUid:row.guest_id, guestId:g?g.id:undefined, name:row.name, persons:row.persons, table:row.table_num||0, status:row.status, mode:row.mode, resolution:row.resolution, at:msOf(row.created_at), resolvedAt:msOf(row.resolved_at), createdBy:row.created_by||t.createdBy||"", resolvedBy:row.resolved_by||t.resolvedBy||"", reason:row.reason||t.reason||"", validatedWith:row.validated_with||t.validatedWith||""});
+    Object.assign(t, {kind:row.kind, guestUid:row.guest_id, guestId:g?g.id:undefined, name:row.name, persons:row.persons, table:row.table_num||0, status:row.status, mode:row.mode, resolution:row.resolution, at:msOf(row.created_at), resolvedAt:msOf(row.resolved_at), createdBy:row.created_by||t.createdBy||"", resolvedBy:row.resolved_by||t.resolvedBy||"", reason:row.reason||t.reason||"", validatedWith:row.validated_with||t.validatedWith||"", fromTable:row.from_table||t.fromTable||0});
     if(ui.req && ui.req.id===t.id && t.status!=="pending") ui.req = null;
   }
   last[kind].set(row.id, JSON.stringify(ROW[kind](currentId, t)));
@@ -1470,6 +1473,7 @@ const fits = (num, n, g) => !!num && n <= freeAt(num, g);
 
 /* ================= Motivos y validaciones ================= */
 const REASONS = ["No había confirmado asistencia","Se invitó en la última semana","Acompañante no registrado en la invitación","Error u omisión en la lista","Invitado de último momento por la familia"];
+const MOVE_REASONS = ["Lo pidieron los novios","Lo pidió la familia de los novios","El invitado pidió estar con su familia o amigos","Incomodidad o conflicto en la mesa original","Ajuste por espacio o accesibilidad"];
 const VALIDATIONS = ["Decisión propia","Con los novios","Con los papás de los novios","Con un hermano o hermana de los novios","Con la wedding planner","Con otro familiar"];
 const VALID = {}; // validación elegida por solicitud (mientras el admin decide)
 
@@ -1568,7 +1572,7 @@ function renderList(){
   $("rows").innerHTML = list.map((g,i)=>{
     const st = status(g);
     const by = g.by && g.arrived>0 ? ` · ${esc(g.by)}` : "";
-    const sub = st==="review" ? `${ic("inbox")}En revisión, mesa llena` : st==="pending" ? `${ic("hourglass")}Pendiente` : st==="partial" ? `${ic("clock")}Llegaron ${g.arrived} de ${g.persons} a las ${fmtTime(g.at)}${by}` : `${ic("clock")}Llegó a las ${fmtTime(g.at)}${by}`;
+    const sub = st==="review" ? `${ic("inbox")}${pendingReq(g).fromTable?`En revisión: cambio a Mesa ${pendingReq(g).table}`:pendingReq(g).kind==="guest"?"En revisión, mesa llena":"En revisión"}` : st==="pending" ? `${ic("hourglass")}Pendiente` : st==="partial" ? `${ic("clock")}Llegaron ${g.arrived} de ${g.persons} a las ${fmtTime(g.at)}${by}` : `${ic("clock")}Llegó a las ${fmtTime(g.at)}${by}`;
     const ci = chgInfo(g), notes = ci.any ? chgNotes(g) : [], cb = ci.any ? chgBy(g) : "";
     const note = notes.length ? `<small class="note">${ic(ci.walk?"userPlus":ci.moved?"move":"users")}${esc(notes.join(" · "))}${cb?` · por ${esc(cb)}`:""}</small>` : "";
     return `<div class="row ${st}${ci.any?" chg":""}${i===0&&ui.q?" first":""}" role="listitem" data-id="${g.id}">
@@ -1613,6 +1617,10 @@ function renderTables(){
 
 /* ---------- Solicitudes ---------- */
 const reasonText = r => {
+  if(r.fromTable){
+    const f = Math.max(0, freeAt(r.table, reqGuest(r)));
+    return `Solicita cambiar de la Mesa ${r.fromTable} a la Mesa ${r.table}` + (f>=r.persons ? `, que tiene ${plural(f,"lugar libre","lugares libres")}.` : f===0 ? `, que está llena.` : `, que solo tiene ${plural(f,"lugar libre","lugares libres")} y necesita ${r.persons}.`);
+  }
   const pre = r.kind==="new" ? "No está en la lista de invitados. " : "";
   if(!r.table) return `${pre}Sin mesa sugerida. Necesita lugar para ${plural(r.persons,"persona","personas")}.`;
   const f = Math.max(0, freeAt(r.table, reqGuest(r)));
@@ -1657,7 +1665,7 @@ function renderRequests(){
   $("reqInfo").textContent = pend.length ? `${plural(pend.length,"pendiente","pendientes")}` : "Sin pendientes";
   $("reqPending").innerHTML = pend.length ? pend.map(r=>`<article class="req" data-req="${r.id}">
       <div class="req-top"><span class="avatar">${esc(initials(r.name))}</span>
-        <div class="who"><b>${esc(r.name)}</b><small><span>${ic("users")}${plural(r.persons,"persona","personas")}</span><span>${ic("clock")}Enviada a las ${fmtTime(r.at)}</span><span>${ic(r.kind==="guest"?"list":"userPlus")}${r.kind==="guest"?"En la lista":"No estaba en la lista"}</span></small></div>
+        <div class="who"><b>${esc(r.name)}</b><small><span>${ic("users")}${plural(r.persons,"persona","personas")}</span><span>${ic("clock")}Enviada a las ${fmtTime(r.at)}</span><span>${ic(r.fromTable?"move":r.kind==="guest"?"list":"userPlus")}${r.fromTable?`Cambio de mesa ${r.fromTable} → ${r.table}`:r.kind==="guest"?"En la lista":"No estaba en la lista"}</span></small></div>
         <span class="req-by">${ic("user")}Solicitó: <b>${esc(r.createdBy||"—")}</b></span>
       </div>
       <p class="req-why">${ic("alert")}<span>${reasonText(r)}</span></p>
@@ -1671,7 +1679,7 @@ function renderRequests(){
       </div>${reqForm(r)}` : `<div class="info">${ic("hourglass")}<span>Esperando la aprobación de un administrador.</span></div>`}</article>`).join("")
     : `<div class="empty" style="background:var(--surface);border:1px solid var(--line);border-radius:16px"><div class="ei">${ic("check",1.5)}</div><b>Todo en orden</b>Aquí aparecen los invitados fuera de lista y las mesas llenas para que un administrador los apruebe.</div>`;
   $("reqDone").innerHTML = done.length ? `<div class="done-list">${done.map(r=>`<div class="done"><b>${esc(r.name)}</b>
-      <span class="pill ${r.status==="rejected"?"full":"ok"}">${r.status==="rejected"?"No procede":r.mode==="chairs"?"Sillas agregadas":/^Aprobad/.test(r.resolution||"")?"Aprobado":"Reacomodado"}</span>
+      <span class="pill ${r.status==="rejected"?"full":"ok"}">${r.status==="rejected"?"No procede":r.mode==="chairs"?"Sillas agregadas":/^Cambio aprobado/.test(r.resolution||"")?"Cambio aprobado":/^Aprobad/.test(r.resolution||"")?"Aprobado":"Reacomodado"}</span>
       <small>${esc(r.resolution)} · ${fmtTime(r.resolvedAt)}</small>
       <small>${r.reason?`Motivo: ${esc(r.reason)} · `:""}Solicitó <b>${esc(r.createdBy||"—")}</b> · ${r.status==="rejected"?"Rechazó":"Liberó"} <b>${esc(r.resolvedBy||"—")}</b>${r.validatedWith?` · Validado: ${esc(r.validatedWith)}`:""}</small></div>`).join("")}</div>`
     : `<p class="req-intro">Aún no hay solicitudes resueltas.</p>`;
@@ -1727,6 +1735,7 @@ function drawCard(){
   const opts = tableStats().map(t=>{ const f = Math.max(0,freeAt(t.num,g)); return `<option value="${t.num}" ${t.num===d.table?"selected":""}>Mesa ${t.num} · ${f===0?"llena":plural(f,"libre","libres")}</option>`; }).join("");
   let primary;
   if(req) primary = `<button class="btn request" id="confirmArrival" data-act="goreq">${ic("inbox")}Ver solicitud</button>`;
+  else if(d.table!==g.table) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar cambio a solicitudes</button>`;
   else if(!ok) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar a solicitudes</button>`;
   else primary = `<button class="btn primary" id="confirmArrival" data-act="arrive">${ic("check",2.4)}${st==="pending"?"Registrar llegada":"Guardar cambios"}</button>`;
   $("guestCard").innerHTML = `
@@ -1748,8 +1757,10 @@ function drawCard(){
         <div class="stepper"><button data-step="-1" aria-label="Uno menos">−</button><output>${d.n} de ${g.persons}</output><button data-step="1" aria-label="Uno más">+</button></div>
       </div>
       ${d.n>g.persons?`<div class="info">${ic("userPlus")}<span>Se registrará${d.n-g.persons===1?" 1 persona adicional":"n "+(d.n-g.persons)+" personas adicionales"} a la invitación (tenía ${g.persons}). Quedará marcado en azul como cambio.</span></div>`:""}
-      ${d.table!==g.table?`<div class="info">${ic("move")}<span>Cambio de mesa: original Mesa ${g.orig||g.table}, nueva ubicación Mesa ${d.table}. Quedará marcado en azul.</span></div>`:""}
+
       <div class="field"><label for="cardTable">${ic("table")}Mesa asignada</label><select id="cardTable">${opts}</select></div>`:""}
+      ${d.table!==g.table?`<div class="info">${ic("move")}<span>Cambio de mesa: Mesa ${g.table} → Mesa ${d.table}. Se enviará a <b>Solicitudes</b> para que un administrador lo apruebe.</span></div>
+      <div class="field col"><label for="cardReason">${ic("notes")}Motivo del cambio</label><select id="cardReason"><option value="">Elige un motivo…</option>${MOVE_REASONS.map(x=>`<option ${d.reason===x?"selected":""}>${esc(x)}</option>`).join("")}</select></div>`:""}
       ${!ok&&!req?`<div class="alert">${ic("alert")}<span>La Mesa ${d.table} ${free===0?"está llena":`solo tiene ${plural(free,"lugar libre","lugares libres")}`} y llegan ${d.n}. Envía la solicitud para que el coordinador lo resuelva y sigue con la fila.</span></div>`:""}
       ${(g.log||[]).length?`<div class="hist"><p>${ic("clock")}Historial de cambios</p><ul>${g.log.slice().reverse().map(l=>`<li>${esc(l.txt)}<small>${l.by?"por "+esc(l.by)+" · ":""}${fmtTime(l.at)}</small></li>`).join("")}</ul></div>`:""}
       ${mates.length?`<div class="mates"><p>${ic("users")}Comparte mesa con</p><ul>${mates.map(m=>`<li class="${m.arrived>0?"ok":""}">${m.arrived>0?ic("check",2.4):""}${esc(m.name)}</li>`).join("")}</ul></div>`:""}
@@ -1768,7 +1779,12 @@ $("guestCard").addEventListener("click", e=>{
     const act = c.dataset.act;
     if(act==="goreq"){ closeAll(false); setSection("requests"); return; }
     if(act==="request"){
-      createRequest({kind:"guest", guestId:g.id, guestUid:g.uid, name:g.name, persons:d.n, table:d.table, reason: d.n>g.persons ? `Llegó con ${d.n} personas (invitación de ${g.persons})` : "Mesa sin lugares suficientes"});
+      if(d.table!==g.table){
+        if(!d.reason){ showToast("Elige el motivo del cambio de mesa.", false); const s = $("cardReason"); if(s) s.focus(); return; }
+        createRequest({kind:"guest", guestId:g.id, guestUid:g.uid, name:g.name, persons:d.n, table:d.table, fromTable:g.table, reason:d.reason});
+      } else {
+        createRequest({kind:"guest", guestId:g.id, guestUid:g.uid, name:g.name, persons:d.n, table:d.table, reason: d.n>g.persons ? `Llegó con ${d.n} personas (invitación de ${g.persons})` : "Mesa sin lugares suficientes"});
+      }
       closeAll(); return;
     }
     const prevTable = g.table, prevOrig = g.orig, prevLog = (g.log||[]).slice();
@@ -1783,7 +1799,7 @@ $("guestCard").addEventListener("click", e=>{
   }
   if(e.target.closest("#undoArrival")){ setArrival(g,0,`${g.name}: llegada quitada`); closeAll(); }
 });
-$("guestCard").addEventListener("change", e=>{ if(e.target.id==="cardTable"){ ui.draft.table = +e.target.value; drawCard(); } });
+$("guestCard").addEventListener("change", e=>{ if(e.target.id==="cardReason"){ ui.draft.reason = e.target.value; return; } if(e.target.id==="cardTable"){ ui.draft.table = +e.target.value; drawCard(); } });
 
 /* ---------- Resolver solicitudes ---------- */
 function resolve(r, mode, table, chairs){
@@ -1798,13 +1814,14 @@ function resolve(r, mode, table, chairs){
       logChange(guest, "add", `Agregado fuera de lista en Mesa ${table}${guest.persons>1?` (${guest.persons} personas)`:""}${who}`);
       S.guests.push(guest); S.guests.sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:"base"}));
     }
-    if(guest.table!==table){ if(!guest.orig) guest.orig = guest.table; if(!guest.walkIn || guest.orig!==table) logChange(guest, "move", `Cambio de mesa: original Mesa ${guest.orig}, nueva ubicación Mesa ${table}`); }
+    if(guest.table!==table){ if(!guest.orig) guest.orig = guest.table; if(!guest.walkIn || guest.orig!==table) logChange(guest, "move", `Cambio de mesa: original Mesa ${guest.orig}, nueva ubicación Mesa ${table}${r.reason && r.fromTable ? ` · motivo: ${r.reason}` : ""}${r.createdBy ? ` · solicitó ${r.createdBy}` : ""}${r.validatedWith ? ` · validado: ${r.validatedWith.replace(/^Con /,"con ")}` : ""}`); }
     if(mode==="chairs") logChange(guest, "chairs", `Se ${chairs===1?"agregó 1 silla":"agregaron "+chairs+" sillas"} a la Mesa ${table}`);
     if(r.persons>guest.persons && !guest.walkIn) logChange(guest, "extra", `Tenía ${guest.persons} en invitación, se ${r.persons-guest.persons===1?"agrega 1":"agregan "+(r.persons-guest.persons)} a Mesa ${table}`);
     guest.table = table; guest.arrived = r.persons; guest.at = Date.now(); guest.by = r.createdBy || ME();
   }
   r.status = mode==="reject" ? "rejected" : "done"; r.mode = mode; r.resolvedAt = Date.now(); r.resolvedBy = ME(); delete VALID[r.id];
-  r.resolution = mode==="approve" ? `Aprobado en la Mesa ${table} y llegada registrada`
+  r.resolution = mode==="approve" && r.fromTable ? `Cambio aprobado: Mesa ${r.fromTable} → Mesa ${table}`
+               : mode==="approve" ? `Aprobado en la Mesa ${table} y llegada registrada`
                : mode==="chairs" ? `Se agregaron ${plural(chairs,"silla","sillas")} a la Mesa ${table} y se registró su llegada`
                : mode==="move" ? `Reacomodado en la Mesa ${table} y llegada registrada`
                : `No procede${ui.req.note?": "+ui.req.note:""}`;
@@ -2421,7 +2438,7 @@ function buildReport(key){
     <div style="display:flex;gap:18px" class="rp-mu"><span><b style="color:${P.dark};font-weight:500">${D.full}</b> completas</span><span><b style="color:${P.accentText};font-weight:500">${D.partial}</b> parciales</span><span><b style="color:#5F5E5A;font-weight:500">${D.none}</b> no llegaron</span></div>` : "";
   let obs = "";
   if(D.walk.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Fuera de lista (${plural(D.walkPersons,"persona","personas")})</b>${D.walk.slice(0,6).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}${g.persons>1?` (${g.persons})`:""} → Mesa ${g.table||"—"}${(()=>{ const rq = S.requests.find(r=>r.kind==="new" && r.status==="done" && r.name===g.name); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· aprobó ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${D.walk.length>6?`<div class="rp-mu">y ${D.walk.length-6} más (ver lista)</div>`:""}</div>`;
-  if(D.moves.length || D.extras.length) obs += `<div class="rp-obs"><b>${ri("move",P.accentText)}Cambios de mesa</b>${D.moves.slice(0,5).map(g=>`<div>${ri("move",P.accentText)}${esc(g.name)}: Mesa ${g.orig} → Mesa ${g.table}${chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""}</div>`).join("")}${D.moves.length>5?`<div class="rp-mu">y ${D.moves.length-5} cambios más</div>`:""}${D.extras.map(t=>`<div>${ri("chair",P.accentText)}Mesa ${t.num}: se ${t.extra===1?"agregó 1 silla":`agregaron ${t.extra} sillas`}</div>`).join("")}</div>`;
+  if(D.moves.length || D.extras.length) obs += `<div class="rp-obs"><b>${ri("move",P.accentText)}Cambios de mesa</b>${D.moves.slice(0,5).map(g=>`<div>${ri("move",P.accentText)}${esc(g.name)}: Mesa ${g.orig} → Mesa ${g.table}${(()=>{ const rq = S.requests.filter(r=>r.fromTable && r.status==="done" && r.guestUid===g.uid).pop(); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${D.moves.length>5?`<div class="rp-mu">y ${D.moves.length-5} cambios más</div>`:""}${D.extras.map(t=>`<div>${ri("chair",P.accentText)}Mesa ${t.num}: se ${t.extra===1?"agregó 1 silla":`agregaron ${t.extra} sillas`}</div>`).join("")}</div>`;
   if(D.plus.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Personas adicionales a la invitación</b>${D.plus.slice(0,5).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}: tenía ${g.persons}, llegaron ${g.arrived} (+${g.arrived-g.persons}) · Mesa ${g.table}${chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""}</div>`).join("")}${D.plus.length>5?`<div class="rp-mu">y ${D.plus.length-5} más (ver lista)</div>`:""}</div>`;
   if(D.rejected.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Solicitudes que no procedieron</b>${D.rejected.slice(0,4).map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)}${r.resolution&&r.resolution!=="No procede"?` · ${esc(r.resolution.replace(/^No procede:\s*/,""))}`:""}${r.resolvedBy?` <span class="rp-mu">· rechazó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}</div>`;
   if(!obs) obs = `<div class="rp-obs" style="display:flex;flex-direction:row;align-items:center;gap:8px">${ri("check",P.dark)}Sin observaciones: todo salió según lo planeado.</div>`;

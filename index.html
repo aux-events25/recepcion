@@ -14,6 +14,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -208,7 +209,7 @@ body[data-section="reception"] #requestsView,body[data-section="reports"] #reque
 body:not([data-section="reports"]) #reportsView{display:none}
 .panel{min-width:0}
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-.panel-head h2{margin:0;display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:600;font-size:30px;line-height:1}
+.panel-head h2{margin:0;display:flex;align-items:center;gap:12px;font-family:"Outfit","Jost",sans-serif;font-weight:400;font-size:28px;line-height:1.1;letter-spacing:-.01em}
 .panel-head h2 .hi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--primary-soft);color:var(--primary-ink);font-size:19px}
 .panel-head p{margin:0;color:var(--muted);font-size:14px}
 
@@ -445,7 +446,8 @@ body[data-screen="event"] #eventApp{display:block}
 .login-art .sprig.r{right:-30px;bottom:-24px;transform:scale(-1,-1)}
 .big-mono{position:relative;width:118px;height:118px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:34px;color:var(--gold);letter-spacing:.04em;box-shadow:inset 0 0 0 6px color-mix(in srgb,var(--band) 60%, transparent),inset 0 0 0 7px color-mix(in srgb,var(--gold) 45%, transparent)}
 .login-art h1{position:relative;margin:26px 0 0;font-family:var(--serif);font-weight:700;font-size:clamp(28px,3.2vw,42px);letter-spacing:.1em;line-height:1;color:var(--band-title)}
-.login-art .script{position:relative;font-family:var(--script);font-style:italic;font-weight:600;font-size:clamp(30px,3vw,40px);color:var(--gold);line-height:1.1;margin-top:6px}
+.login-art .script{position:relative;font-family:"Outfit","Jost",sans-serif;font-style:normal;font-weight:400;font-size:clamp(14px,1.3vw,18px);letter-spacing:.36em;padding-left:.36em;text-transform:uppercase;color:#FFFFFF;line-height:1.3;margin-top:18px;display:flex;align-items:center;justify-content:center;gap:14px;text-align:center}
+.login-art .script::before,.login-art .script::after{content:"";width:30px;height:1px;background:rgba(255,255,255,.55);flex:none}
 .login-art .rule{position:relative;width:120px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:26px auto}
 .login-art .motto{position:relative;font-family:var(--serif);font-style:italic;font-size:clamp(19px,1.7vw,23px);opacity:.88;max-width:28ch;line-height:1.35}
 .login-pane{display:flex;align-items:center;justify-content:center;padding:40px 24px}
@@ -700,6 +702,21 @@ a.ev-map[hidden]{display:none}
 .ev-card:hover .ev-veil,.ev-card:focus-within .ev-veil{opacity:.18}
 .ev-next{box-shadow:0 0 0 2px var(--gold),var(--shadow)}
 .ev-next::before{content:"Siguiente evento";position:absolute;top:-1px;left:50%;transform:translateX(-50%);z-index:6;background:var(--gold);color:#fff;font-size:12px;font-weight:600;letter-spacing:.08em;padding:3px 12px;border-radius:0 0 10px 10px}
+/* ---------- Logo AUX Events ---------- */
+.logo-big{position:relative;width:min(400px,80%);height:auto;display:block;margin:0 auto 6px}
+.logo-band{height:38px;width:auto;display:block;flex:none}
+#eventsScreen .brand span#eSub{font-family:"Outfit","Jost",sans-serif;font-style:normal;font-weight:400;font-size:12.5px;letter-spacing:.3em;text-transform:uppercase;color:#FFFFFF;border-left:1px solid rgba(255,255,255,.35);padding-left:14px;margin:0;line-height:1.35}
+.auxwm{white-space:nowrap;letter-spacing:0;font-style:normal}
+.auxwm b{font-family:"Bebas Neue",Impact,"Arial Narrow",sans-serif;font-weight:400;font-size:1.14em;letter-spacing:.01em}
+.auxwm i{font-style:normal;font-family:"Outfit","Jost",sans-serif;font-weight:500;color:#575757;margin-left:.2em}
+.band .auxwm i,.rp-side .auxwm i,.login-art .auxwm i{color:#E4D2AE}
+
+.brand .planner-tag b{font-size:15px;letter-spacing:.04em}
+.brand .planner-tag b:empty{display:none}
+.brand .planner-tag{border-left:1px solid color-mix(in srgb,var(--on-band) 30%, transparent);padding-left:12px}
+.rp-wm{opacity:.45 !important}
+.brand [hidden],.login-art [hidden]{display:none !important}
+@media (max-width:640px){ .logo-band{height:34px} .brand .planner-tag{display:none} }
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -778,8 +795,9 @@ a.ev-map[hidden]{display:none}
   <div class="login-art">
     <svg class="sprig l" aria-hidden="true"><use href="#sprig"/></svg>
     <svg class="sprig r" aria-hidden="true"><use href="#sprig"/></svg>
-    <div class="big-mono" id="lMono">AUX</div>
-    <h1 id="lName">AUX EVENTS</h1>
+    <img class="logo-big" data-logo="light" alt="AUX Events · Donde el estilo celebra contigo">
+    <div class="big-mono" id="lMono" hidden>AUX</div>
+    <h1 id="lName" hidden>AUX EVENTS</h1>
     <div class="script" id="lSub">Recepción de invitados</div>
     <div class="rule"></div>
     <p class="motto">Cada invitado, recibido con su nombre y llevado a su lugar.</p>
@@ -821,8 +839,9 @@ a.ev-map[hidden]{display:none}
     <svg class="sprig l" aria-hidden="true"><use href="#sprig"/></svg>
     <svg class="sprig r" aria-hidden="true"><use href="#sprig"/></svg>
     <div class="brand">
-      <div class="mono" id="eMono">AUX</div>
-      <div><b id="eName">AUX EVENTS</b><span id="eSub">Recepción de invitados</span></div>
+      <img class="logo-band" data-logo="light" alt="AUX Events">
+      <div class="mono" id="eMono" hidden>AUX</div>
+      <div><b id="eName" hidden>AUX EVENTS</b><span id="eSub">Recepción de invitados</span></div>
     </div>
     <div class="event"><h1>Mis eventos</h1><div class="meta"><span id="eCount"></span></div></div>
     <div class="band-right">
@@ -855,8 +874,9 @@ a.ev-map[hidden]{display:none}
   <svg class="sprig l" aria-hidden="true"><use href="#sprig"/></svg>
   <svg class="sprig r" aria-hidden="true"><use href="#sprig"/></svg>
   <div class="brand">
-    <div class="mono" id="plannerMono">MG</div>
-    <div><b id="plannerName">AUX EVENTS</b><span id="plannerSub">Recepción de invitados</span></div>
+    <img class="logo-band" data-logo="light" alt="AUX Events">
+    <div class="mono" id="plannerMono" hidden>MG</div>
+    <div class="planner-tag"><b id="plannerName"></b><span id="plannerSub"></span></div>
   </div>
   <div class="event">
     <h1 id="eventName">Boda Ana &amp; Luis</h1>
@@ -1105,6 +1125,20 @@ a.ev-map[hidden]{display:none}
 <div class="toast" id="toast" role="status"><span class="ti"><i data-icon="check"></i></span><span id="toastMsg"></span><button id="toastUndo"><i data-icon="undo"></i>Deshacer</button></div>
 
 <script>
+/* ================= Logo AUX Events (vectorial) ================= */
+const LOGO_P = {"aux":["translate(0.000000,930.000000) scale(0.100000,-0.100000)","<path d=\"M9130 9112 c-6 -2 -10 -13 -10 -24 0 -20 54 -189 69 -218 5 -9 12 -31 16 -50 4 -19 11 -39 15 -45 4 -5 11 -25 15 -43 4 -18 13 -45 21 -60 8 -15 14 -35 14 -45 0 -9 5 -25 10 -35 9 -16 121 -342 140 -407 10 -38 29 -91 47 -132 7 -17 13 -38 13 -47 0 -9 5 -24 10 -34 9 -16 151 -430 170 -497 10 -38 29 -91 47 -132 7 -17 13 -38 13 -47 0 -9 5 -24 10 -34 6 -9 35 -91 65 -182 68 -207 75 -228 92 -267 7 -17 13 -38 13 -46 0 -8 7 -28 15 -43 8 -16 15 -36 15 -45 0 -9 7 -30 15 -45 8 -16 15 -36 15 -45 0 -9 7 -30 15 -45 8 -16 15 -38 15 -50 0 -11 4 -24 8 -30 5 -5 25 -61 46 -124 20 -63 40 -122 45 -130 5 -9 12 -30 16 -49 4 -18 13 -44 21 -59 8 -15 14 -34 14 -43 0 -9 7 -30 15 -45 8 -16 15 -37 15 -47 0 -9 5 -25 10 -35 6 -9 40 -107 76 -217 36 -110 72 -214 80 -232 8 -17 14 -38 14 -46 0 -8 7 -28 15 -43 8 -16 15 -36 15 -45 0 -9 7 -30 15 -45 8 -16 15 -37 15 -47 0 -9 5 -25 10 -35 6 -9 35 -91 65 -182 l54 -166 -10 -44 c-6 -25 -14 -49 -20 -55 -5 -5 -9 -18 -9 -28 0 -10 -6 -33 -14 -50 -8 -18 -22 -57 -31 -87 -10 -30 -23 -69 -30 -85 -7 -17 -16 -45 -19 -62 -4 -18 -12 -35 -17 -38 -5 -4 -9 -16 -9 -28 0 -12 -7 -35 -15 -51 -8 -15 -15 -35 -15 -43 0 -8 -6 -29 -14 -46 -8 -18 -25 -63 -37 -102 -12 -38 -26 -74 -31 -80 -4 -5 -8 -18 -8 -30 0 -11 -7 -33 -15 -49 -8 -15 -15 -35 -15 -43 0 -8 -6 -29 -14 -46 -8 -18 -37 -102 -65 -187 -28 -85 -56 -163 -61 -172 -6 -10 -10 -25 -10 -34 0 -9 -6 -30 -13 -47 -18 -42 -37 -95 -47 -132 -14 -48 -39 -119 -50 -137 -6 -10 -10 -25 -10 -34 0 -9 -6 -30 -13 -47 -18 -41 -37 -94 -47 -132 -17 -58 -70 -210 -80 -227 -6 -10 -10 -25 -10 -34 0 -9 -6 -30 -13 -47 -17 -39 -31 -79 -64 -182 -14 -44 -30 -84 -34 -89 -5 -6 -9 -19 -9 -29 0 -10 -6 -33 -13 -50 -18 -41 -37 -94 -47 -132 -17 -58 -70 -210 -80 -227 -6 -10 -10 -25 -10 -34 0 -9 -6 -30 -13 -47 -17 -39 -31 -79 -64 -182 -14 -44 -30 -84 -34 -89 -5 -6 -9 -19 -9 -30 0 -12 -7 -34 -15 -50 -8 -15 -15 -34 -15 -41 0 -8 -5 -26 -11 -42 -14 -34 -126 -356 -139 -398 -17 -58 -130 -390 -140 -410 -15 -34 -80 -235 -80 -250 0 -7 4 -16 9 -20 5 -3 290 -5 632 -5 l623 0 16 17 c9 10 38 86 64 168 26 83 54 165 62 183 8 18 14 40 14 50 0 9 7 30 15 46 8 15 15 36 15 45 0 9 7 29 15 45 8 15 15 35 15 43 0 8 6 29 13 46 16 37 108 319 107 329 0 4 5 19 12 35 24 60 47 129 48 143 0 8 7 28 15 44 8 15 15 35 15 43 0 8 6 29 13 46 17 39 164 491 173 530 3 15 10 30 15 33 5 3 9 15 9 27 0 12 7 35 15 51 8 15 15 36 15 45 0 9 7 29 15 45 8 15 15 35 15 43 0 8 6 29 13 46 16 38 104 310 113 350 3 15 10 30 15 33 5 3 9 15 9 27 0 12 7 35 15 51 8 15 15 36 15 45 0 9 7 29 15 45 8 15 15 35 15 43 0 8 6 29 13 46 8 18 35 100 62 182 26 83 53 166 60 185 8 19 17 46 20 60 3 14 10 34 14 45 18 46 33 92 42 130 18 73 58 92 59 27 0 -12 4 -30 9 -40 5 -9 26 -71 47 -137 20 -66 43 -134 50 -152 8 -17 14 -38 14 -47 0 -9 4 -24 9 -34 5 -9 33 -91 61 -182 29 -91 56 -173 61 -182 5 -10 13 -34 18 -55 9 -36 15 -55 46 -143 7 -19 21 -62 30 -95 10 -33 24 -74 32 -92 7 -17 13 -38 13 -47 0 -9 4 -24 9 -34 5 -9 26 -71 47 -137 20 -66 43 -134 50 -152 8 -17 14 -40 14 -51 0 -12 4 -23 9 -26 5 -3 12 -18 15 -33 9 -40 97 -312 113 -350 7 -17 13 -38 13 -47 0 -8 6 -30 14 -48 8 -18 29 -80 47 -138 17 -58 38 -119 46 -137 7 -17 13 -38 13 -47 0 -9 4 -24 9 -34 5 -9 33 -91 62 -182 28 -91 58 -179 65 -197 8 -17 14 -35 14 -40 -1 -11 90 -290 107 -330 7 -17 13 -39 13 -50 1 -10 7 -29 15 -43 8 -14 14 -35 15 -47 0 -12 9 -27 19 -33 13 -7 260 -10 730 -10 l711 0 0 19 c0 21 -15 71 -36 118 -8 17 -14 38 -14 47 0 9 -5 24 -10 34 -6 9 -35 91 -65 182 -67 204 -76 230 -86 255 -12 28 -69 194 -79 230 -10 38 -29 91 -47 132 -7 17 -13 38 -13 46 0 8 -7 28 -15 43 -8 16 -15 37 -15 46 0 9 -6 29 -14 45 -8 15 -24 57 -35 93 -23 76 -41 127 -52 155 -12 29 -69 195 -79 230 -4 17 -18 57 -30 90 -11 33 -24 69 -27 80 -3 11 -11 34 -19 52 -8 17 -14 40 -14 50 0 10 -4 23 -8 29 -5 5 -19 41 -31 79 -12 39 -29 84 -37 102 -8 17 -14 38 -14 46 0 8 -7 28 -15 43 -8 16 -15 38 -15 50 0 11 -4 24 -9 30 -4 5 -20 45 -34 89 -33 103 -47 143 -64 182 -7 17 -13 38 -13 47 0 9 -4 24 -10 34 -10 17 -63 169 -80 227 -11 40 -30 93 -46 133 -8 18 -14 39 -14 47 0 9 -4 23 -10 33 -10 17 -63 169 -80 227 -9 33 -29 89 -41 120 -12 28 -69 194 -79 230 -10 38 -29 91 -47 132 -7 17 -13 38 -13 47 0 9 -4 24 -10 34 -11 18 -36 89 -50 137 -10 37 -29 90 -47 132 -7 17 -13 38 -13 47 0 9 -4 24 -10 34 -15 27 -80 225 -80 245 0 11 6 33 13 50 18 41 37 94 47 132 19 65 131 391 140 407 5 10 10 26 10 35 0 10 7 31 15 47 8 15 15 35 15 43 0 8 6 29 13 46 17 39 24 60 92 267 30 91 59 173 65 182 5 10 10 25 10 34 0 9 6 30 13 47 21 50 38 99 48 140 5 21 13 45 18 55 10 21 30 76 41 117 10 34 36 110 49 140 5 11 19 54 31 95 13 41 27 79 31 84 5 6 9 19 9 30 0 12 7 34 15 50 8 15 15 36 15 45 0 9 6 28 14 43 8 15 17 42 21 60 4 18 10 38 14 43 4 6 15 37 25 70 10 33 24 74 31 90 7 17 16 45 19 62 4 18 12 35 17 38 5 4 9 16 9 28 0 12 7 35 15 51 8 15 15 36 15 45 0 9 7 29 15 45 8 15 15 35 15 43 0 8 6 29 13 46 18 41 37 94 47 132 11 39 128 384 139 410 13 31 32 87 41 120 5 17 14 46 21 65 41 117 56 163 86 255 14 44 30 84 34 89 5 6 9 19 9 30 0 12 7 34 15 50 8 15 15 35 15 43 0 8 6 29 13 46 18 42 37 95 47 132 5 17 15 48 24 70 18 47 20 71 7 80 -7 4 -923 8 -1247 5 -14 0 -34 -48 -74 -175 -18 -55 -38 -115 -46 -133 -8 -18 -14 -40 -14 -50 0 -9 -7 -30 -15 -46 -8 -15 -15 -36 -15 -45 0 -9 -7 -29 -15 -45 -8 -15 -15 -36 -15 -45 0 -9 -7 -29 -15 -45 -8 -15 -15 -35 -15 -43 0 -8 -6 -29 -13 -46 -17 -39 -164 -491 -173 -530 -3 -15 -10 -30 -15 -33 -5 -3 -9 -14 -9 -26 0 -11 -6 -34 -13 -51 -8 -18 -42 -120 -77 -227 -34 -107 -68 -211 -75 -230 -29 -82 -37 -107 -44 -135 -4 -17 -13 -40 -19 -52 -7 -12 -12 -29 -12 -38 0 -9 -6 -31 -13 -48 -21 -50 -38 -99 -48 -140 -5 -21 -13 -45 -18 -55 -11 -21 -188 -567 -197 -605 -3 -15 -10 -30 -15 -33 -5 -3 -9 -15 -9 -27 0 -12 -7 -35 -15 -51 -8 -15 -15 -36 -15 -45 0 -9 -7 -29 -15 -45 -8 -15 -15 -36 -15 -45 0 -9 -10 -36 -21 -61 -21 -46 -38 -43 -39 7 0 12 -6 37 -14 55 -8 18 -22 60 -32 93 -9 33 -23 74 -31 92 -7 17 -13 38 -13 47 0 8 -6 30 -14 48 -8 18 -22 60 -32 93 -9 33 -23 74 -31 92 -7 17 -13 36 -13 42 0 14 -59 199 -71 223 -5 10 -13 34 -18 55 -10 43 -27 92 -47 141 -8 18 -14 41 -14 51 0 10 -7 32 -15 47 -8 16 -15 39 -15 51 0 12 -4 24 -9 28 -5 3 -12 20 -16 38 -9 41 -34 122 -52 164 -7 17 -13 38 -13 47 0 8 -6 30 -14 48 -8 18 -29 80 -46 138 -18 58 -38 121 -45 140 -7 19 -28 82 -45 140 -18 58 -39 119 -47 137 -7 17 -13 36 -13 43 0 15 -28 102 -47 147 -7 17 -13 40 -13 51 0 12 -4 23 -9 26 -5 3 -12 18 -15 33 -9 42 -67 223 -83 260 -7 17 -13 36 -13 42 0 14 -58 194 -77 238 -7 17 -13 37 -13 45 0 7 -14 51 -30 98 -17 46 -30 91 -30 100 0 10 -8 24 -18 34 l-19 16 -691 3 c-381 1 -697 1 -702 -1z\"/> <path d=\"M1566 9098 c-2 -7 -11 -56 -20 -108 -9 -52 -20 -122 -26 -155 -6 -33 -15 -96 -20 -140 -6 -44 -15 -93 -20 -109 -6 -16 -10 -43 -10 -60 0 -17 -6 -67 -14 -111 -9 -44 -22 -123 -30 -175 -9 -52 -21 -124 -27 -160 -6 -36 -13 -81 -15 -100 -3 -19 -11 -73 -19 -120 -8 -47 -21 -129 -29 -182 -25 -156 -45 -278 -57 -348 -6 -36 -15 -96 -20 -135 -4 -38 -13 -90 -18 -115 -15 -67 -32 -176 -41 -261 -5 -41 -14 -88 -20 -103 -5 -15 -10 -42 -10 -59 0 -18 -6 -68 -14 -112 -9 -44 -22 -124 -30 -178 -20 -126 -43 -267 -56 -342 -6 -33 -15 -96 -20 -140 -6 -44 -13 -87 -16 -95 -6 -15 -28 -156 -44 -286 -6 -40 -14 -84 -20 -99 -5 -14 -10 -45 -10 -68 0 -23 -5 -60 -11 -82 -5 -22 -16 -83 -24 -135 -21 -134 -24 -154 -40 -257 -9 -51 -22 -137 -31 -190 -8 -54 -22 -136 -29 -183 -26 -156 -37 -224 -45 -292 -5 -36 -13 -84 -19 -105 -6 -21 -11 -53 -11 -72 0 -18 -6 -63 -14 -100 -14 -62 -32 -172 -42 -251 -3 -19 -11 -73 -19 -120 -14 -87 -32 -199 -60 -375 -16 -96 -26 -160 -59 -365 -23 -135 -36 -225 -47 -300 -5 -36 -13 -85 -18 -110 -10 -44 -28 -160 -37 -230 -5 -36 -24 -153 -45 -270 -6 -36 -15 -99 -20 -141 -4 -41 -13 -88 -19 -103 -5 -15 -10 -42 -10 -59 0 -18 -6 -68 -14 -112 -9 -44 -22 -123 -30 -175 -9 -52 -21 -124 -27 -160 -6 -36 -15 -96 -20 -135 -4 -38 -13 -90 -18 -115 -12 -57 -29 -164 -41 -259 -5 -40 -14 -88 -19 -105 -17 -55 -21 -145 -7 -159 10 -9 144 -11 631 -7 l618 5 17 90 c20 103 39 230 50 325 3 36 12 88 18 115 10 45 28 163 38 255 4 34 22 144 45 285 6 39 13 88 15 110 3 22 11 81 19 130 8 50 19 124 25 164 6 41 16 81 22 88 8 11 167 13 842 11 l831 -3 6 -76 c4 -42 9 -81 13 -87 3 -6 10 -46 15 -89 10 -84 23 -175 46 -318 8 -49 16 -108 19 -130 5 -52 24 -175 38 -250 6 -33 14 -89 18 -125 13 -110 31 -233 41 -280 5 -25 13 -78 18 -118 4 -41 14 -79 22 -87 12 -13 112 -15 693 -15 425 0 683 3 689 9 6 6 4 39 -6 93 -9 46 -23 128 -32 183 -35 222 -47 294 -61 370 -8 44 -14 94 -14 111 0 17 -4 44 -10 60 -5 16 -14 65 -20 109 -5 44 -14 107 -20 140 -11 66 -37 223 -44 270 -8 53 -26 168 -41 255 -8 47 -16 101 -19 120 -2 19 -9 64 -15 100 -7 36 -19 108 -27 160 -8 52 -21 131 -30 175 -8 44 -14 92 -14 107 0 15 -7 53 -15 85 -8 31 -15 76 -15 99 0 24 -5 55 -10 69 -6 15 -14 61 -20 103 -12 97 -28 204 -41 262 -5 25 -14 77 -18 115 -5 39 -14 99 -20 135 -6 36 -18 108 -27 160 -8 52 -21 133 -29 180 -8 47 -16 101 -19 120 -9 76 -28 188 -38 235 -6 28 -15 79 -19 115 -4 36 -12 94 -18 130 -21 119 -40 235 -45 270 -2 19 -9 64 -15 100 -14 79 -37 221 -57 350 -8 52 -21 133 -29 180 -8 47 -16 101 -19 120 -10 79 -28 189 -42 251 -8 37 -14 82 -14 100 0 19 -5 51 -11 72 -6 21 -14 69 -19 105 -4 37 -13 96 -19 132 -12 68 -30 182 -55 340 -33 205 -48 298 -61 380 -8 47 -16 101 -19 120 -2 19 -9 64 -15 100 -6 36 -18 108 -26 160 -9 52 -22 131 -30 175 -8 44 -15 94 -15 112 0 17 -5 44 -10 59 -6 15 -15 63 -20 108 -5 45 -14 108 -20 141 -6 33 -17 103 -25 155 -9 52 -22 133 -30 180 -8 47 -16 101 -19 120 -2 19 -9 64 -15 100 -6 36 -18 108 -26 160 -25 154 -45 279 -60 370 -8 47 -17 105 -20 129 -3 24 -10 52 -16 62 l-10 19 -1000 0 c-791 0 -1000 -3 -1003 -12z m954 -1668 c0 -19 6 -71 14 -115 21 -118 37 -222 46 -295 8 -70 25 -179 42 -275 6 -33 14 -89 18 -125 4 -36 13 -99 19 -140 25 -152 41 -256 44 -290 6 -47 25 -171 39 -245 6 -33 14 -89 18 -125 13 -112 31 -233 41 -282 6 -26 14 -80 19 -120 10 -87 26 -194 46 -301 8 -42 14 -95 14 -116 0 -21 5 -51 10 -67 6 -16 14 -65 19 -109 5 -44 14 -111 20 -150 7 -38 18 -110 26 -160 7 -49 19 -124 25 -165 7 -41 16 -104 20 -140 14 -111 31 -222 46 -303 8 -42 14 -92 14 -110 0 -18 5 -48 10 -67 6 -19 15 -71 20 -115 11 -101 27 -208 46 -308 8 -42 14 -95 14 -117 l0 -40 -645 0 -645 0 0 43 c0 23 6 80 14 127 23 131 38 232 43 270 2 19 10 76 18 125 32 202 37 233 45 305 5 41 13 95 19 120 9 40 26 156 37 250 5 35 21 146 45 290 6 41 15 104 19 140 4 36 12 92 18 125 16 86 32 190 41 270 5 39 13 97 19 130 6 33 19 110 27 170 17 119 37 247 56 365 6 41 13 91 16 110 2 19 10 76 18 125 27 174 37 241 45 313 5 40 13 94 19 120 11 53 28 168 42 287 5 44 13 93 19 109 5 16 10 46 10 67 0 21 6 74 14 116 18 95 37 224 43 278 7 71 13 91 24 74 5 -7 9 -30 9 -49z\"/> <path d=\"M4927 9103 c-12 -11 -8 -6916 3 -6970 5 -26 14 -91 20 -143 9 -96 21 -168 41 -250 7 -25 15 -61 20 -80 19 -80 39 -148 59 -200 12 -30 25 -67 30 -81 9 -31 121 -262 130 -269 3 -3 17 -23 30 -45 13 -22 44 -67 69 -100 188 -248 398 -412 676 -529 17 -7 47 -21 68 -30 21 -9 45 -16 53 -16 9 0 30 -6 47 -14 37 -16 101 -34 170 -46 26 -5 62 -13 80 -19 149 -48 703 -60 957 -22 74 11 162 27 195 35 125 29 161 39 192 52 17 8 38 14 47 14 8 0 30 6 48 14 18 8 51 22 73 31 49 20 187 90 235 118 159 95 397 329 490 482 13 22 26 42 29 45 19 17 125 231 156 315 93 251 136 448 162 740 14 148 16 603 20 3553 2 2339 0 3389 -7 3402 l-11 20 -643 0 c-578 0 -644 -2 -650 -16 -3 -9 -6 -1564 -6 -3457 -1 -2316 -4 -3457 -11 -3487 -6 -25 -14 -67 -18 -95 -9 -59 -40 -153 -52 -161 -5 -3 -9 -13 -9 -23 0 -24 -81 -135 -129 -179 -44 -40 -143 -102 -163 -102 -8 0 -19 -5 -24 -10 -6 -6 -37 -15 -70 -21 -32 -6 -79 -15 -104 -19 -135 -26 -355 4 -475 63 -85 43 -159 103 -202 166 -18 25 -37 52 -44 59 -6 7 -14 25 -19 40 -5 15 -18 52 -29 82 -12 30 -24 77 -27 105 -3 27 -11 64 -17 80 -9 23 -13 884 -17 3500 l-5 3470 -681 3 c-374 1 -684 -1 -687 -5z\"/>"],"ev":["translate(0.000000,930.000000) scale(0.100000,-0.100000)","<path d=\"M15394 9097 c-12 -7 -14 -598 -14 -4357 l0 -4349 19 -10 c12 -7 646 -11 1859 -11 l1841 0 11 19 c16 31 14 1220 -2 1226 -7 3 -538 6 -1180 8 -641 1 -1170 6 -1175 10 -11 11 -16 2508 -5 2525 7 10 202 13 943 15 l934 2 3 627 2 628 -942 2 -943 3 0 1210 0 1210 1185 5 1185 5 2 605 c2 333 -1 611 -5 618 -10 14 -3692 24 -3718 9z\"/> <path d=\"M33339 5969 c-5 -3 -10 -323 -11 -750 l-3 -744 -480 -5 -480 -5 0 -580 0 -580 480 -5 480 -5 5 -1558 5 -1557 572 -1 c315 0 577 2 583 6 7 4 10 501 10 1560 l0 1555 478 2 477 3 0 580 0 580 -477 3 -478 2 0 745 c0 611 -2 747 -13 751 -19 7 -1137 10 -1148 3z\"/> <path d=\"M37015 4569 c-22 -4 -67 -8 -100 -8 -33 -1 -91 -8 -130 -17 -133 -30 -190 -45 -236 -59 -26 -8 -54 -15 -63 -15 -8 0 -32 -7 -53 -16 -21 -9 -51 -23 -68 -29 -31 -14 -165 -79 -200 -99 -99 -56 -300 -233 -358 -316 -17 -25 -39 -53 -47 -63 -15 -16 -74 -129 -105 -202 -39 -91 -69 -190 -91 -305 -20 -101 -14 -369 11 -460 36 -135 47 -166 91 -258 141 -295 403 -515 794 -667 25 -10 59 -23 75 -30 45 -19 96 -36 135 -45 19 -5 55 -14 80 -20 158 -41 309 -70 360 -70 19 0 73 -6 120 -15 47 -8 130 -21 185 -30 55 -8 118 -20 140 -26 22 -5 56 -14 75 -19 208 -51 370 -185 370 -305 0 -136 -111 -223 -355 -275 -96 -21 -552 -26 -612 -7 -27 9 -59 17 -73 20 -14 3 -41 11 -60 18 -206 74 -309 219 -332 468 -5 58 -14 111 -19 116 -10 10 -393 22 -787 24 l-213 1 3 -207 c4 -192 14 -281 40 -358 5 -16 14 -43 18 -60 22 -77 79 -206 120 -270 11 -16 23 -37 27 -45 19 -40 163 -212 238 -283 59 -56 239 -191 290 -217 11 -6 34 -19 50 -30 17 -11 37 -22 45 -26 8 -3 24 -10 34 -16 11 -6 31 -14 45 -18 14 -5 51 -18 81 -30 117 -45 137 -51 185 -59 28 -5 70 -13 95 -19 151 -36 222 -42 476 -42 258 0 356 8 539 46 39 8 82 14 97 14 15 0 39 5 55 11 15 6 46 14 68 19 109 24 207 60 320 117 117 59 126 64 155 90 13 13 42 35 64 50 104 71 252 248 315 378 18 39 38 77 42 85 15 25 35 91 65 212 19 77 15 461 -6 533 -6 22 -18 65 -27 95 -15 54 -37 111 -54 140 -5 8 -12 22 -15 30 -3 8 -10 22 -15 30 -5 8 -14 26 -19 39 -10 23 -69 111 -81 121 -4 3 -19 23 -33 45 -55 81 -245 260 -306 288 -8 4 -28 16 -45 27 -16 11 -39 24 -50 30 -11 6 -33 19 -50 30 -46 30 -119 63 -195 90 -14 5 -50 18 -80 30 -30 12 -71 26 -90 30 -19 5 -66 18 -105 30 -38 12 -90 25 -115 30 -25 4 -67 12 -95 18 -27 6 -104 18 -170 27 -66 9 -156 22 -200 30 -44 9 -91 15 -104 15 -23 0 -86 16 -182 46 -26 8 -56 14 -68 14 -30 0 -198 90 -235 126 -53 52 -76 105 -76 179 0 98 35 153 125 198 140 71 251 90 530 91 273 1 378 -20 551 -112 39 -21 148 -127 163 -159 34 -70 41 -92 51 -147 5 -33 10 -81 10 -107 0 -37 4 -51 18 -58 24 -13 952 -14 971 -2 38 25 3 392 -51 534 -11 29 -23 66 -27 82 -4 17 -13 39 -18 50 -6 11 -22 43 -36 70 -119 242 -276 426 -482 565 -76 51 -81 54 -190 108 -97 48 -139 65 -200 82 -16 5 -61 19 -100 30 -38 12 -95 25 -125 30 -30 4 -77 13 -105 19 -131 28 -569 41 -670 20z\"/> <path d=\"M27992 4488 c-9 -9 -12 -170 -12 -662 l0 -651 -20 25 c-11 14 -38 61 -61 105 -57 112 -67 128 -214 337 -38 55 -282 300 -361 364 -105 84 -124 97 -228 160 -108 64 -245 133 -317 159 -66 23 -158 53 -214 69 -27 8 -75 21 -106 30 -31 9 -71 16 -89 16 -18 0 -69 7 -113 16 -166 34 -632 1 -817 -58 -19 -6 -51 -15 -70 -19 -95 -21 -337 -123 -425 -180 -16 -10 -37 -22 -45 -26 -8 -3 -33 -18 -55 -32 -22 -14 -45 -28 -52 -31 -70 -29 -414 -346 -504 -465 -52 -67 -132 -183 -142 -205 -4 -8 -16 -28 -27 -45 -24 -38 -111 -216 -133 -272 -17 -42 -32 -83 -57 -153 -6 -19 -16 -56 -20 -82 -5 -27 -11 -52 -14 -57 -4 -5 -16 -63 -27 -128 -28 -156 -31 -583 -5 -703 9 -41 16 -86 16 -99 0 -13 6 -47 14 -75 55 -195 62 -216 94 -301 23 -60 103 -225 131 -270 40 -62 50 -79 57 -95 4 -8 41 -59 81 -113 223 -294 491 -518 803 -668 132 -64 221 -98 318 -123 290 -75 331 -79 647 -74 149 3 293 10 320 16 28 6 79 16 115 22 143 26 218 46 355 98 96 36 267 129 381 207 87 59 311 272 390 369 21 27 46 56 54 65 9 9 30 36 48 61 187 259 185 248 57 285 -33 9 -76 23 -95 30 -19 7 -62 20 -95 30 -33 9 -76 23 -95 30 -19 7 -62 20 -95 30 -33 9 -75 23 -93 31 -18 8 -39 14 -47 14 -8 0 -29 6 -47 14 -18 7 -60 21 -93 31 -33 9 -76 23 -95 30 -19 7 -51 18 -70 25 -19 6 -51 16 -70 20 -19 5 -44 11 -55 14 -15 4 -34 -7 -70 -40 -87 -80 -99 -90 -145 -120 -25 -16 -63 -39 -85 -49 -22 -11 -47 -25 -55 -31 -8 -6 -42 -19 -75 -28 -33 -10 -75 -25 -93 -32 -18 -8 -45 -14 -59 -14 -15 0 -65 -7 -112 -16 -154 -29 -293 -11 -496 64 -68 25 -201 96 -237 127 -13 11 -45 38 -73 60 -120 95 -248 265 -279 372 -4 12 -2 24 3 27 13 8 2831 6 2901 -3 l55 -6 3 -860 c1 -472 6 -863 10 -867 11 -11 1143 -11 1153 -1 4 5 9 523 11 1153 l4 1145 17 45 c9 25 17 54 17 65 2 69 103 265 188 365 58 69 121 130 187 184 44 36 190 126 205 126 5 0 24 6 42 14 144 60 201 70 388 71 254 0 350 -25 583 -153 86 -48 277 -247 336 -351 37 -66 81 -161 81 -176 0 -9 5 -25 11 -36 55 -104 60 -214 65 -1395 l5 -1062 17 -3 c9 -2 252 -3 540 -1 l522 3 0 1104 c0 1102 -5 1317 -36 1505 -32 200 -87 391 -155 545 -24 56 -78 166 -92 190 -7 11 -25 43 -41 70 -112 191 -379 461 -564 570 -10 6 -31 20 -47 31 -78 56 -312 159 -415 184 -19 5 -55 14 -80 20 -166 42 -228 49 -480 56 -189 6 -274 0 -425 -28 -33 -6 -80 -14 -105 -18 -25 -4 -61 -13 -80 -20 -93 -34 -118 -43 -150 -57 -69 -29 -156 -76 -208 -112 -29 -20 -63 -41 -74 -48 -30 -16 -106 -84 -174 -153 -32 -33 -64 -60 -71 -60 -10 0 -13 54 -13 254 0 218 -2 257 -16 270 -14 14 -79 16 -573 16 -420 0 -560 -3 -569 -12z m-1832 -1127 c41 -5 89 -14 105 -20 17 -5 58 -18 93 -27 34 -9 67 -23 73 -31 6 -7 19 -13 29 -13 10 0 23 -7 30 -15 7 -8 18 -15 25 -15 23 0 139 -91 210 -165 96 -100 152 -174 191 -253 47 -94 46 -102 -18 -102 -51 -1 -1855 -1 -1870 0 -36 1 104 249 159 283 7 4 13 14 13 22 0 8 30 40 68 72 37 32 80 70 95 83 48 42 189 118 257 138 108 32 153 42 225 50 87 11 197 8 315 -7z\"/> <path d=\"M18960 4456 c0 -13 75 -174 101 -216 5 -8 12 -22 15 -30 16 -40 331 -689 345 -710 5 -8 12 -22 15 -30 12 -30 96 -205 105 -220 5 -8 12 -22 15 -30 3 -8 10 -22 15 -30 5 -8 12 -22 15 -30 12 -30 96 -205 105 -220 5 -8 12 -22 15 -30 4 -8 47 -98 96 -200 50 -102 124 -255 165 -340 41 -85 79 -162 84 -170 5 -8 12 -22 15 -30 9 -21 108 -227 229 -475 190 -389 287 -589 347 -715 33 -69 64 -132 69 -140 5 -8 12 -22 15 -30 6 -14 79 -164 244 -502 34 -71 67 -128 73 -128 7 -1 197 -1 422 0 226 0 422 0 438 0 15 0 27 5 27 10 0 6 21 54 46 108 46 96 77 164 133 285 16 34 50 107 75 162 88 187 105 223 196 420 17 36 44 94 60 130 17 36 44 94 60 130 17 36 44 94 60 130 17 36 44 95 61 133 17 37 35 74 40 82 5 8 12 22 15 30 7 17 52 115 94 205 31 67 71 155 120 260 17 39 36 77 41 85 5 8 12 22 15 30 3 8 19 43 35 78 16 34 42 90 58 125 16 34 45 96 64 137 19 41 47 102 62 135 15 33 40 87 55 120 67 145 100 216 140 300 43 93 79 170 129 278 16 34 45 96 64 137 19 41 49 107 67 145 18 39 49 106 70 150 20 44 48 103 60 130 37 81 100 215 131 279 15 32 26 63 23 67 -3 5 -305 9 -672 9 l-667 0 -17 -32 c-16 -33 -68 -147 -93 -203 -7 -16 -27 -61 -45 -100 -34 -74 -83 -180 -105 -230 -82 -185 -103 -230 -137 -305 -17 -36 -36 -78 -43 -95 -8 -16 -27 -59 -43 -95 -37 -81 -63 -138 -137 -305 -7 -16 -27 -59 -43 -95 -17 -36 -42 -92 -57 -125 -58 -130 -68 -152 -97 -215 -16 -36 -35 -78 -43 -95 -7 -16 -27 -61 -45 -100 -18 -38 -38 -83 -45 -100 -33 -75 -78 -173 -91 -198 -8 -16 -14 -35 -14 -42 0 -8 -10 -21 -22 -29 l-22 -16 -39 83 c-21 45 -43 89 -48 97 -5 8 -12 22 -15 30 -4 8 -37 78 -75 156 -38 78 -73 152 -79 165 -10 24 -15 34 -38 74 -7 11 -15 27 -18 35 -15 36 -303 631 -315 650 -5 8 -12 22 -15 30 -10 23 -262 542 -439 903 l-77 157 -674 0 c-580 0 -674 -2 -674 -14z\"/>"]};
+const LOGO_W = 3921, LOGO_H = 930;
+function logoSvg(ca, ce){ return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${LOGO_W} ${LOGO_H}">` + [["aux",ca],["ev",ce]].map(([k,c])=>`<g transform="${LOGO_P[k][0]}" fill="${c}">${LOGO_P[k][1]}</g>`).join("") + '</svg>'; }
+const LOGO_DARK = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(logoSvg("#111111","#575757"));
+const LOGO_LIGHT = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(logoSvg("#FFFFFF","#E4D2AE"));
+let LOGO_DARK_PNG = LOGO_DARK, LOGO_LIGHT_PNG = LOGO_LIGHT;
+function rasterLogo(src, w=1400){ return new Promise(res=>{ const im = new Image(); im.onload = ()=>{ try{ const c = document.createElement("canvas"); c.width = w; c.height = Math.round(w*LOGO_H/LOGO_W); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); res(c.toDataURL("image/png")); }catch(e){ res(src); } }; im.onerror = ()=>res(src); im.src = src; }); }
+rasterLogo(LOGO_DARK).then(u=>{ LOGO_DARK_PNG = u; }); rasterLogo(LOGO_LIGHT).then(u=>{ LOGO_LIGHT_PNG = u; });
+function paintLogos(root=document){ root.querySelectorAll("img[data-logo]").forEach(i=>{ i.src = i.dataset.logo==="dark" ? LOGO_DARK : LOGO_LIGHT; }); }
+/* Texto "AUX Events" con el estilo del logo */
+const auxWord = () => `<span class="auxwm"><b>AUX</b><i>Events</i></span>`;
+const withWord = s => String(s).replace(/AUX\s*Events/gi, auxWord());
+
 /* ================= Íconos ================= */
 const ICONS = {
   search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
@@ -1543,8 +1577,10 @@ function blueSeats(num){
 /* ================= Render ================= */
 function renderHeader(){
   const e = S.event;
-  $("plannerName").textContent = e.planner.toUpperCase();
-  $("plannerSub").textContent = e.sub;
+  const isAux = /^aux/i.test(e.planner||"");
+  $("plannerName").textContent = isAux ? "" : (e.planner||"");
+  $("plannerSub").textContent = isAux ? "" : (e.sub||"");
+  document.querySelector("#eventApp .planner-tag").hidden = isAux;
   $("plannerMono").textContent = /^aux/i.test(e.planner) ? "AUX" : initials(e.planner);
   $("eventName").textContent = e.name;
   let d = "";
@@ -2475,8 +2511,8 @@ function buildReport(key){
   const vars = `--r-side:${P.side};--r-sideText:${P.sideText};--r-ink:${P.ink};--r-muted:${P.muted};--r-line:${P.line};--r-zebra:${P.zebra};--r-panel:${P.panel};--r-wm:${P.wm}`;
   const planner = esc(E.planner||"AUX Events"), sub = esc(E.sub||""), title = esc(E.name);
   const pages = [];
-  const foot = () => `<div class="rp-pn">{{P}}</div><div class="rp-wm">AUX EVENTS</div>`;
-  const headRight = `<span style="color:${P.accentText};font-size:15px">${planner}${sub?" · "+sub:""}</span>`;
+  const foot = () => `<div class="rp-pn">{{P}}</div><div class="rp-wm"><img src="${LOGO_DARK_PNG}" alt="AUX Events" style="height:22px;display:block"></div>`;
+  const headRight = `<span style="color:${P.accentText};font-size:15px">${withWord(planner)}${sub?" · "+sub:""}</span>`;
 
   /* ---- Hoja 1: resumen ---- */
   const maxN = D.peak ? D.peak.n : 1;
@@ -2507,7 +2543,7 @@ function buildReport(key){
   const barTotal = Math.max(1, D.invited);
   pages.push(`<div class="rp-page" style="${vars}">
     <div class="rp-side" style="${P.sideLine?`border-right:2px solid ${P.sideLine}`:""}">
-      <div><div class="rp-sv" style="font-size:26px;line-height:1.1">${planner.replace(" ","<br>")}</div><div style="color:${P.accent};font-size:16px;margin-top:3px">${sub}</div></div>
+      <div><div class="rp-sv" style="font-size:26px;line-height:1.1">${/^aux\s*events$/i.test(E.planner||"AUX Events") ? auxWord() : planner.replace(" ","<br>")}</div><div style="color:${P.accent};font-size:16px;margin-top:3px">${sub}</div></div>
       <div style="height:1px;background:${P.accent};opacity:.6"></div>
       <div><div class="rp-sv" style="font-size:58px;line-height:1">${D.pct}%</div><div style="opacity:.85;font-size:16px">asistencia</div></div>
       <div style="display:flex;gap:16px;height:440px">
@@ -2519,6 +2555,7 @@ function buildReport(key){
       </div>
       <div style="height:1px;background:${P.accent};opacity:.3"></div>
       <div style="display:flex;align-items:center;gap:10px">${ri("cutlery",P.accent,22)}<span class="rp-sv" style="font-size:34px;line-height:1">${S.tables.length}</span><span style="font-size:16px;opacity:.9">mesas</span></div>
+      <img src="${LOGO_LIGHT_PNG}" alt="AUX Events" style="width:170px;margin-top:auto;opacity:.95">
     </div>
     <div class="rp-main">
       <div><div class="rp-sv" style="font-size:38px;line-height:1.1">${title}</div><div class="rp-mu" style="font-size:16px">${esc(longDate())}</div></div>
@@ -2612,6 +2649,7 @@ $("repDownload").onclick = async ()=>{
     await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
     const pages = buildReport(repPal);
     stage = document.createElement("div"); stage.id = "rpStage"; stage.innerHTML = pages.join(""); document.body.appendChild(stage);
+    try{ await document.fonts.load('400 20px "Bebas Neue"'); await document.fonts.load('500 20px "Outfit"'); }catch(e){}
     await document.fonts.ready;
     const pdf = new window.jspdf.jsPDF({unit:"pt", format:"letter", orientation:"portrait", compress:true});
     const els = [...stage.querySelectorAll(".rp-page")];
@@ -2629,7 +2667,7 @@ $("repDownload").onclick = async ()=>{
 };
 
 /* ================= Inicio ================= */
-paintIcons();
+paintIcons(); paintLogos();
 (async()=>{
   paintBrand();
   tick(); setInterval(tick, 15000);

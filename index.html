@@ -794,6 +794,9 @@ a.ev-map[hidden]{display:none}
 .arr-opt input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--primary);flex:none}
 .arr-opt b{display:block;font-weight:500;font-size:14.5px}
 .arr-opt small{display:block;color:var(--muted);font-size:12.5px}
+html[data-theme="grafito"] .band .sprig,html[data-theme="grafito"] .invite .sprig,.ev-t-grafito .sprig{display:none}
+html[data-theme="grafito"] .band::after{background:linear-gradient(90deg,transparent,#C8C8C8,transparent)}
+html[data-theme="grafito"] .icon-btn{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.26)}
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1277,6 +1280,7 @@ function paintIcons(root=document){ root.querySelectorAll("i[data-icon]").forEac
 
 /* ================= Temas ================= */
 const THEMES = [
+  {id:"grafito",   name:"AUX Clásico",           desc:"Negro y grises, como la página principal de AUX Events.", band:"#1A1B1D", band2:"#26272A", paper:"#F1F1EF", title:"#FFFFFF", sw:["#2B2C2F","#8E8E92","#C9C9C9"]},
   {id:"olivo",     name:"Jardín olivo",          desc:"Verde olivo, vino y champaña. Se oscurece solo de noche.", band:"#3E4936", band2:"#4B5841", paper:"#F4EFE6", title:"#FFFFFF", sw:["#5A6A4C","#6E2233","#B08D52"]},
   {id:"marino",    name:"Marino y oro",          desc:"Azul marino con dorado. Formal y clásico.", band:"#1C2A48", band2:"#26375C", paper:"#F3F2EE", title:"#FFFFFF", sw:["#26375C","#B8975A","#9AA7C2"]},
   {id:"vino",      name:"Vino y beige",          desc:"Vino profundo sobre beige cálido, con detalles dorados.", band:"#6B2737", band2:"#7E3244", paper:"#F4EBDF", title:"#FFF8F0", sw:["#7A2E40","#B8925E","#F4EBDF"]},
@@ -2472,7 +2476,7 @@ function renderEvents(){
       </div>`;
     const pct = e.persons ? Math.round(e.arrived/e.persons*100) : 0;
     return `<article class="ev-card${isNext(e)?" ev-next":""}" data-open="${e.id}" tabindex="0" aria-label="Abrir ${esc(e.name)}" style="--ev-band:${t.band};--ev-band2:${t.band2};--ev-title:${t.title};--ev-acc:${t.sw[t.id==="blanco"?1:0]}">
-      <div class="ev-top ${t.id==="blanco"?"light":""}">
+      <div class="ev-top ${t.id==="blanco"?"light":""} ev-t-${t.id}">
         <svg class="sprig" aria-hidden="true"><use href="#sprig"/></svg>
         <span class="stat-pill ${w.cls}">${w.txt}</span>
         <span class="type">${ic("heart")}${esc(e.type||"Evento")}</span>
@@ -2598,6 +2602,7 @@ async function deleteEvent(id){
 
 /* ================= Reporte PDF ================= */
 const PALETTES = {
+  grafito:{name:"AUX Clásico", side:"#1A1B1D", sideText:"#F2F2F2", accent:"#C9C9C9", accentText:"#5E5E62", dark:"#2B2C2F", light:"#DADAD8", mid:"#8E8E92", panel:"#F3F3F1", miss:"#6B6B70", missIcon:"#BDBDBD", ink:"#1F1F21", muted:"#86868A", line:"#E6E6E3", zebra:"#F8F8F7", okBg:"#E6E6E4", okTx:"#2B2C2F", midBg:"#EFEFED", midTx:"#4A4A4D", lowBg:"#F1F1EF", lowTx:"#4A4A4D", wm:"#1A1B1D"},
   clasico:{name:"Clásico olivo", side:"#3E4936", sideText:"#F3EEE2", accent:"#C9A96E", accentText:"#9C7A3C", dark:"#3E4936", light:"#C9D3BC", mid:"#7E9470", panel:"#F3F1EA", miss:"#8A6458", missIcon:"#E2B8AC", ink:"#26302A", muted:"#7D8689", line:"#E7E5DE", zebra:"#F8F7F3", okBg:"#E1EAD9", okTx:"#3E4936", midBg:"#EEF2E8", midTx:"#4F6545", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#3E4936"},
   vino:{name:"Vino y beige", side:"#6B2737", sideText:"#F7EDE3", accent:"#C9A36E", accentText:"#8E6A3A", dark:"#6B2737", light:"#E7D3D2", mid:"#A86B76", panel:"#F6EEE4", miss:"#B88A8F", missIcon:"#F1D3D3", ink:"#3A2A2A", muted:"#8E7B72", line:"#EADFD2", zebra:"#FBF7F1", okBg:"#F3E2E3", okTx:"#6B2737", midBg:"#F8EEEE", midTx:"#8E4A57", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#6B2737"},
   rosa:{name:"Rosa empolvado y lino", side:"#9E6870", sideText:"#FFF5F2", accent:"#D9B98A", accentText:"#9C7A4C", dark:"#8A5A62", light:"#EBD3D6", mid:"#C2949B", panel:"#F8EFEF", miss:"#D7AEB4", missIcon:"#FFE3E6", ink:"#4A3437", muted:"#9C8589", line:"#EFE1DF", zebra:"#FCF7F6", okBg:"#F5E6E8", okTx:"#7E4F57", midBg:"#FAF0F1", midTx:"#9E6870", lowBg:"#F7F0E2", lowTx:"#8A6A2E", wm:"#8A5A62"},
@@ -2623,7 +2628,7 @@ const ri = (n, color, size=18) => `<svg width="${size}" height="${size}" viewBox
 const hhmm = ms => { const d = new Date(ms); return d.toLocaleTimeString("es-MX",{hour:"numeric",minute:"2-digit"}).replace(/\s?[ap]\.?\s?m\.?/i,""); };
 
 function reportData(){
-  const reg = S.guests.filter(g=>!g.walkIn), walk = S.guests.filter(g=>g.walkIn);
+  const reg = S.guests.slice(), walk = S.guests.filter(g=>g.walkIn); // lista final completa (incluye agregados aprobados)
   const invited = reg.reduce((a,g)=>a+g.persons,0), came = reg.reduce((a,g)=>a+Math.min(g.arrived,g.persons),0);
   const pts = S.guests.filter(g=>g.arrived>0 && g.at).map(g=>({t:g.at, n:g.arrived})).sort((a,b)=>a.t-b.t);
   let slots = [], peak = null;

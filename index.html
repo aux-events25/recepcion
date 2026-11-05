@@ -747,6 +747,18 @@ a.ev-map[hidden]{display:none}
 .noir > *:not(.nd):not(.sprig){position:relative;z-index:1}
 @media (max-width:860px){ .nd-b,.nd-c{display:none} .nd-a{top:30px;left:30px;width:52px;height:62px} }
 
+/* ---------- Barra inferior en celular: Actualizar y Salir ---------- */
+.mbar{display:none}
+@media (max-width:640px){
+  body[data-screen="events"] .mbar, body[data-screen="event"] .mbar{display:flex}
+  .mbar{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;gap:10px;padding:8px;border-radius:18px;background:rgba(26,27,29,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 12px 30px -12px rgba(0,0,0,.6)}
+  .mbar button{flex:1;height:48px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#F2F2F2;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px}
+  .mbar button:active{transform:scale(.97)}
+  .mbar button#mLogout{color:#FFB4AE;border-color:rgba(255,140,130,.35)}
+  body[data-screen="events"], body[data-screen="event"]{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+  .toast{bottom:calc(86px + env(safe-area-inset-bottom))}
+  #logoutBtn{display:none}
+}
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1159,6 +1171,10 @@ a.ev-map[hidden]{display:none}
   </div>
 </div>
 
+<nav class="mbar" id="mbar" aria-label="Acciones rápidas">
+  <button type="button" id="mRefresh"><i data-icon="refresh"></i><span>Actualizar</span></button>
+  <button type="button" id="mLogout"><i data-icon="logout"></i><span>Salir</span></button>
+</nav>
 <div class="toast" id="toast" role="status"><span class="ti"><i data-icon="check"></i></span><span id="toastMsg"></span><button id="toastUndo"><i data-icon="undo"></i>Deshacer</button></div>
 
 <script>
@@ -1203,6 +1219,7 @@ const ICONS = {
   download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
   undo:'<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/>',
   grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/>',
   logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
   copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
   trash:'<path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5"/>',
@@ -2221,9 +2238,17 @@ async function showLogin(){
 }
 function applyRole(){ document.body.dataset.role = SESSION && SESSION.role==="admin" ? "admin" : "hostess"; }
 const isAdmin = () => SESSION && SESSION.role === "admin";
-$("logoutBtn").onclick = async ()=>{
-  await store.flush(); unsubscribe();
+async function doLogout(){
+  try{ await store.flush(); }catch(e){}
+  unsubscribe(); currentId = null;
   await DB.signOut(); SESSION = null; showLogin();
+}
+$("logoutBtn").onclick = doLogout;
+$("mLogout").onclick = ()=>{ if(confirm("¿Cerrar la sesión de este usuario?")) doLogout(); };
+$("mRefresh").onclick = async ()=>{
+  const b = $("mRefresh"); b.disabled = true; b.querySelector("span").textContent = "Actualizando…";
+  try{ await store.flush(); }catch(e){}
+  location.replace(location.pathname + "?v=" + Date.now() + location.hash);
 };
 
 /* ---------- Usuarios (solo administrador) ---------- */

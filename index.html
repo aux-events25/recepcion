@@ -777,6 +777,10 @@ a.ev-map[hidden]{display:none}
 .del-box p{margin:0 0 10px;display:flex;align-items:center;gap:8px;color:var(--bad-ink)}
 .del-box label{display:block;font-size:13px;color:var(--ink-soft);margin-bottom:5px}
 .del-box select{width:100%;height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 12px}
+.arr-opt{display:flex;gap:10px;align-items:flex-start;margin-top:12px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);cursor:pointer}
+.arr-opt input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--primary);flex:none}
+.arr-opt b{display:block;font-weight:500;font-size:14.5px}
+.arr-opt small{display:block;color:var(--muted);font-size:12.5px}
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1072,7 +1076,7 @@ a.ev-map[hidden]{display:none}
     <div class="tools">
       <button class="btn admin-only" id="importBtn"><i data-icon="upload"></i>Importar lista de Excel</button>
       <button class="btn" id="exportBtn"><i data-icon="download"></i>Descargar lista</button>
-      <button class="btn danger admin-only" id="resetBtn"><i data-icon="undo"></i>Reiniciar llegadas</button>
+      <button class="btn danger admin-only" id="resetBtn"><i data-icon="undo"></i>Reiniciar a la lista original</button>
       <button class="btn admin-only" id="demoBtn"><i data-icon="sparkle"></i>Cargar lista de ejemplo</button>
       <button class="btn danger admin-only" id="clearListBtn"><i data-icon="trash"></i>Borrar toda la lista</button>
     </div>
@@ -1360,11 +1364,11 @@ function rowGuest(id, g){
 function rowRequest(id, r){
   if(!r.guestUid && r.guestId){ const g = S && S.guests.find(x=>x.id===r.guestId); if(g) r.guestUid = g.uid; }
   const o = {id:r.id, event_id:id, kind:r.kind, guest_id:r.guestUid||null, name:r.name, persons:Math.max(1,r.persons|0), table_num:r.table||null, status:r.status, mode:r.mode==="approve"?"move":r.mode==="delete"?null:(r.mode||null), resolution:r.resolution||null, created_at:isoOf(r.at), resolved_at:isoOf(r.resolvedAt)};
-  if(!NO_EXTRA){ o.created_by = r.createdBy || null; o.resolved_by = r.resolvedBy || null; o.reason = r.reason || null; o.validated_with = r.validatedWith || null; o.from_table = r.fromTable || null; }
+  if(!NO_EXTRA){ o.created_by = r.createdBy || null; o.resolved_by = r.resolvedBy || null; o.reason = r.reason || null; o.validated_with = r.validatedWith || null; o.from_table = r.fromTable || null; o.with_arrival = (r.withArrival===undefined ? null : !!r.withArrival); }
   return o;
 }
 let NO_EXTRA = false; // si aún no existen las columnas nuevas en Supabase
-const isExtraErr = e => /walk_in|original_table|checked_by|changes|created_by|resolved_by|reason|validated_with|from_table/i.test((e && (e.message||e.details)) || "");
+const isExtraErr = e => /walk_in|original_table|checked_by|changes|created_by|resolved_by|reason|validated_with|from_table|with_arrival/i.test((e && (e.message||e.details)) || "");
 const TBL = {tables:"event_tables", guests:"guests", requests:"requests"};
 const ROW = {tables:rowTable, guests:rowGuest, requests:rowRequest};
 function rowsOf(id, s){ return {tables:s.tables.map(t=>rowTable(id,t)), guests:s.guests.map(g=>rowGuest(id,g)), requests:s.requests.map(r=>rowRequest(id,r))}; }
@@ -1443,7 +1447,7 @@ const DB = {
         event:{name:ev.name, type:ev.type, date:ev.event_date||"", time:(ev.start_time||"").slice(0,5), theme:ev.theme, planner:ev.planner, sub:ev.subtitle, venue:ev.venue||"", venueUrl:ev.venue_url||""},
         tables: tables.map(t=>({uid:t.id, num:t.num, cap:t.capacity, extra:t.extra})),
         guests: gl,
-        requests: reqs.map(r=>({id:r.id, kind:r.kind, guestUid:r.guest_id, name:r.name, persons:r.persons, table:r.table_num||0, status:r.status, mode:r.mode, resolution:r.resolution, at:msOf(r.created_at), resolvedAt:msOf(r.resolved_at), createdBy:r.created_by||"", resolvedBy:r.resolved_by||"", reason:r.reason||"", validatedWith:r.validated_with||"", fromTable:r.from_table||0}))
+        requests: reqs.map(r=>({id:r.id, kind:r.kind, guestUid:r.guest_id, name:r.name, persons:r.persons, table:r.table_num||0, status:r.status, mode:r.mode, resolution:r.resolution, at:msOf(r.created_at), resolvedAt:msOf(r.resolved_at), createdBy:r.created_by||"", resolvedBy:r.resolved_by||"", reason:r.reason||"", validatedWith:r.validated_with||"", fromTable:r.from_table||0, withArrival:(r.with_arrival===null||r.with_arrival===undefined)?undefined:r.with_arrival}))
       };
       st.requests.forEach(r=>{ const g = gl.find(x=>x.uid===r.guestUid); if(g) r.guestId = g.id; });
       return {state:st, fromServer:true};
@@ -1575,7 +1579,7 @@ function remote(kind, payload){
   } else {
     if(!t){ t = {id:row.id}; S.requests.unshift(t); }
     const g = S.guests.find(x=>x.uid===row.guest_id);
-    Object.assign(t, {kind:row.kind, guestUid:row.guest_id, guestId:g?g.id:undefined, name:row.name, persons:row.persons, table:row.table_num||0, status:row.status, mode:row.mode, resolution:row.resolution, at:msOf(row.created_at), resolvedAt:msOf(row.resolved_at), createdBy:row.created_by||t.createdBy||"", resolvedBy:row.resolved_by||t.resolvedBy||"", reason:row.reason||t.reason||"", validatedWith:row.validated_with||t.validatedWith||"", fromTable:row.from_table||t.fromTable||0});
+    Object.assign(t, {kind:row.kind, guestUid:row.guest_id, guestId:g?g.id:undefined, name:row.name, persons:row.persons, table:row.table_num||0, status:row.status, mode:row.mode, resolution:row.resolution, at:msOf(row.created_at), resolvedAt:msOf(row.resolved_at), createdBy:row.created_by||t.createdBy||"", resolvedBy:row.resolved_by||t.resolvedBy||"", reason:row.reason||t.reason||"", validatedWith:row.validated_with||t.validatedWith||"", fromTable:row.from_table||t.fromTable||0, withArrival:(row.with_arrival===null||row.with_arrival===undefined)?t.withArrival:row.with_arrival});
     if(ui.req && ui.req.id===t.id && t.status!=="pending") ui.req = null;
   }
   last[kind].set(row.id, JSON.stringify(ROW[kind](currentId, t)));
@@ -1775,7 +1779,7 @@ const reasonText = r => {
   if(r.kind==="delete"){ const g = reqGuest(r); return `Solicita eliminar a ${r.name} de la lista (${plural(r.persons,"persona","personas")}, Mesa ${r.table||"—"})${g && g.arrived>0 ? `. Ojo: ya tiene registrada su llegada (${g.arrived}).` : "."}`; }
   if(r.fromTable){
     const f = Math.max(0, freeAt(r.table, reqGuest(r)));
-    return `Solicita cambiar de la Mesa ${r.fromTable} a la Mesa ${r.table}` + (f>=r.persons ? `, que tiene ${plural(f,"lugar libre","lugares libres")}.` : f===0 ? `, que está llena.` : `, que solo tiene ${plural(f,"lugar libre","lugares libres")} y necesita ${r.persons}.`);
+    return `Solicita cambiar de la Mesa ${r.fromTable} a la Mesa ${r.table}${r.withArrival===false?" (solo cambio de mesa, sin registrar llegada)":""}` + (f>=r.persons ? `, que tiene ${plural(f,"lugar libre","lugares libres")}.` : f===0 ? `, que está llena.` : `, que solo tiene ${plural(f,"lugar libre","lugares libres")} y necesita ${r.persons}.`);
   }
   const pre = r.kind==="new" ? "No está en la lista de invitados. " : "";
   if(!r.table) return `${pre}Sin mesa sugerida. Necesita lugar para ${plural(r.persons,"persona","personas")}.`;
@@ -1892,7 +1896,9 @@ function drawCard(){
   const opts = tableStats().map(t=>{ const f = Math.max(0,freeAt(t.num,g)); return `<option value="${t.num}" ${t.num===d.table?"selected":""}>Mesa ${t.num} · ${f===0?"llena":plural(f,"libre","libres")}</option>`; }).join("");
   let primary;
   if(req) primary = `<button class="btn request" id="confirmArrival" data-act="goreq">${ic("inbox")}Ver solicitud</button>`;
-  else if(d.table!==g.table) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar cambio a solicitudes</button>`;
+  else if(d.table!==g.table) primary = isAdmin()
+      ? `<button class="btn dark" id="confirmArrival" data-act="movenow">${ic("move")}Guardar cambio de mesa</button>`
+      : `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar cambio a solicitudes</button>`;
   else if(!ok) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar a solicitudes</button>`;
   else primary = `<button class="btn primary" id="confirmArrival" data-act="arrive">${ic("check",2.4)}${st==="pending"?"Registrar llegada":"Guardar cambios"}</button>`;
   $("guestCard").innerHTML = `
@@ -1916,8 +1922,11 @@ function drawCard(){
       ${d.n>g.persons?`<div class="info">${ic("userPlus")}<span>Se registrará${d.n-g.persons===1?" 1 persona adicional":"n "+(d.n-g.persons)+" personas adicionales"} a la invitación (tenía ${g.persons}). Quedará marcado en azul como cambio.</span></div>`:""}
 
       <div class="field"><label for="cardTable">${ic("table")}Mesa asignada</label><select id="cardTable">${opts}</select></div>`:""}
-      ${d.table!==g.table?`<div class="info">${ic("move")}<span>Cambio de mesa: Mesa ${g.table} → Mesa ${d.table}. Se enviará a <b>Solicitudes</b> para que un administrador lo apruebe.</span></div>
-      <div class="field col"><label for="cardReason">${ic("notes")}Motivo del cambio</label><select id="cardReason"><option value="">Elige un motivo…</option>${MOVE_REASONS.map(x=>`<option ${d.reason===x?"selected":""}>${esc(x)}</option>`).join("")}</select></div>`:""}
+      ${d.table!==g.table?(()=>{ const asg = S.guests.reduce((a,x)=>a+(x.table===d.table && x!==g ? x.persons : 0),0) + g.persons, cap = (tableOf(d.table)||{}).cap||0;
+        return `<div class="info">${ic("move")}<span>Cambio de mesa: Mesa ${g.table} → Mesa ${d.table}. ${isAdmin()?"Como administrador, el cambio se guarda al momento.":"Se enviará a <b>Solicitudes</b> para que un administrador lo apruebe."} La Mesa ${d.table} quedaría con ${asg} de ${cap} lugares asignados.</span></div>
+      <div class="field col"><label for="cardReason">${ic("notes")}Motivo del cambio</label><select id="cardReason"><option value="">Elige un motivo…</option>${MOVE_REASONS.map(x=>`<option ${d.reason===x?"selected":""}>${esc(x)}</option>`).join("")}</select></div>
+      ${isAdmin()?`<div class="field col"><label for="cardValid">${ic("userCheck")}¿Con quién se validó?</label><select id="cardValid"><option value="">Elige una opción…</option>${VALIDATIONS.map(x=>`<option ${d.valid===x?"selected":""}>${esc(x)}</option>`).join("")}</select></div>`:""}
+      <label class="arr-opt"><input type="checkbox" id="cardArrive" ${d.arrive?"checked":""}><span><b>También registrar su llegada ahora</b><small>Déjalo sin marcar si solo estás actualizando la lista antes del evento.</small></span></label>`; })():""}
       ${!ok&&!req?`<div class="alert">${ic("alert")}<span>La Mesa ${d.table} ${free===0?"está llena":`solo tiene ${plural(free,"lugar libre","lugares libres")}`} y llegan ${d.n}. Envía la solicitud para que el coordinador lo resuelva y sigue con la fila.</span></div>`:""}
       ${(g.log||[]).length?`<div class="hist"><p>${ic("clock")}Historial de cambios</p><ul>${g.log.slice().reverse().map(l=>`<li>${esc(l.txt)}<small>${l.by?"por "+esc(l.by)+" · ":""}${fmtTime(l.at)}</small></li>`).join("")}</ul></div>`:""}
       ${mates.length?`<div class="mates"><p>${ic("users")}Comparte mesa con</p><ul>${mates.map(m=>`<li class="${m.arrived>0?"ok":""}">${m.arrived>0?ic("check",2.4):""}${esc(m.name)}</li>`).join("")}</ul></div>`:""}
@@ -1939,10 +1948,21 @@ $("guestCard").addEventListener("click", e=>{
   if(c){
     const act = c.dataset.act;
     if(act==="goreq"){ closeAll(false); setSection("requests"); return; }
+    if(act==="movenow"){
+      if(!d.reason){ showToast("Elige el motivo del cambio de mesa.", false); $("cardReason").focus(); return; }
+      if(!d.valid){ showToast("Elige con quién se validó el cambio.", false); $("cardValid").focus(); return; }
+      const prevTable = g.table, prevOrig = g.orig, prevLog = (g.log||[]).slice();
+      if(!g.orig) g.orig = g.table;
+      logChange(g, "move", `Cambio de mesa: original Mesa ${g.orig}, nueva ubicación Mesa ${d.table} · motivo: ${d.reason} · validado: ${d.valid.replace(/^Con /,"con ")}`);
+      g.table = d.table;
+      if(d.arrive){ setArrival(g, d.n, `${g.name} cambiado a la Mesa ${g.table} y registrado`); const u = undo; undo = ()=>{ g.table = prevTable; g.orig = prevOrig; g.log = prevLog; u(); }; }
+      else { store.save(); render(); undo = ()=>{ g.table = prevTable; g.orig = prevOrig; g.log = prevLog; store.save(); render(); }; showToast(`${g.name} cambiado a la Mesa ${g.table} (sin registrar llegada)`); }
+      closeAll(); return;
+    }
     if(act==="request"){
       if(d.table!==g.table){
         if(!d.reason){ showToast("Elige el motivo del cambio de mesa.", false); const s = $("cardReason"); if(s) s.focus(); return; }
-        createRequest({kind:"guest", guestId:g.id, guestUid:g.uid, name:g.name, persons:d.n, table:d.table, fromTable:g.table, reason:d.reason});
+        createRequest({kind:"guest", guestId:g.id, guestUid:g.uid, name:g.name, persons:d.n, table:d.table, fromTable:g.table, reason:d.reason, withArrival:!!d.arrive});
       } else {
         createRequest({kind:"guest", guestId:g.id, guestUid:g.uid, name:g.name, persons:d.n, table:d.table, reason: d.n>g.persons ? `Llegó con ${d.n} personas (invitación de ${g.persons})` : "Mesa sin lugares suficientes"});
       }
@@ -1964,11 +1984,11 @@ $("guestCard").addEventListener("click", e=>{
   if(e.target.closest("#delSend")){
     const reason = $("delReason").value;
     if(!reason){ showToast("Elige el motivo para eliminar al invitado.", false); $("delReason").focus(); return; }
-    createRequest({kind:"delete", guestId:g.id, guestUid:g.uid, name:g.name, persons:g.persons, table:g.table, reason});
+    createRequest({kind:"delete", guestId:g.id, guestUid:g.uid, name:g.name, persons:g.persons, table:g.table, fromTable:g.orig||g.table, reason});
     closeAll(); return;
   }
 });
-$("guestCard").addEventListener("change", e=>{ if(e.target.id==="delReason"){ ui.draft.delReason = e.target.value; return; } if(e.target.id==="cardReason"){ ui.draft.reason = e.target.value; return; } if(e.target.id==="cardTable"){ ui.draft.table = +e.target.value; drawCard(); } });
+$("guestCard").addEventListener("change", e=>{ if(e.target.id==="cardValid"){ ui.draft.valid = e.target.value; return; } if(e.target.id==="cardArrive"){ ui.draft.arrive = e.target.checked; return; } if(e.target.id==="delReason"){ ui.draft.delReason = e.target.value; return; } if(e.target.id==="cardReason"){ ui.draft.reason = e.target.value; return; } if(e.target.id==="cardTable"){ ui.draft.table = +e.target.value; drawCard(); } });
 
 /* ---------- Resolver solicitudes ---------- */
 function resolve(r, mode, table, chairs){
@@ -1986,12 +2006,15 @@ function resolve(r, mode, table, chairs){
     }
     if(guest.table!==table){ if(!guest.orig) guest.orig = guest.table; if(!guest.walkIn || guest.orig!==table) logChange(guest, "move", `Cambio de mesa: original Mesa ${guest.orig}, nueva ubicación Mesa ${table}${r.reason && r.fromTable ? ` · motivo: ${r.reason}` : ""}${r.createdBy ? ` · solicitó ${r.createdBy}` : ""}${r.validatedWith ? ` · validado: ${r.validatedWith.replace(/^Con /,"con ")}` : ""}`); }
     if(mode==="chairs") logChange(guest, "chairs", `Se ${chairs===1?"agregó 1 silla":"agregaron "+chairs+" sillas"} a la Mesa ${table}`);
-    if(r.persons>guest.persons && !guest.walkIn) logChange(guest, "extra", `Tenía ${guest.persons} en invitación, se ${r.persons-guest.persons===1?"agrega 1":"agregan "+(r.persons-guest.persons)} a Mesa ${table}`);
-    guest.table = table; guest.arrived = r.persons; guest.at = Date.now(); guest.by = r.createdBy || ME();
+    const regArr = !(r.fromTable && r.withArrival===false);
+    if(regArr && r.persons>guest.persons && !guest.walkIn) logChange(guest, "extra", `Tenía ${guest.persons} en invitación, se ${r.persons-guest.persons===1?"agrega 1":"agregan "+(r.persons-guest.persons)} a Mesa ${table}`);
+    guest.table = table;
+    if(regArr){ guest.arrived = r.persons; guest.at = Date.now(); guest.by = r.createdBy || ME(); }
   }
   r.status = mode==="reject" ? "rejected" : "done"; r.mode = mode; r.resolvedAt = Date.now(); r.resolvedBy = ME(); delete VALID[r.id];
+  if(r.fromTable && r.withArrival===false && (mode==="approve"||mode==="move"||mode==="chairs")) r._noArr = true;
   r.resolution = mode==="delete" ? `Eliminado de la lista · motivo: ${r.reason||"—"}`
-               : mode==="approve" && r.fromTable ? `Cambio aprobado: Mesa ${r.fromTable} → Mesa ${table}`
+               : mode==="approve" && r.fromTable ? `Cambio aprobado: Mesa ${r.fromTable} → Mesa ${table}${r.withArrival===false?" (sin registrar llegada)":""}`
                : mode==="approve" ? `Aprobado en la Mesa ${table} y llegada registrada`
                : mode==="chairs" ? `Se agregaron ${plural(chairs,"silla","sillas")} a la Mesa ${table} y se registró su llegada`
                : mode==="move" ? `Reacomodado en la Mesa ${table} y llegada registrada`
@@ -2050,14 +2073,21 @@ $("saveSettings").onclick = ()=>{
   store.save(); renderHeader(); closeAll(); undo=null; showToast("Datos del evento guardados", false);
 };
 $("resetBtn").onclick = ()=>{
-  if(!confirm("¿Reiniciar la recepción?\n\nSe quitan todas las llegadas, solicitudes y cambios: los invitados agregados fuera de lista se eliminan, los cambios de mesa regresan a su mesa original y las sillas extra se retiran. La lista original se conserva.")) return;
+  if(!confirm("¿Reiniciar la recepción a la lista original?\n\nLa lista regresa a como se importó: se quitan las llegadas y solicitudes, se eliminan los invitados agregados fuera de lista, los cambios de mesa regresan a su mesa original, se retiran las sillas extra y los invitados que se eliminaron vuelven a la lista.")) return;
   const snap = JSON.stringify(S);
   S.guests = S.guests.filter(g=>!g.walkIn);
+  // regresar a los invitados eliminados con aprobación
+  S.requests.filter(r=>r.kind==="delete" && r.status==="done").forEach(r=>{
+    if(S.guests.some(g=>(r.guestUid && g.uid===r.guestUid))) return;
+    const t = r.fromTable || r.table || 0;
+    S.guests.push({id: Math.max(0,...S.guests.map(x=>x.id))+1, uid: r.guestUid || uuid(), name:r.name, persons:r.persons, table:t, orig:t, arrived:0, at:null, by:"", walkIn:false, log:[]});
+  });
+  S.guests.sort(byName);
   S.guests.forEach(g=>{ g.arrived=0; g.at=null; g.by=""; g.log=[]; if(g.orig && g.orig!==g.table) g.table = g.orig; });
   S.tables.forEach(t=>{ if(t.extra){ t.cap = Math.max(0, t.cap - t.extra); t.extra = 0; } });
   S.requests = []; ui.table = null; store.save(); render(); closeAll();
   undo = ()=>{ S = JSON.parse(snap); store.save(); render(); };
-  showToast("Recepción reiniciada: llegadas y cambios en cero");
+  showToast("Lista reiniciada a la carga original");
 };
 $("clearListBtn").onclick = ()=>{
   const n = S.guests.length, p = S.guests.reduce((a,g)=>a+g.persons,0);

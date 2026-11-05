@@ -1896,9 +1896,7 @@ function drawCard(){
   const opts = tableStats().map(t=>{ const f = Math.max(0,freeAt(t.num,g)); return `<option value="${t.num}" ${t.num===d.table?"selected":""}>Mesa ${t.num} · ${f===0?"llena":plural(f,"libre","libres")}</option>`; }).join("");
   let primary;
   if(req) primary = `<button class="btn request" id="confirmArrival" data-act="goreq">${ic("inbox")}Ver solicitud</button>`;
-  else if(d.table!==g.table) primary = isAdmin()
-      ? `<button class="btn dark" id="confirmArrival" data-act="movenow">${ic("move")}Guardar cambio de mesa</button>`
-      : `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar cambio a solicitudes</button>`;
+  else if(d.table!==g.table) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar cambio a solicitudes</button>`;
   else if(!ok) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar a solicitudes</button>`;
   else primary = `<button class="btn primary" id="confirmArrival" data-act="arrive">${ic("check",2.4)}${st==="pending"?"Registrar llegada":"Guardar cambios"}</button>`;
   $("guestCard").innerHTML = `
@@ -1923,9 +1921,8 @@ function drawCard(){
 
       <div class="field"><label for="cardTable">${ic("table")}Mesa asignada</label><select id="cardTable">${opts}</select></div>`:""}
       ${d.table!==g.table?(()=>{ const asg = S.guests.reduce((a,x)=>a+(x.table===d.table && x!==g ? x.persons : 0),0) + g.persons, cap = (tableOf(d.table)||{}).cap||0;
-        return `<div class="info">${ic("move")}<span>Cambio de mesa: Mesa ${g.table} → Mesa ${d.table}. ${isAdmin()?"Como administrador, el cambio se guarda al momento.":"Se enviará a <b>Solicitudes</b> para que un administrador lo apruebe."} La Mesa ${d.table} quedaría con ${asg} de ${cap} lugares asignados.</span></div>
+        return `<div class="info">${ic("move")}<span>Cambio de mesa: Mesa ${g.table} → Mesa ${d.table}. Se enviará a <b>Solicitudes</b> para que un administrador lo apruebe. La Mesa ${d.table} quedaría con ${asg} de ${cap} lugares asignados.</span></div>
       <div class="field col"><label for="cardReason">${ic("notes")}Motivo del cambio</label><select id="cardReason"><option value="">Elige un motivo…</option>${MOVE_REASONS.map(x=>`<option ${d.reason===x?"selected":""}>${esc(x)}</option>`).join("")}</select></div>
-      ${isAdmin()?`<div class="field col"><label for="cardValid">${ic("userCheck")}¿Con quién se validó?</label><select id="cardValid"><option value="">Elige una opción…</option>${VALIDATIONS.map(x=>`<option ${d.valid===x?"selected":""}>${esc(x)}</option>`).join("")}</select></div>`:""}
       <label class="arr-opt"><input type="checkbox" id="cardArrive" ${d.arrive?"checked":""}><span><b>También registrar su llegada ahora</b><small>Déjalo sin marcar si solo estás actualizando la lista antes del evento.</small></span></label>`; })():""}
       ${!ok&&!req?`<div class="alert">${ic("alert")}<span>La Mesa ${d.table} ${free===0?"está llena":`solo tiene ${plural(free,"lugar libre","lugares libres")}`} y llegan ${d.n}. Envía la solicitud para que el coordinador lo resuelva y sigue con la fila.</span></div>`:""}
       ${(g.log||[]).length?`<div class="hist"><p>${ic("clock")}Historial de cambios</p><ul>${g.log.slice().reverse().map(l=>`<li>${esc(l.txt)}<small>${l.by?"por "+esc(l.by)+" · ":""}${fmtTime(l.at)}</small></li>`).join("")}</ul></div>`:""}

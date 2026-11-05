@@ -762,6 +762,16 @@ a.ev-map[hidden]{display:none}
   .toast{bottom:calc(86px + env(safe-area-inset-bottom))}
   #logoutBtn{display:none}
 }
+/* ---------- Encabezado del evento en celular: botones visibles ---------- */
+@media (max-width:640px){
+  #eventApp .band{grid-template-columns:auto 1fr}
+  #eventApp .band-right{flex-wrap:wrap;justify-content:flex-end;gap:6px 8px}
+  #eventApp .band-right .icon-btn{height:40px;min-width:40px;padding:0 10px}
+  #eventApp .clock{order:5;width:100%;flex-direction:row;align-items:baseline;justify-content:flex-end;gap:8px;margin:0}
+  #eventApp .clock b{font-size:15px}
+  #eventApp .clock small{display:block !important;font-size:11.5px}
+  #eventApp .event .meta{font-size:12.5px;gap:2px 12px}
+}
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1059,6 +1069,7 @@ a.ev-map[hidden]{display:none}
       <button class="btn" id="exportBtn"><i data-icon="download"></i>Descargar lista</button>
       <button class="btn danger admin-only" id="resetBtn"><i data-icon="undo"></i>Reiniciar llegadas</button>
       <button class="btn admin-only" id="demoBtn"><i data-icon="sparkle"></i>Cargar lista de ejemplo</button>
+      <button class="btn danger admin-only" id="clearListBtn"><i data-icon="trash"></i>Borrar toda la lista</button>
     </div>
     <p class="hint admin-only">Usa la plantilla de Excel: columnas <b>Nombre</b>, <b>Personas</b> y <b>Mesa</b>, y la hoja <b>Mesas</b> con su <b>Capacidad</b>.</p>
     <input type="file" id="fileIn" accept=".xlsx,.xls,.csv" hidden>
@@ -2004,7 +2015,9 @@ $("themeGrid").addEventListener("click", e=>{
   S.event.theme = b.dataset.themeId; applyTheme(S.event.theme); renderThemes(); store.save();
 });
 $("openSettings").onclick = ()=>{
-  const e = S.event;
+  const e = S.event, hasList = S.guests.length > 0;
+  $("demoBtn").style.display = hasList ? "none" : "";
+  $("clearListBtn").style.display = hasList ? "" : "none";
   $("fType").innerHTML = TYPES.map(t=>`<option ${t===(e.type||"Boda")?"selected":""}>${t}</option>`).join("");
   $("fPlanner").value=e.planner; $("fSub").value=e.sub; $("fEvent").value=e.name; $("fDate").value=e.date; $("fTime").value=e.time; $("fVenue").value=e.venue||""; $("fVenueUrl").value=e.venueUrl||"";
   $("settingsOverlay").classList.add("open");
@@ -2019,6 +2032,16 @@ $("resetBtn").onclick = ()=>{
   S.guests.forEach(g=>{ g.arrived=0; g.at=null; g.by=""; g.log=(g.log||[]).filter(x=>x.k!=="extra"); }); S.requests = []; store.save(); render(); closeAll();
   undo = ()=>{ S = JSON.parse(snap); store.save(); render(); };
   showToast("Llegadas reiniciadas");
+};
+$("clearListBtn").onclick = ()=>{
+  const n = S.guests.length, p = S.guests.reduce((a,g)=>a+g.persons,0);
+  if(!confirm(`¿Borrar toda la lista de este evento?\n\nSe eliminarán ${n} invitaciones (${p} personas), sus llegadas, las mesas y las solicitudes. Los datos del evento (nombre, fecha, hora y lugar) se conservan.`)) return;
+  if(!confirm("Confirma una vez más: ¿borrar la lista completa?")) return;
+  const snap = JSON.stringify(S);
+  S.guests = []; S.tables = []; S.requests = []; ui.table = null;
+  store.save(); render(); closeAll();
+  undo = ()=>{ S = JSON.parse(snap); store.save(); render(); };
+  showToast("Lista borrada. Puedes importar una nueva desde Excel.");
 };
 $("demoBtn").onclick = ()=>{
   if(!confirm("¿Reemplazar la lista actual por la lista de ejemplo?")) return;

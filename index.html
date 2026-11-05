@@ -772,6 +772,11 @@ a.ev-map[hidden]{display:none}
   #eventApp .clock small{display:block !important;font-size:11.5px}
   #eventApp .event .meta{font-size:12.5px;gap:2px 12px}
 }
+.link-del{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:10px;border:0;background:transparent;color:var(--bad-ink);font-size:14px;text-decoration:underline;text-underline-offset:3px}
+.del-box{margin-top:16px;padding:14px;border-radius:14px;border:1px solid color-mix(in srgb,var(--bad) 35%, var(--line));background:color-mix(in srgb,var(--bad-soft) 45%, var(--surface))}
+.del-box p{margin:0 0 10px;display:flex;align-items:center;gap:8px;color:var(--bad-ink)}
+.del-box label{display:block;font-size:13px;color:var(--ink-soft);margin-bottom:5px}
+.del-box select{width:100%;height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 12px}
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1354,7 +1359,7 @@ function rowGuest(id, g){
 }
 function rowRequest(id, r){
   if(!r.guestUid && r.guestId){ const g = S && S.guests.find(x=>x.id===r.guestId); if(g) r.guestUid = g.uid; }
-  const o = {id:r.id, event_id:id, kind:r.kind, guest_id:r.guestUid||null, name:r.name, persons:Math.max(1,r.persons|0), table_num:r.table||null, status:r.status, mode:r.mode==="approve"?"move":(r.mode||null), resolution:r.resolution||null, created_at:isoOf(r.at), resolved_at:isoOf(r.resolvedAt)};
+  const o = {id:r.id, event_id:id, kind:r.kind, guest_id:r.guestUid||null, name:r.name, persons:Math.max(1,r.persons|0), table_num:r.table||null, status:r.status, mode:r.mode==="approve"?"move":r.mode==="delete"?null:(r.mode||null), resolution:r.resolution||null, created_at:isoOf(r.at), resolved_at:isoOf(r.resolvedAt)};
   if(!NO_EXTRA){ o.created_by = r.createdBy || null; o.resolved_by = r.resolvedBy || null; o.reason = r.reason || null; o.validated_with = r.validatedWith || null; o.from_table = r.fromTable || null; }
   return o;
 }
@@ -1597,8 +1602,8 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">"
 const norm = s => String(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 const fmtTime = ts => new Date(ts).toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});
 const plural = (n,a,b) => `${n} ${n===1?a:b}`;
-const reqGuest = r => r.kind==="guest" ? S.guests.find(g=>(r.guestUid && g.uid===r.guestUid) || (!r.guestUid && g.id===r.guestId)) || null : null;
-const pendingReq = g => S.requests.find(r=>r.status==="pending" && r.kind==="guest" && reqGuest(r)===g);
+const reqGuest = r => (r.kind==="guest"||r.kind==="delete") ? S.guests.find(g=>(r.guestUid && g.uid===r.guestUid) || (!r.guestUid && g.id===r.guestId)) || null : null;
+const pendingReq = g => S.requests.find(r=>r.status==="pending" && (r.kind==="guest"||r.kind==="delete") && reqGuest(r)===g);
 const status = g => pendingReq(g) ? "review" : g.arrived<=0 ? "pending" : g.arrived<g.persons ? "partial" : "arrived";
 const initials = s => { const w = String(s).replace(/\+\d+/g,"").replace(/^familia\s+/i,"").trim().split(/\s+/).filter(Boolean); return ((w[0]||"")[0]||"").toUpperCase()+((w[1]||"")[0]||"").toUpperCase(); };
 function coupleMono(name){
@@ -1619,6 +1624,7 @@ const fits = (num, n, g) => !!num && n <= freeAt(num, g);
 /* ================= Motivos y validaciones ================= */
 const REASONS = ["No había confirmado asistencia","Se invitó en la última semana","Acompañante no registrado en la invitación","Error u omisión en la lista","Invitado de último momento por la familia"];
 const MOVE_REASONS = ["Lo pidieron los novios","Lo pidió la familia de los novios","El invitado pidió estar con su familia o amigos","Incomodidad o conflicto en la mesa original","Ajuste por espacio o accesibilidad"];
+const DELETE_REASONS = ["Canceló su asistencia","Invitado duplicado en la lista","Error en la lista","Lo pidieron los novios","Lo pidió la familia de los novios"];
 const VALIDATIONS = ["Decisión propia","Con los novios","Con los papás de los novios","Con un hermano o hermana de los novios","Con la wedding planner","Con otro familiar"];
 const VALID = {}; // validación elegida por solicitud (mientras el admin decide)
 
@@ -1721,7 +1727,7 @@ function renderList(){
   $("rows").innerHTML = list.map((g,i)=>{
     const st = status(g);
     const by = g.by && g.arrived>0 ? ` · ${esc(g.by)}` : "";
-    const sub = st==="review" ? `${ic("inbox")}${pendingReq(g).fromTable?`En revisión: cambio a Mesa ${pendingReq(g).table}`:pendingReq(g).kind==="guest"?"En revisión, mesa llena":"En revisión"}` : st==="pending" ? `${ic("hourglass")}Pendiente` : st==="partial" ? `${ic("clock")}Llegaron ${g.arrived} de ${g.persons} a las ${fmtTime(g.at)}${by}` : `${ic("clock")}Llegó a las ${fmtTime(g.at)}${by}`;
+    const sub = st==="review" ? `${ic("inbox")}${pendingReq(g).kind==="delete"?"En revisión: eliminar de la lista":pendingReq(g).fromTable?`En revisión: cambio a Mesa ${pendingReq(g).table}`:pendingReq(g).kind==="guest"?"En revisión, mesa llena":"En revisión"}` : st==="pending" ? `${ic("hourglass")}Pendiente` : st==="partial" ? `${ic("clock")}Llegaron ${g.arrived} de ${g.persons} a las ${fmtTime(g.at)}${by}` : `${ic("clock")}Llegó a las ${fmtTime(g.at)}${by}`;
     const ci = chgInfo(g), notes = ci.any ? chgNotes(g) : [], cb = ci.any ? chgBy(g) : "";
     const note = notes.length ? `<small class="note">${ic(ci.walk?"userPlus":ci.moved?"move":"users")}${esc(notes.join(" · "))}${cb?` · por ${esc(cb)}`:""}</small>` : "";
     return `<div class="row ${st}${ci.any?" chg":""}${i===0&&ui.q?" first":""}" role="listitem" data-id="${g.id}">
@@ -1766,6 +1772,7 @@ function renderTables(){
 
 /* ---------- Solicitudes ---------- */
 const reasonText = r => {
+  if(r.kind==="delete"){ const g = reqGuest(r); return `Solicita eliminar a ${r.name} de la lista (${plural(r.persons,"persona","personas")}, Mesa ${r.table||"—"})${g && g.arrived>0 ? `. Ojo: ya tiene registrada su llegada (${g.arrived}).` : "."}`; }
   if(r.fromTable){
     const f = Math.max(0, freeAt(r.table, reqGuest(r)));
     return `Solicita cambiar de la Mesa ${r.fromTable} a la Mesa ${r.table}` + (f>=r.persons ? `, que tiene ${plural(f,"lugar libre","lugares libres")}.` : f===0 ? `, que está llena.` : `, que solo tiene ${plural(f,"lugar libre","lugares libres")} y necesita ${r.persons}.`);
@@ -1814,21 +1821,22 @@ function renderRequests(){
   $("reqInfo").textContent = pend.length ? `${plural(pend.length,"pendiente","pendientes")}` : "Sin pendientes";
   $("reqPending").innerHTML = pend.length ? pend.map(r=>`<article class="req" data-req="${r.id}">
       <div class="req-top"><span class="avatar">${esc(initials(r.name))}</span>
-        <div class="who"><b>${esc(r.name)}</b><small><span>${ic("users")}${plural(r.persons,"persona","personas")}</span><span>${ic("clock")}Enviada a las ${fmtTime(r.at)}</span><span>${ic(r.fromTable?"move":r.kind==="guest"?"list":"userPlus")}${r.fromTable?`Cambio de mesa ${r.fromTable} → ${r.table}`:r.kind==="guest"?"En la lista":"No estaba en la lista"}</span></small></div>
+        <div class="who"><b>${esc(r.name)}</b><small><span>${ic("users")}${plural(r.persons,"persona","personas")}</span><span>${ic("clock")}Enviada a las ${fmtTime(r.at)}</span><span>${ic(r.kind==="delete"?"trash":r.fromTable?"move":r.kind==="guest"?"list":"userPlus")}${r.kind==="delete"?"Eliminar de la lista":r.fromTable?`Cambio de mesa ${r.fromTable} → ${r.table}`:r.kind==="guest"?"En la lista":"No estaba en la lista"}</span></small></div>
         <span class="req-by">${ic("user")}Solicitó: <b>${esc(r.createdBy||"—")}</b></span>
       </div>
       <p class="req-why">${ic("alert")}<span>${reasonText(r)}</span></p>
       ${r.reason?`<p class="req-reason">${ic("notes")}<span><b>Motivo:</b> ${esc(r.reason)}</span></p>`:""}
       ${isAdmin()?`<label class="req-valid">${ic("userCheck")}<span>¿Con quién se validó?</span><select data-rv="${r.id}"><option value="">Elige una opción…</option>${VALIDATIONS.map(v=>`<option ${VALID[r.id]===v?"selected":""}>${esc(v)}</option>`).join("")}</select></label>
       <div class="req-actions">
+        ${r.kind==="delete" ? `<button class="btn request" data-rdo="delete" style="flex:0 1 auto">${ic("trash")}Aprobar eliminación</button><button class="btn danger" data-rmode="reject" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="reject"}">${ic("ban")}No procede</button></div>${reqForm(r)}` : `
         ${r.table && fits(r.table, r.persons, reqGuest(r)) ? `<button class="btn primary" data-rdo="approve" style="flex:0 1 auto">${ic("check",2.4)}Aprobar en Mesa ${r.table}</button>` : ""}
         <button class="btn" data-rmode="chairs" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="chairs"}">${ic("chairPlus")}Agregar sillas</button>
         <button class="btn" data-rmode="move" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="move"}">${ic("move")}Reacomodar en otra mesa</button>
         <button class="btn danger" data-rmode="reject" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="reject"}">${ic("ban")}No procede</button>
-      </div>${reqForm(r)}` : `<div class="info">${ic("hourglass")}<span>Esperando la aprobación de un administrador.</span></div>`}</article>`).join("")
+      </div>${reqForm(r)}`}` : `<div class="info">${ic("hourglass")}<span>Esperando la aprobación de un administrador.</span></div>`}</article>`).join("")
     : `<div class="empty" style="background:var(--surface);border:1px solid var(--line);border-radius:16px"><div class="ei">${ic("check",1.5)}</div><b>Todo en orden</b>Aquí aparecen los invitados fuera de lista y las mesas llenas para que un administrador los apruebe.</div>`;
   $("reqDone").innerHTML = done.length ? `<div class="done-list">${done.map(r=>`<div class="done"><b>${esc(r.name)}</b>
-      <span class="pill ${r.status==="rejected"?"full":"ok"}">${r.status==="rejected"?"No procede":r.mode==="chairs"?"Sillas agregadas":/^Cambio aprobado/.test(r.resolution||"")?"Cambio aprobado":/^Aprobad/.test(r.resolution||"")?"Aprobado":"Reacomodado"}</span>
+      <span class="pill ${r.status==="rejected"?"full":"ok"}">${r.status==="rejected"?"No procede":r.kind==="delete"?"Eliminado":r.mode==="chairs"?"Sillas agregadas":/^Cambio aprobado/.test(r.resolution||"")?"Cambio aprobado":/^Aprobad/.test(r.resolution||"")?"Aprobado":"Reacomodado"}</span>
       <small>${esc(r.resolution)} · ${fmtTime(r.resolvedAt)}</small>
       <small>${r.reason?`Motivo: ${esc(r.reason)} · `:""}Solicitó <b>${esc(r.createdBy||"—")}</b> · ${r.status==="rejected"?"Rechazó":"Liberó"} <b>${esc(r.resolvedBy||"—")}</b>${r.validatedWith?` · Validado: ${esc(r.validatedWith)}`:""}</small></div>`).join("")}</div>`
     : `<p class="req-intro">Aún no hay solicitudes resueltas.</p>`;
@@ -1917,6 +1925,10 @@ function drawCard(){
         ${(st==="arrived"||st==="partial")?`<button class="btn danger" id="undoArrival">${ic("undo")}Quitar llegada</button>`:`<button class="btn" data-close>Cerrar</button>`}
         ${primary}
       </div>
+      ${!req?(d.del?`<div class="del-box"><p>${ic("trash")}<b>Solicitar eliminar de la lista</b></p>
+        <label for="delReason">Motivo</label><select id="delReason"><option value="">Elige un motivo…</option>${DELETE_REASONS.map(x=>`<option ${d.delReason===x?"selected":""}>${esc(x)}</option>`).join("")}</select>
+        <div class="actions" style="margin-top:10px"><button class="btn" id="delCancel">Cancelar</button><button class="btn request" id="delSend">${ic("send")}Enviar a solicitudes</button></div></div>`
+        :`<button class="link-del" id="delOpen">${ic("trash")}Solicitar eliminar a este invitado de la lista</button>`):""}
     </div>`;
 }
 $("guestCard").addEventListener("click", e=>{
@@ -1946,9 +1958,17 @@ $("guestCard").addEventListener("click", e=>{
     const u = undo; undo = ()=>{ g.table = prevTable; g.orig = prevOrig; g.log = prevLog; u(); };
     closeAll(); return;
   }
-  if(e.target.closest("#undoArrival")){ setArrival(g,0,`${g.name}: llegada quitada`); closeAll(); }
+  if(e.target.closest("#undoArrival")){ setArrival(g,0,`${g.name}: llegada quitada`); closeAll(); return; }
+  if(e.target.closest("#delOpen")){ d.del = true; drawCard(); return; }
+  if(e.target.closest("#delCancel")){ d.del = false; drawCard(); return; }
+  if(e.target.closest("#delSend")){
+    const reason = $("delReason").value;
+    if(!reason){ showToast("Elige el motivo para eliminar al invitado.", false); $("delReason").focus(); return; }
+    createRequest({kind:"delete", guestId:g.id, guestUid:g.uid, name:g.name, persons:g.persons, table:g.table, reason});
+    closeAll(); return;
+  }
 });
-$("guestCard").addEventListener("change", e=>{ if(e.target.id==="cardReason"){ ui.draft.reason = e.target.value; return; } if(e.target.id==="cardTable"){ ui.draft.table = +e.target.value; drawCard(); } });
+$("guestCard").addEventListener("change", e=>{ if(e.target.id==="delReason"){ ui.draft.delReason = e.target.value; return; } if(e.target.id==="cardReason"){ ui.draft.reason = e.target.value; return; } if(e.target.id==="cardTable"){ ui.draft.table = +e.target.value; drawCard(); } });
 
 /* ---------- Resolver solicitudes ---------- */
 function resolve(r, mode, table, chairs){
@@ -1957,7 +1977,8 @@ function resolve(r, mode, table, chairs){
   r.validatedWith = VALID[r.id] || r.validatedWith || "";
   const who = `${r.reason && r.kind==="new" ? ` · motivo: ${r.reason}` : ""}${r.createdBy ? ` · solicitó ${r.createdBy}` : ""}${r.validatedWith ? ` · validado: ${r.validatedWith.replace(/^Con /,"con ")}` : ""}`;
   if(mode==="chairs"){ const t = tableOf(table); t.cap += chairs; t.extra = (t.extra||0) + chairs; }
-  if(mode!=="reject"){
+  if(mode==="delete"){ if(guest) S.guests = S.guests.filter(x=>x!==guest); guest = null; }
+  if(mode!=="reject" && mode!=="delete"){
     if(!guest){
       guest = {id: Math.max(0,...S.guests.map(x=>x.id))+1, uid:uuid(), name:r.name, persons:r.persons, table, arrived:0, at:null, walkIn:true, orig:table, log:[]};
       logChange(guest, "add", `Agregado fuera de lista en Mesa ${table}${guest.persons>1?` (${guest.persons} personas)`:""}${who}`);
@@ -1969,14 +1990,15 @@ function resolve(r, mode, table, chairs){
     guest.table = table; guest.arrived = r.persons; guest.at = Date.now(); guest.by = r.createdBy || ME();
   }
   r.status = mode==="reject" ? "rejected" : "done"; r.mode = mode; r.resolvedAt = Date.now(); r.resolvedBy = ME(); delete VALID[r.id];
-  r.resolution = mode==="approve" && r.fromTable ? `Cambio aprobado: Mesa ${r.fromTable} → Mesa ${table}`
+  r.resolution = mode==="delete" ? `Eliminado de la lista · motivo: ${r.reason||"—"}`
+               : mode==="approve" && r.fromTable ? `Cambio aprobado: Mesa ${r.fromTable} → Mesa ${table}`
                : mode==="approve" ? `Aprobado en la Mesa ${table} y llegada registrada`
                : mode==="chairs" ? `Se agregaron ${plural(chairs,"silla","sillas")} a la Mesa ${table} y se registró su llegada`
                : mode==="move" ? `Reacomodado en la Mesa ${table} y llegada registrada`
                : `No procede${ui.req.note?": "+ui.req.note:""}`;
   ui.req = null; store.save(); render();
   undo = () => { S = JSON.parse(snap); store.save(); render(); };
-  showToast(mode==="reject" ? `${r.name}: solicitud marcada como no procede` : mode==="approve" ? `${r.name} aprobado en la Mesa ${table}` : `${r.name} asignado a la Mesa ${table}`);
+  showToast(mode==="delete" ? `${r.name} eliminado de la lista` : mode==="reject" ? `${r.name}: solicitud marcada como no procede` : mode==="approve" ? `${r.name} aprobado en la Mesa ${table}` : `${r.name} asignado a la Mesa ${table}`);
 }
 $("reqPending").addEventListener("click", e=>{
   const card = e.target.closest("[data-req]"); if(!card) return;
@@ -1993,7 +2015,8 @@ $("reqPending").addEventListener("click", e=>{
   if(go){
     if(!isAdmin()){ showToast("Solo un administrador puede liberar solicitudes.", false); return; }
     if(!VALID[r.id]){ showToast("Elige con quién se validó antes de liberar la solicitud.", false); const s = card.querySelector("[data-rv]"); if(s) s.focus(); return; }
-    if(go.dataset.rdo==="approve") resolve(r, "approve", r.table, 0);
+    if(go.dataset.rdo==="delete") resolve(r, "delete", r.table, 0);
+    else if(go.dataset.rdo==="approve") resolve(r, "approve", r.table, 0);
     else resolve(r, go.dataset.rdo, ui.req.table, ui.req.n);
   }
 });
@@ -2027,11 +2050,14 @@ $("saveSettings").onclick = ()=>{
   store.save(); renderHeader(); closeAll(); undo=null; showToast("Datos del evento guardados", false);
 };
 $("resetBtn").onclick = ()=>{
-  if(!confirm("¿Quitar todas las llegadas y solicitudes registradas? La lista de invitados se conserva.")) return;
+  if(!confirm("¿Reiniciar la recepción?\n\nSe quitan todas las llegadas, solicitudes y cambios: los invitados agregados fuera de lista se eliminan, los cambios de mesa regresan a su mesa original y las sillas extra se retiran. La lista original se conserva.")) return;
   const snap = JSON.stringify(S);
-  S.guests.forEach(g=>{ g.arrived=0; g.at=null; g.by=""; g.log=(g.log||[]).filter(x=>x.k!=="extra"); }); S.requests = []; store.save(); render(); closeAll();
+  S.guests = S.guests.filter(g=>!g.walkIn);
+  S.guests.forEach(g=>{ g.arrived=0; g.at=null; g.by=""; g.log=[]; if(g.orig && g.orig!==g.table) g.table = g.orig; });
+  S.tables.forEach(t=>{ if(t.extra){ t.cap = Math.max(0, t.cap - t.extra); t.extra = 0; } });
+  S.requests = []; ui.table = null; store.save(); render(); closeAll();
   undo = ()=>{ S = JSON.parse(snap); store.save(); render(); };
-  showToast("Llegadas reiniciadas");
+  showToast("Recepción reiniciada: llegadas y cambios en cero");
 };
 $("clearListBtn").onclick = ()=>{
   const n = S.guests.length, p = S.guests.reduce((a,g)=>a+g.persons,0);
@@ -2625,6 +2651,8 @@ function buildReport(key){
   if(D.walk.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Fuera de lista (${plural(D.walkPersons,"persona","personas")})</b>${D.walk.slice(0,6).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}${g.persons>1?` (${g.persons})`:""} → Mesa ${g.table||"—"}${(()=>{ const rq = S.requests.find(r=>r.kind==="new" && r.status==="done" && r.name===g.name); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· aprobó ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${D.walk.length>6?`<div class="rp-mu">y ${D.walk.length-6} más (ver lista)</div>`:""}</div>`;
   if(D.moves.length || D.extras.length) obs += `<div class="rp-obs"><b>${ri("move",P.accentText)}Cambios de mesa</b>${D.moves.slice(0,5).map(g=>`<div>${ri("move",P.accentText)}${esc(g.name)}: Mesa ${g.orig} → Mesa ${g.table}${(()=>{ const rq = S.requests.filter(r=>r.fromTable && r.status==="done" && r.guestUid===g.uid).pop(); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${D.moves.length>5?`<div class="rp-mu">y ${D.moves.length-5} cambios más</div>`:""}${D.extras.map(t=>`<div>${ri("chair",P.accentText)}Mesa ${t.num}: se ${t.extra===1?"agregó 1 silla":`agregaron ${t.extra} sillas`}</div>`).join("")}</div>`;
   if(D.plus.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Personas adicionales a la invitación</b>${D.plus.slice(0,5).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}: tenía ${g.persons}, llegaron ${g.arrived} (+${g.arrived-g.persons}) · Mesa ${g.table}${chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""}</div>`).join("")}${D.plus.length>5?`<div class="rp-mu">y ${D.plus.length-5} más (ver lista)</div>`:""}</div>`;
+  const dels = S.requests.filter(r=>r.kind==="delete" && r.status==="done");
+  if(dels.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Eliminados de la lista (${dels.length})</b>${dels.slice(0,5).map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)} · ${esc(r.reason||"")}${r.resolvedBy?` <span class="rp-mu">· aprobó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}${dels.length>5?`<div class="rp-mu">y ${dels.length-5} más</div>`:""}</div>`;
   if(D.rejected.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Solicitudes que no procedieron</b>${D.rejected.slice(0,4).map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)}${r.resolution&&r.resolution!=="No procede"?` · ${esc(r.resolution.replace(/^No procede:\s*/,""))}`:""}${r.resolvedBy?` <span class="rp-mu">· rechazó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}</div>`;
   if(!obs) obs = `<div class="rp-obs" style="display:flex;flex-direction:row;align-items:center;gap:8px">${ri("check",P.dark)}Sin observaciones: todo salió según lo planeado.</div>`;
   const barTotal = Math.max(1, D.invited);

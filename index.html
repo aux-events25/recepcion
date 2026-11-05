@@ -744,6 +744,9 @@ a.ev-map[hidden]{display:none}
 .nd-b{right:54px;bottom:64px;width:54px;height:136px;transform:rotate(20deg)}
 .nd-c{left:44px;bottom:44px;width:190px;height:38px}
 .nd-band{right:18px;top:50%;width:42px;height:50px;transform:translateY(-50%);stroke-opacity:.16}
+.event h1.formal{display:inline-flex;align-items:center;gap:.45em}
+.nd-inline{width:.95em;height:1.15em;flex:none;fill:none;stroke:#C9C9C9;stroke-opacity:.75;stroke-width:1.6;vector-effect:non-scaling-stroke;overflow:visible}
+.nd-inline use{vector-effect:non-scaling-stroke}
 .noir > *:not(.nd):not(.sprig){position:relative;z-index:1}
 @media (max-width:860px){ .nd-b,.nd-c{display:none} .nd-a{top:30px;left:30px;width:52px;height:62px} }
 
@@ -884,7 +887,6 @@ a.ev-map[hidden]{display:none}
 <!-- ============ Mis eventos ============ -->
 <section id="eventsScreen" aria-label="Mis eventos">
   <header class="band noir">
-    <svg class="nd nd-band" aria-hidden="true"><use href="#nd-check"/></svg>
     <svg class="sprig l" aria-hidden="true"><use href="#sprig"/></svg>
     <svg class="sprig r" aria-hidden="true"><use href="#sprig"/></svg>
     <div class="brand">
@@ -892,7 +894,7 @@ a.ev-map[hidden]{display:none}
       <div class="mono" id="eMono" hidden>AUX</div>
       <div><b id="eName" hidden>AUX EVENTS</b><span id="eSub">Recepción<br>Invitados</span></div>
     </div>
-    <div class="event"><h1 class="formal">Mis eventos</h1><div class="meta"><span id="eCount"></span></div></div>
+    <div class="event"><h1 class="formal"><svg class="nd-inline" aria-hidden="true"><use href="#nd-check"/></svg>Mis eventos</h1><div class="meta"><span id="eCount"></span></div></div>
     <div class="band-right">
       <div class="who-chip"><span id="eRole">Sesión iniciada</span><b id="eUser"></b></div>
       <button class="icon-btn" id="meBtn" aria-label="Mi perfil"><i data-icon="user"></i><span class="lbl">Mi perfil</span></button>

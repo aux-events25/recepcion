@@ -665,6 +665,19 @@ body[data-role="hostess"] .admin-only{display:none !important}
 .rp-tb tr.z td{background:var(--r-zebra)}
 .rp-tb tr.no td{background:#FBE7E4;color:#7A2E26;border-bottom-color:#F3D3CE}
 .rp-tb tr.chg td{background:#E8F0FB;border-bottom-color:#D3E1F4}
+.rp-obs b.rp-n,.rp-n{display:inline !important;font-weight:600;color:var(--r-ink)}
+.rp-obs > div:not(.rp-mu){display:block;position:relative;padding-left:26px;line-height:1.45}
+.rp-obs > div > svg:first-child{position:absolute;left:0;top:2px}
+.rp-sum > div{padding-left:0 !important}
+.rp-sum{flex-direction:row !important;align-items:center;justify-content:space-between;gap:10px;background:#FFFFFF !important;border:1px solid var(--r-line)}
+.rp-sum > div{display:flex !important;flex-direction:column;align-items:flex-start !important;gap:0 !important}
+.rp-sum span{font-size:11.5px;color:var(--r-muted);text-transform:uppercase;letter-spacing:.06em}
+.rp-sum b{font-family:"AuxSerif",Georgia,serif;font-weight:600;font-size:26px;line-height:1.05;color:var(--r-ink)}
+.rp-sum small{font-size:11.5px;color:var(--r-muted)}
+.rp-sum .ch{align-items:center !important;gap:4px !important}
+.rp-sum .ch span{text-transform:none;letter-spacing:0;font-size:12.5px;padding:2px 10px;border-radius:99px;background:#F1F0EC;color:var(--r-ink)}
+.rp-sum .ch .up{background:#E8F0FB;color:#2B5591}
+.rp-sum .ch .dn{background:#FBE7E4;color:#7A2E26}
 .rp-pill{display:inline-block;padding:2px 11px;border-radius:99px;font-size:12.5px}
 @media (max-width:640px){ .rep-dl{width:100%} }
 
@@ -2676,13 +2689,24 @@ function buildReport(key){
     <div style="display:flex;height:16px;border-radius:8px;overflow:hidden;background:#E6E3DC"><i style="width:${D.full/D.invCount*100}%;background:${P.dark}"></i><i style="width:${D.partial/D.invCount*100}%;background:${P.accent}"></i></div>
     <div style="display:flex;gap:18px" class="rp-mu"><span><b style="color:${P.dark};font-weight:500">${D.full}</b> completas</span><span><b style="color:${P.accentText};font-weight:500">${D.partial}</b> parciales</span><span><b style="color:#5F5E5A;font-weight:500">${D.none}</b> no llegaron</span></div>` : "";
   let obs = "";
-  if(D.walk.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Fuera de lista (${plural(D.walkPersons,"persona","personas")})</b>${D.walk.slice(0,6).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}${g.persons>1?` (${g.persons})`:""} → Mesa ${g.table||"—"}${(()=>{ const rq = S.requests.find(r=>r.kind==="new" && r.status==="done" && r.name===g.name); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· aprobó ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${D.walk.length>6?`<div class="rp-mu">y ${D.walk.length-6} más (ver lista)</div>`:""}</div>`;
-  if(D.moves.length || D.extras.length) obs += `<div class="rp-obs"><b>${ri("move",P.accentText)}Cambios de mesa</b>${D.moves.slice(0,5).map(g=>`<div>${ri("move",P.accentText)}${esc(g.name)}: Mesa ${g.orig} → Mesa ${g.table}${(()=>{ const rq = S.requests.filter(r=>r.fromTable && r.status==="done" && r.guestUid===g.uid).pop(); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${D.moves.length>5?`<div class="rp-mu">y ${D.moves.length-5} cambios más</div>`:""}${D.extras.map(t=>`<div>${ri("chair",P.accentText)}Mesa ${t.num}: se ${t.extra===1?"agregó 1 silla":`agregaron ${t.extra} sillas`}</div>`).join("")}</div>`;
+  if(D.walk.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Fuera de lista (${plural(D.walkPersons,"persona","personas")})</b>${D.walk.slice(0,6).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)} <b class="rp-n">(${g.persons})</b> → Mesa ${g.table||"—"}${(()=>{ const rq = S.requests.find(r=>r.kind==="new" && r.status==="done" && r.name===g.name); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· aprobó ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${D.walk.length>6?`<div class="rp-mu">y ${D.walk.length-6} más (ver lista)</div>`:""}</div>`;
+  if(D.moves.length || D.extras.length) obs += `<div class="rp-obs"><b>${ri("move",P.accentText)}Cambios de mesa${D.moves.length?` (${plural(D.moves.reduce((a,g)=>a+g.persons,0),"persona","personas")})`:""}</b>${D.moves.slice(0,5).map(g=>`<div>${ri("move",P.accentText)}${esc(g.name)} <b class="rp-n">(${g.persons})</b>: Mesa ${g.orig} → Mesa ${g.table}${(()=>{ const rq = S.requests.filter(r=>r.fromTable && r.status==="done" && r.guestUid===g.uid).pop(); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${D.moves.length>5?`<div class="rp-mu">y ${D.moves.length-5} cambios más</div>`:""}${D.extras.map(t=>`<div>${ri("chair",P.accentText)}Mesa ${t.num}: se ${t.extra===1?"agregó 1 silla":`agregaron ${t.extra} sillas`}</div>`).join("")}</div>`;
   if(D.plus.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Personas adicionales a la invitación</b>${D.plus.slice(0,5).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}: tenía ${g.persons}, llegaron ${g.arrived} (+${g.arrived-g.persons}) · Mesa ${g.table}${chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""}</div>`).join("")}${D.plus.length>5?`<div class="rp-mu">y ${D.plus.length-5} más (ver lista)</div>`:""}</div>`;
   const dels = S.requests.filter(r=>r.kind==="delete" && r.status==="done");
-  if(dels.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Eliminados de la lista (${dels.length})</b>${dels.slice(0,5).map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)} · ${esc(r.reason||"")}${r.resolvedBy?` <span class="rp-mu">· aprobó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}${dels.length>5?`<div class="rp-mu">y ${dels.length-5} más</div>`:""}</div>`;
+  if(dels.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Eliminados de la lista (${plural(dels.reduce((a,r)=>a+(+r.persons||0),0),"persona","personas")})</b>${dels.slice(0,5).map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)} <b class="rp-n">(${r.persons})</b> · ${esc(r.reason||"")}${r.resolvedBy?` <span class="rp-mu">· aprobó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}${dels.length>5?`<div class="rp-mu">y ${dels.length-5} más</div>`:""}</div>`;
+  {
+    const finP = S.guests.reduce((a,g)=>a+g.persons,0), finI = S.guests.length;
+    const delP = dels.reduce((a,r)=>a+(+r.persons||0),0);
+    const iniP = finP - D.walkPersons + delP, iniI = finI - D.walk.length + dels.length;
+    const fmt = n => n.toLocaleString("es-MX");
+    obs = `<div class="rp-obs rp-sum">
+      <div><span>Lista inicial</span><b>${fmt(iniP)}</b><small>invitados · ${fmt(iniI)} invitaciones</small></div>
+      <div class="ch">${D.walkPersons?`<span class="up">+${D.walkPersons} agregados</span>`:""}${delP?`<span class="dn">−${delP} eliminados</span>`:""}${!D.walkPersons&&!delP?`<span>Sin altas ni bajas</span>`:""}</div>
+      <div><span>Lista final con modificaciones</span><b>${fmt(finP)}</b><small>invitados · ${fmt(finI)} invitaciones</small></div>
+    </div>` + obs;
+  }
   if(D.rejected.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Solicitudes que no procedieron</b>${D.rejected.slice(0,4).map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)}${r.resolution&&r.resolution!=="No procede"?` · ${esc(r.resolution.replace(/^No procede:\s*/,""))}`:""}${r.resolvedBy?` <span class="rp-mu">· rechazó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}</div>`;
-  if(!obs) obs = `<div class="rp-obs" style="display:flex;flex-direction:row;align-items:center;gap:8px">${ri("check",P.dark)}Sin observaciones: todo salió según lo planeado.</div>`;
+  if(!(D.walk.length||D.moves.length||D.extras.length||D.plus.length||dels.length||D.rejected.length)) obs += `<div class="rp-obs" style="display:flex;flex-direction:row;align-items:center;gap:8px">${ri("check",P.dark)}Sin observaciones: todo salió según lo planeado.</div>`;
   const barTotal = Math.max(1, D.invited);
   pages.push(`<div class="rp-page" style="${vars}">
     <div class="rp-side" style="${P.sideLine?`border-right:2px solid ${P.sideLine}`:""}">

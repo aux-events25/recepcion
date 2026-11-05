@@ -718,6 +718,25 @@ a.ev-map[hidden]{display:none}
 .rp-wm{opacity:.45 !important}
 .brand [hidden],.login-art [hidden]{display:none !important}
 @media (max-width:640px){ .logo-band{height:34px} .brand .planner-tag{display:none} }
+
+/* ---------- Fondo grafito con marco plata (opción D) ---------- */
+.noir{background:linear-gradient(150deg,#26272A,#1A1B1D) !important;color:#F2F2F2}
+.noir .sprig{display:none !important}
+.login-art.noir::after{border-color:rgba(200,200,200,.45) !important}
+.band.noir::after{background:linear-gradient(90deg,transparent,#C8C8C8,transparent) !important}
+.noir .rule{background:linear-gradient(90deg,transparent,#BDBDBD,transparent) !important}
+.noir .icon-btn{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.26)}
+.noir .icon-btn:hover{border-color:#C8C8C8}
+.noir .mono{border-color:#BDBDBD;color:#D9D9D9}
+.nd{position:absolute;pointer-events:none;z-index:0;fill:none;stroke:#B0B0B0;stroke-opacity:.22;stroke-width:1.5;vector-effect:non-scaling-stroke;overflow:visible}
+.nd use{vector-effect:non-scaling-stroke}
+.nd-a{top:44px;left:44px;width:78px;height:94px}
+.nd-b{right:54px;bottom:64px;width:54px;height:136px;transform:rotate(20deg)}
+.nd-c{left:44px;bottom:44px;width:190px;height:38px}
+.nd-band{right:18px;top:50%;width:42px;height:50px;transform:translateY(-50%);stroke-opacity:.16}
+.noir > *:not(.nd):not(.sprig){position:relative;z-index:1}
+@media (max-width:860px){ .nd-b,.nd-c{display:none} .nd-a{top:30px;left:30px;width:52px;height:62px} }
+
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -768,6 +787,11 @@ a.ev-map[hidden]{display:none}
 </style>
 </head>
 <body data-view="guests" data-section="reception" data-screen="loading">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <symbol id="nd-check" viewBox="0 0 100 120"><rect x="10" y="14" width="80" height="100" rx="8"/><rect x="34" y="6" width="32" height="16" rx="4"/><path d="M28 50l10 10 18-18M28 82h44M28 96h30"/></symbol>
+ <symbol id="nd-pencil" viewBox="0 0 200 40"><path d="M8 20 L34 8 H182 a6 6 0 0 1 6 6 v12 a6 6 0 0 1 -6 6 H34 Z"/><path d="M34 8v24M160 8v24M168 8v24M8 20h10M34 14h126M34 26h126"/></symbol>
+ <symbol id="nd-feather" viewBox="0 0 80 200"><path d="M40 196 C40 140 42 80 66 10 C30 40 14 100 22 160 Z"/><path d="M40 196 C44 130 50 70 66 10"/><path d="M28 140l14 -10M24 110l20 -12M24 80l24 -14M30 52l24 -14"/></symbol>
+</defs></svg>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -793,7 +817,8 @@ a.ev-map[hidden]{display:none}
 
 <!-- ============ Inicio de sesión ============ -->
 <section id="loginScreen" aria-label="Inicio de sesión">
-  <div class="login-art">
+  <div class="login-art noir">
+    <svg class="nd nd-a" aria-hidden="true"><use href="#nd-check"/></svg><svg class="nd nd-b" aria-hidden="true"><use href="#nd-feather"/></svg><svg class="nd nd-c" aria-hidden="true"><use href="#nd-pencil"/></svg>
     <svg class="sprig l" aria-hidden="true"><use href="#sprig"/></svg>
     <svg class="sprig r" aria-hidden="true"><use href="#sprig"/></svg>
     <img class="logo-big" data-logo="light" alt="AUX Events · Donde el estilo celebra contigo">
@@ -836,7 +861,8 @@ a.ev-map[hidden]{display:none}
 
 <!-- ============ Mis eventos ============ -->
 <section id="eventsScreen" aria-label="Mis eventos">
-  <header class="band">
+  <header class="band noir">
+    <svg class="nd nd-band" aria-hidden="true"><use href="#nd-check"/></svg>
     <svg class="sprig l" aria-hidden="true"><use href="#sprig"/></svg>
     <svg class="sprig r" aria-hidden="true"><use href="#sprig"/></svg>
     <div class="brand">

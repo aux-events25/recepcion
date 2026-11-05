@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-theme="olivo">
+<html lang="es" data-theme="grafito">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -57,6 +57,16 @@
     --bad:#FF4D45; --bad-soft:#4A1513; --bad-ink:#FF948E;
     --shadow:0 22px 50px -28px rgba(0,0,0,.85); --shadow-sm:0 6px 18px -12px rgba(0,0,0,.8);
   }
+}
+html[data-theme="grafito"]{
+  color-scheme: light;
+  --paper:#F1F1EF; --surface:#FFFFFF; --surface-2:#EAEAE8;
+  --ink:#1F1F21; --ink-soft:#4A4A4D; --muted:#86868A; --line:#DEDEDB;
+  --band:#1A1B1D; --band-2:#26272A; --on-band:#F2F2F2; --band-title:#FFFFFF;
+  --primary:#2B2C2F; --primary-soft:#E6E6E4; --primary-ink:#2B2C2F; --on-primary:#FFFFFF;
+  --gold:#8E8E92; --gold-soft:#ECECEA;
+  --seal:#2B2C2F; --seal-2:#4A4B4F; --on-seal:#E8E8E8;
+  --blush:#C9C9C9; --leaf:#BDBDBD; --berry:#9A9A9A; --bloom:#E6E6E6;
 }
 html[data-theme="marino"]{
   color-scheme: light;
@@ -1224,7 +1234,7 @@ const THEMES = [
   {id:"champana",  name:"Champaña y marfil",     desc:"Dorado champaña con fondo marfil. Luminoso y de gala.", band:"#9E7B45", band2:"#B5935C", paper:"#FAF6EE", title:"#FFFFFF", sw:["#A8864F","#8E6E3C","#FAF6EE"]}
 ];
 const LEGACY_THEME = {negro:"moka", blanco:"champana"};
-function applyTheme(id){ id = LEGACY_THEME[id] || id; document.documentElement.dataset.theme = THEMES.some(t=>t.id===id) ? id : "olivo"; }
+function applyTheme(id){ id = LEGACY_THEME[id] || id; document.documentElement.dataset.theme = (id==="grafito" || THEMES.some(t=>t.id===id)) ? id : "olivo"; }
 function renderThemes(){
   const cur = S.event.theme || "olivo";
   $("themeGrid").innerHTML = THEMES.map(t=>`<button class="theme" data-theme-id="${t.id}" aria-pressed="${t.id===cur}">
@@ -2120,7 +2130,7 @@ document.addEventListener("keydown", e=>{
 /* ================= Pantallas ================= */
 function showScreen(name){
   document.body.dataset.screen = name;
-  if(name!=="event") applyTheme("olivo");
+  if(name!=="event") applyTheme("grafito");
   window.scrollTo(0,0);
 }
 function paintBrand(){

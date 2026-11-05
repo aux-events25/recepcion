@@ -1094,6 +1094,7 @@ a.ev-map[hidden]{display:none}
       <label>Personas<select id="aPers"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select></label>
       <label>Mesa sugerida<select id="aTable"></select></label>
       <label class="wide">Motivo por el que se agrega<select id="aReason"><option value="">Elige un motivo…</option></select></label>
+      <label class="wide arr-opt" style="flex-direction:row"><input type="checkbox" id="aArrive"><span><b>Ya está aquí: registrar su llegada al aprobar</b><small>Déjalo sin marcar si solo lo estás agregando a la lista antes del evento.</small></span></label>
     </div>
     <div id="aWarn"></div>
     <div class="actions"><button class="btn" data-close>Cancelar</button><button class="btn primary" id="saveAdd"></button></div>
@@ -1781,7 +1782,7 @@ const reasonText = r => {
     const f = Math.max(0, freeAt(r.table, reqGuest(r)));
     return `Solicita cambiar de la Mesa ${r.fromTable} a la Mesa ${r.table}${r.withArrival===false?" (solo cambio de mesa, sin registrar llegada)":""}` + (f>=r.persons ? `, que tiene ${plural(f,"lugar libre","lugares libres")}.` : f===0 ? `, que está llena.` : `, que solo tiene ${plural(f,"lugar libre","lugares libres")} y necesita ${r.persons}.`);
   }
-  const pre = r.kind==="new" ? "No está en la lista de invitados. " : "";
+  const pre = r.kind==="new" ? `No está en la lista de invitados${r.withArrival===false?" (solo agregar a la lista, sin registrar llegada)":r.withArrival===true?" (ya llegó)":""}. ` : "";
   if(!r.table) return `${pre}Sin mesa sugerida. Necesita lugar para ${plural(r.persons,"persona","personas")}.`;
   const f = Math.max(0, freeAt(r.table, reqGuest(r)));
   if(r.kind==="new" && f>=r.persons) return `${pre}Mesa sugerida: Mesa ${r.table}, con ${plural(f,"lugar libre","lugares libres")}. Necesita ${r.persons}.`;
@@ -2003,7 +2004,7 @@ function resolve(r, mode, table, chairs){
     }
     if(guest.table!==table){ if(!guest.orig) guest.orig = guest.table; if(!guest.walkIn || guest.orig!==table) logChange(guest, "move", `Cambio de mesa: original Mesa ${guest.orig}, nueva ubicación Mesa ${table}${r.reason && r.fromTable ? ` · motivo: ${r.reason}` : ""}${r.createdBy ? ` · solicitó ${r.createdBy}` : ""}${r.validatedWith ? ` · validado: ${r.validatedWith.replace(/^Con /,"con ")}` : ""}`); }
     if(mode==="chairs") logChange(guest, "chairs", `Se ${chairs===1?"agregó 1 silla":"agregaron "+chairs+" sillas"} a la Mesa ${table}`);
-    const regArr = !(r.fromTable && r.withArrival===false);
+    const regArr = r.withArrival !== false;
     if(regArr && r.persons>guest.persons && !guest.walkIn) logChange(guest, "extra", `Tenía ${guest.persons} en invitación, se ${r.persons-guest.persons===1?"agrega 1":"agregan "+(r.persons-guest.persons)} a Mesa ${table}`);
     guest.table = table;
     if(regArr){ guest.arrived = r.persons; guest.at = Date.now(); guest.by = r.createdBy || ME(); }
@@ -2012,7 +2013,7 @@ function resolve(r, mode, table, chairs){
   if(r.fromTable && r.withArrival===false && (mode==="approve"||mode==="move"||mode==="chairs")) r._noArr = true;
   r.resolution = mode==="delete" ? `Eliminado de la lista · motivo: ${r.reason||"—"}`
                : mode==="approve" && r.fromTable ? `Cambio aprobado: Mesa ${r.fromTable} → Mesa ${table}${r.withArrival===false?" (sin registrar llegada)":""}`
-               : mode==="approve" ? `Aprobado en la Mesa ${table} y llegada registrada`
+               : mode==="approve" ? `Aprobado en la Mesa ${table}${r.withArrival===false?" (agregado a la lista, sin registrar llegada)":" y llegada registrada"}`
                : mode==="chairs" ? `Se agregaron ${plural(chairs,"silla","sillas")} a la Mesa ${table} y se registró su llegada`
                : mode==="move" ? `Reacomodado en la Mesa ${table} y llegada registrada`
                : `No procede${ui.req.note?": "+ui.req.note:""}`;
@@ -2160,7 +2161,7 @@ function updateAdd(){
   b.innerHTML = `${ic("send")}Enviar a solicitudes`;
 }
 $("addGuest").onclick = ()=>{
-  $("aName").value = ui.q; $("aPers").value = 1;
+  $("aName").value = ui.q; $("aPers").value = 1; $("aArrive").checked = false;
   $("aReason").innerHTML = `<option value="">Elige un motivo…</option>` + REASONS.map(x=>`<option>${esc(x)}</option>`).join("");
   $("aTable").innerHTML = `<option value="0">Sin mesa (enviar a revisión)</option>` + tableStats().map(t=>`<option value="${t.num}">Mesa ${t.num} · ${t.free<=0?"llena":plural(t.free,"libre","libres")}</option>`).join("");
   const best = tableStats().filter(t=>t.free>0).sort((a,b)=>b.free-a.free)[0];
@@ -2175,7 +2176,7 @@ $("saveAdd").onclick = ()=>{
   ui.q=""; $("q").value=""; $("searchBox").classList.remove("has-text");
   const reason = $("aReason").value;
   if(!reason){ $("aWarn").innerHTML = `<div class="alert">${ic("alert")}<span>Elige el motivo por el que se agrega al invitado.</span></div>`; $("aReason").focus(); return; }
-  createRequest({kind:"new", name, persons:p, table:t||0, reason});
+  createRequest({kind:"new", name, persons:p, table:t||0, reason, withArrival:$("aArrive").checked});
   closeAll();
 };
 

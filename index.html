@@ -665,6 +665,7 @@ body[data-role="hostess"] .admin-only{display:none !important}
 .rp-tb tr.z td{background:var(--r-zebra)}
 .rp-tb tr.no td{background:#FBE7E4;color:#7A2E26;border-bottom-color:#F3D3CE}
 .rp-tb tr.chg td{background:#E8F0FB;border-bottom-color:#D3E1F4}
+.rp-tb tr.okr td{background:#EAF5E7;border-bottom-color:#D5EAD0}
 .rp-obs b.rp-n,.rp-n{display:inline !important;font-weight:600;color:var(--r-ink)}
 .rp-obs > div:not(.rp-mu){display:block;position:relative;padding-left:26px;line-height:1.45}
 .rp-obs > div > svg:first-child{position:absolute;left:0;top:2px}
@@ -765,7 +766,7 @@ a.ev-map[hidden]{display:none}
 
 /* ---------- Barra inferior en celular: Actualizar y Salir ---------- */
 .mbar{display:none}
-@media (max-width:640px){
+@media (max-width:640px), (pointer:coarse) and (max-width:1400px){
   body[data-screen="events"] .mbar, body[data-screen="event"] .mbar{display:flex}
   .mbar{position:fixed;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;gap:10px;padding:8px;border-radius:18px;background:rgba(26,27,29,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 12px 30px -12px rgba(0,0,0,.6)}
   .mbar button{flex:1;height:48px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#F2F2F2;font-size:15px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px}
@@ -1381,7 +1382,7 @@ function rowGuest(id, g){
 }
 function rowRequest(id, r){
   if(!r.guestUid && r.guestId){ const g = S && S.guests.find(x=>x.id===r.guestId); if(g) r.guestUid = g.uid; }
-  const o = {id:r.id, event_id:id, kind:r.kind, guest_id:r.guestUid||null, name:r.name, persons:Math.max(1,r.persons|0), table_num:r.table||null, status:r.status, mode:r.mode==="approve"?"move":r.mode==="delete"?null:(r.mode||null), resolution:r.resolution||null, created_at:isoOf(r.at), resolved_at:isoOf(r.resolvedAt)};
+  const o = {id:r.id, event_id:id, kind:r.kind, guest_id:r.guestUid||null, name:r.name, persons:Math.max(1,r.persons|0), table_num:r.table||null, status:r.status, mode:r.mode==="approve"||r.mode==="split"?"move":r.mode==="delete"?null:(r.mode||null), resolution:r.resolution||null, created_at:isoOf(r.at), resolved_at:isoOf(r.resolvedAt)};
   if(!NO_EXTRA){ o.created_by = r.createdBy || null; o.resolved_by = r.resolvedBy || null; o.reason = r.reason || null; o.validated_with = r.validatedWith || null; o.from_table = r.fromTable || null; o.with_arrival = (r.withArrival===undefined ? null : !!r.withArrival); }
   return o;
 }
@@ -1795,6 +1796,11 @@ function renderTables(){
 /* ---------- Solicitudes ---------- */
 const reasonText = r => {
   if(r.kind==="delete"){ const g = reqGuest(r); return `Solicita eliminar a ${r.name} de la lista (${plural(r.persons,"persona","personas")}, Mesa ${r.table||"—"})${g && g.arrived>0 ? `. Ojo: ya tiene registrada su llegada (${g.arrived}).` : "."}`; }
+  { const g0 = reqGuest(r);
+    if(r.kind==="guest" && !r.fromTable && g0 && r.persons > g0.persons){
+      const f = Math.max(0, freeAt(r.table, g0)), ex = r.persons - g0.persons;
+      return `Llegó con ${plural(r.persons,"persona","personas")}; su invitación es para ${g0.persons} (${plural(ex,"persona extra","personas extra")}). La Mesa ${r.table} ${f>=r.persons?`tiene ${plural(f,"lugar libre","lugares libres")}: caben todos.`:f===0?"está llena.":`solo tiene ${plural(f,"lugar libre","lugares libres")}.`}`;
+    } }
   if(r.fromTable){
     const f = Math.max(0, freeAt(r.table, reqGuest(r)));
     return `Solicita cambiar de la Mesa ${r.fromTable} a la Mesa ${r.table}${r.withArrival===false?" (solo cambio de mesa, sin registrar llegada)":""}` + (f>=r.persons ? `, que tiene ${plural(f,"lugar libre","lugares libres")}.` : f===0 ? `, que está llena.` : `, que solo tiene ${plural(f,"lugar libre","lugares libres")} y necesita ${r.persons}.`);
@@ -1829,6 +1835,15 @@ function reqForm(r){
       <label>Nueva mesa<select data-rf="table">${opts.map(t=>`<option value="${t.num}" ${t.num===st.table?"selected":""}>Mesa ${t.num} (${t.free} libres${t.arrived===0?", vacía":""})</option>`).join("")}</select></label>
       <button class="btn primary" data-rdo="move">${ic("move")}Reacomodar y registrar llegada</button></div></div>`;
   }
+  if(st.mode==="split"){
+    const ex = r.persons - (guest ? guest.persons : r.persons);
+    const opts = ts.filter(t=>t.num!==(guest?guest.table:r.table) && t.free>=ex).sort((a,b)=>b.free-a.free);
+    if(!opts.length) return `<div class="req-form"><p class="note">Ninguna otra mesa tiene ${plural(ex,"lugar libre","lugares libres")}. Usa “Agregar sillas”.</p></div>`;
+    if(!opts.some(t=>t.num===st.table)) st.table = opts[0].num;
+    return `<div class="req-form"><div class="row2">
+      <label>Mesa para ${ex===1?"la persona extra":`las ${ex} personas extra`}<select data-rf="table">${opts.map(t=>`<option value="${t.num}" ${t.num===st.table?"selected":""}>Mesa ${t.num} (${t.free} libres)</option>`).join("")}</select></label>
+      <button class="btn primary" data-rdo="split">${ic("users")}Registrar: ${guest?guest.persons:""} en Mesa ${guest?guest.table:r.table} y ${ex} en Mesa ${st.table}</button></div></div>`;
+  }
   if(st.mode==="reject"){
     return `<div class="req-form"><div class="row2">
       <label style="flex:1">Motivo (opcional)<input data-rf="note" value="${esc(st.note||"")}" placeholder="Ej. no está en la lista de los novios"></label>
@@ -1853,12 +1868,13 @@ function renderRequests(){
         ${r.kind==="delete" ? `<button class="btn request" data-rdo="delete" style="flex:0 1 auto">${ic("trash")}Aprobar eliminación</button><button class="btn danger" data-rmode="reject" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="reject"}">${ic("ban")}No procede</button></div>${reqForm(r)}` : `
         ${r.table && fits(r.table, r.persons, reqGuest(r)) ? `<button class="btn primary" data-rdo="approve" style="flex:0 1 auto">${ic("check",2.4)}Aprobar en Mesa ${r.table}</button>` : ""}
         <button class="btn" data-rmode="chairs" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="chairs"}">${ic("chairPlus")}Agregar sillas</button>
-        <button class="btn" data-rmode="move" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="move"}">${ic("move")}Reacomodar en otra mesa</button>
+        <button class="btn" data-rmode="move" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="move"}">${ic("move")}${(()=>{ const g0 = reqGuest(r); return r.kind==="guest" && !r.fromTable && g0 && r.persons>g0.persons ? "Mover a todos a otra mesa" : "Reacomodar en otra mesa"; })()}</button>
+        ${(()=>{ const g0 = reqGuest(r); return r.kind==="guest" && !r.fromTable && g0 && r.persons>g0.persons ? `<button class="btn" data-rmode="split" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="split"}">${ic("users")}Extras a otra mesa</button>` : ""; })()}
         <button class="btn danger" data-rmode="reject" aria-pressed="${ui.req?.id===r.id&&ui.req.mode==="reject"}">${ic("ban")}No procede</button>
       </div>${reqForm(r)}`}` : `<div class="info">${ic("hourglass")}<span>Esperando la aprobación de un administrador.</span></div>`}</article>`).join("")
     : `<div class="empty" style="background:var(--surface);border:1px solid var(--line);border-radius:16px"><div class="ei">${ic("check",1.5)}</div><b>Todo en orden</b>Aquí aparecen los invitados fuera de lista y las mesas llenas para que un administrador los apruebe.</div>`;
   $("reqDone").innerHTML = done.length ? `<div class="done-list">${done.map(r=>`<div class="done"><b>${esc(r.name)}</b>
-      <span class="pill ${r.status==="rejected"?"full":"ok"}">${r.status==="rejected"?"No procede":r.kind==="delete"?"Eliminado":r.mode==="chairs"?"Sillas agregadas":/^Cambio aprobado/.test(r.resolution||"")?"Cambio aprobado":/^Aprobad/.test(r.resolution||"")?"Aprobado":"Reacomodado"}</span>
+      <span class="pill ${r.status==="rejected"?"full":"ok"}">${r.status==="rejected"?"No procede":r.kind==="delete"?"Eliminado":/extra en la Mesa/.test(r.resolution||"")?"Extras separados":r.mode==="chairs"?"Sillas agregadas":/^Cambio aprobado/.test(r.resolution||"")?"Cambio aprobado":/^Aprobad/.test(r.resolution||"")?"Aprobado":"Reacomodado"}</span>
       <small>${esc(r.resolution)} · ${fmtTime(r.resolvedAt)}</small>
       <small>${r.reason?`Motivo: ${esc(r.reason)} · `:""}Solicitó <b>${esc(r.createdBy||"—")}</b> · ${r.status==="rejected"?"Rechazó":"Liberó"} <b>${esc(r.resolvedBy||"—")}</b>${r.validatedWith?` · Validado: ${esc(r.validatedWith)}`:""}</small></div>`).join("")}</div>`
     : `<p class="req-intro">Aún no hay solicitudes resueltas.</p>`;
@@ -1915,6 +1931,7 @@ function drawCard(){
   let primary;
   if(req) primary = `<button class="btn request" id="confirmArrival" data-act="goreq">${ic("inbox")}Ver solicitud</button>`;
   else if(d.table!==g.table) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar cambio a solicitudes</button>`;
+  else if(d.n > g.persons && !g.walkIn) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar a solicitudes (${d.n-g.persons} extra)</button>`;
   else if(!ok) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar a solicitudes</button>`;
   else primary = `<button class="btn primary" id="confirmArrival" data-act="arrive">${ic("check",2.4)}${st==="pending"?"Registrar llegada":"Guardar cambios"}</button>`;
   $("guestCard").innerHTML = `
@@ -2013,7 +2030,17 @@ function resolve(r, mode, table, chairs){
   const who = `${r.reason && r.kind==="new" ? ` · motivo: ${r.reason}` : ""}${r.createdBy ? ` · solicitó ${r.createdBy}` : ""}${r.validatedWith ? ` · validado: ${r.validatedWith.replace(/^Con /,"con ")}` : ""}`;
   if(mode==="chairs"){ const t = tableOf(table); t.cap += chairs; t.extra = (t.extra||0) + chairs; }
   if(mode==="delete"){ if(guest) S.guests = S.guests.filter(x=>x!==guest); guest = null; }
-  if(mode!=="reject" && mode!=="delete"){
+  let splitTxt = "";
+  if(mode==="split" && guest){
+    const ex = r.persons - guest.persons;
+    logChange(guest, "extra", `Llegó con ${r.persons}: ${guest.persons} en su Mesa ${guest.table} y ${ex} extra en Mesa ${table}${who}`);
+    guest.arrived = guest.persons; guest.at = Date.now(); guest.by = r.createdBy || ME();
+    const xg = {id: Math.max(0,...S.guests.map(x=>x.id))+1, uid:uuid(), name:`${guest.name} · ${ex===1?"acompañante":"acompañantes"}`, persons:ex, table, arrived:ex, at:Date.now(), by:r.createdBy||ME(), walkIn:true, orig:table, log:[]};
+    logChange(xg, "add", `${ex===1?"Persona extra":"Personas extra"} de ${guest.name}, en Mesa ${table}${who}`);
+    S.guests.push(xg); S.guests.sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:"base"}));
+    splitTxt = `${guest.persons} en la Mesa ${guest.table} y ${ex} extra en la Mesa ${table}; llegada registrada`;
+  }
+  if(mode!=="reject" && mode!=="delete" && mode!=="split"){
     if(!guest){
       guest = {id: Math.max(0,...S.guests.map(x=>x.id))+1, uid:uuid(), name:r.name, persons:r.persons, table, arrived:0, at:null, walkIn:true, orig:table, log:[]};
       logChange(guest, "add", `Agregado fuera de lista en Mesa ${table}${guest.persons>1?` (${guest.persons} personas)`:""}${who}`);
@@ -2028,7 +2055,8 @@ function resolve(r, mode, table, chairs){
   }
   r.status = mode==="reject" ? "rejected" : "done"; r.mode = mode; r.resolvedAt = Date.now(); r.resolvedBy = ME(); delete VALID[r.id];
   if(r.fromTable && r.withArrival===false && (mode==="approve"||mode==="move"||mode==="chairs")) r._noArr = true;
-  r.resolution = mode==="delete" ? `Eliminado de la lista · motivo: ${r.reason||"—"}`
+  r.resolution = mode==="split" ? splitTxt
+               : mode==="delete" ? `Eliminado de la lista · motivo: ${r.reason||"—"}`
                : mode==="approve" && r.fromTable ? `Cambio aprobado: Mesa ${r.fromTable} → Mesa ${table}${r.withArrival===false?" (sin registrar llegada)":""}`
                : mode==="approve" ? `Aprobado en la Mesa ${table}${r.withArrival===false?" (agregado a la lista, sin registrar llegada)":" y llegada registrada"}`
                : mode==="chairs" ? `Se agregaron ${plural(chairs,"silla","sillas")} a la Mesa ${table} y se registró su llegada`
@@ -2697,11 +2725,11 @@ function buildReport(key){
     <div style="display:flex;height:16px;border-radius:8px;overflow:hidden;background:#E6E3DC"><i style="width:${D.full/D.invCount*100}%;background:${P.dark}"></i><i style="width:${D.partial/D.invCount*100}%;background:${P.accent}"></i></div>
     <div style="display:flex;gap:18px" class="rp-mu"><span><b style="color:${P.dark};font-weight:500">${D.full}</b> completas</span><span><b style="color:${P.accentText};font-weight:500">${D.partial}</b> parciales</span><span><b style="color:#5F5E5A;font-weight:500">${D.none}</b> no llegaron</span></div>` : "";
   let obs = "";
-  if(D.walk.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Fuera de lista (${plural(D.walkPersons,"persona","personas")})</b>${D.walk.slice(0,6).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)} <b class="rp-n">(${g.persons})</b> → Mesa ${g.table||"—"}${(()=>{ const rq = S.requests.find(r=>r.kind==="new" && r.status==="done" && r.name===g.name); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· aprobó ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${D.walk.length>6?`<div class="rp-mu">y ${D.walk.length-6} más (ver lista)</div>`:""}</div>`;
-  if(D.moves.length || D.extras.length) obs += `<div class="rp-obs"><b>${ri("move",P.accentText)}Cambios de mesa${D.moves.length?` (${plural(D.moves.reduce((a,g)=>a+g.persons,0),"persona","personas")})`:""}</b>${D.moves.slice(0,5).map(g=>`<div>${ri("move",P.accentText)}${esc(g.name)} <b class="rp-n">(${g.persons})</b>: Mesa ${g.orig} → Mesa ${g.table}${(()=>{ const rq = S.requests.filter(r=>r.fromTable && r.status==="done" && r.guestUid===g.uid).pop(); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${D.moves.length>5?`<div class="rp-mu">y ${D.moves.length-5} cambios más</div>`:""}${D.extras.map(t=>`<div>${ri("chair",P.accentText)}Mesa ${t.num}: se ${t.extra===1?"agregó 1 silla":`agregaron ${t.extra} sillas`}</div>`).join("")}</div>`;
-  if(D.plus.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Personas adicionales a la invitación</b>${D.plus.slice(0,5).map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}: tenía ${g.persons}, llegaron ${g.arrived} (+${g.arrived-g.persons}) · Mesa ${g.table}${chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""}</div>`).join("")}${D.plus.length>5?`<div class="rp-mu">y ${D.plus.length-5} más (ver lista)</div>`:""}</div>`;
+  if(D.walk.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Fuera de lista (${plural(D.walkPersons,"persona","personas")})</b>${D.walk.map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)} <b class="rp-n">(${g.persons})</b> → Mesa ${g.table||"—"}${(()=>{ const rq = S.requests.find(r=>r.kind==="new" && r.status==="done" && r.name===g.name); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· aprobó ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${false?`<div class="rp-mu">y ${D.walk.length-6} más (ver lista)</div>`:""}</div>`;
+  if(D.moves.length || D.extras.length) obs += `<div class="rp-obs"><b>${ri("move",P.accentText)}Cambios de mesa${D.moves.length?` (${plural(D.moves.reduce((a,g)=>a+g.persons,0),"persona","personas")})`:""}</b>${D.moves.map(g=>`<div>${ri("move",P.accentText)}${esc(g.name)} <b class="rp-n">(${g.persons})</b>: Mesa ${g.orig} → Mesa ${g.table}${(()=>{ const rq = S.requests.filter(r=>r.fromTable && r.status==="done" && r.guestUid===g.uid).pop(); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${false?`<div class="rp-mu">y ${D.moves.length-5} cambios más</div>`:""}${D.extras.map(t=>`<div>${ri("chair",P.accentText)}Mesa ${t.num}: se ${t.extra===1?"agregó 1 silla":`agregaron ${t.extra} sillas`}</div>`).join("")}</div>`;
+  if(D.plus.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Personas adicionales a la invitación</b>${D.plus.map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}: tenía ${g.persons}, llegaron ${g.arrived} (+${g.arrived-g.persons}) · Mesa ${g.table}${chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""}</div>`).join("")}${false?`<div class="rp-mu">y ${D.plus.length-5} más (ver lista)</div>`:""}</div>`;
   const dels = S.requests.filter(r=>r.kind==="delete" && r.status==="done");
-  if(dels.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Eliminados de la lista (${plural(dels.reduce((a,r)=>a+(+r.persons||0),0),"persona","personas")})</b>${dels.slice(0,5).map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)} <b class="rp-n">(${r.persons})</b> · ${esc(r.reason||"")}${r.resolvedBy?` <span class="rp-mu">· aprobó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}${dels.length>5?`<div class="rp-mu">y ${dels.length-5} más</div>`:""}</div>`;
+  if(dels.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Eliminados de la lista (${plural(dels.reduce((a,r)=>a+(+r.persons||0),0),"persona","personas")})</b>${dels.map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)} <b class="rp-n">(${r.persons})</b> · ${esc(r.reason||"")}${r.resolvedBy?` <span class="rp-mu">· aprobó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}${false?`<div class="rp-mu">y ${dels.length-5} más</div>`:""}</div>`;
   {
     const finP = S.guests.reduce((a,g)=>a+g.persons,0), finI = S.guests.length;
     const delP = dels.reduce((a,r)=>a+(+r.persons||0),0);
@@ -2713,10 +2741,10 @@ function buildReport(key){
       <div><span>Lista final con modificaciones</span><b>${fmt(finP)}</b><small>invitados · ${fmt(finI)} invitaciones</small></div>
     </div>` + obs;
   }
-  if(D.rejected.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Solicitudes que no procedieron</b>${D.rejected.slice(0,4).map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)}${r.resolution&&r.resolution!=="No procede"?` · ${esc(r.resolution.replace(/^No procede:\s*/,""))}`:""}${r.resolvedBy?` <span class="rp-mu">· rechazó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}</div>`;
+  if(D.rejected.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Solicitudes que no procedieron</b>${D.rejected.map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)}${r.resolution&&r.resolution!=="No procede"?` · ${esc(r.resolution.replace(/^No procede:\s*/,""))}`:""}${r.resolvedBy?` <span class="rp-mu">· rechazó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}</div>`;
   if(!(D.walk.length||D.moves.length||D.extras.length||D.plus.length||dels.length||D.rejected.length)) obs += `<div class="rp-obs" style="display:flex;flex-direction:row;align-items:center;gap:8px">${ri("check",P.dark)}Sin observaciones: todo salió según lo planeado.</div>`;
   const barTotal = Math.max(1, D.invited);
-  pages.push(`<div class="rp-page" style="${vars}">
+  const p1 = (o, more) => `<div class="rp-page" style="${vars}">
     <div class="rp-side" style="${P.sideLine?`border-right:2px solid ${P.sideLine}`:""}">
       <div><img src="${LOGO_LIGHT_PNG}" alt="AUX Events" style="width:170px;display:block"><div style="color:${P.accent};font-size:14px;margin-top:8px;letter-spacing:.04em">Recepción de invitados</div></div>
       <div style="height:1px;background:${P.accent};opacity:.6"></div>
@@ -2742,8 +2770,38 @@ function buildReport(key){
       ${chart}
       ${inv}
       <div style="display:flex;align-items:center;gap:10px;margin-top:6px">${ri("notes",P.accentText,22)}<span class="rp-sv" style="font-size:26px;font-style:italic;color:${P.accentText}">Observaciones</span><span style="flex:1;height:1px;background:${P.accent};opacity:.5"></span></div>
-      ${obs}
-    </div>${foot()}</div>`);
+      ${o}${more?`<div class="rp-mu" style="text-align:right;font-size:13px;font-style:italic">Las observaciones continúan en la siguiente hoja…</div>`:""}
+    </div>${foot()}</div>`;
+  const contPage = o => `<div class="rp-page" style="${vars}"><div class="rp-band"></div><div class="rp-inner">
+      <div class="rp-hd"><span class="rp-sv" style="font-size:32px">Observaciones <span style="font-size:20px;opacity:.65">(continuación)</span></span>${headRight}</div>
+      ${o}
+    </div>${foot()}</div>`;
+  // separar las observaciones en renglones para repartirlas en varias hojas
+  const tpl = document.createElement("template"); tpl.innerHTML = obs;
+  const units = [];
+  [...tpl.content.children].forEach((box, bi)=>{
+    const kids = [...box.children], head = kids[0] && kids[0].tagName==="B" ? kids[0].outerHTML : null;
+    if(!head || box.classList.contains("rp-sum")) units.push({bi, whole: box.outerHTML});
+    else kids.slice(1).forEach(k=>units.push({bi, head, item: k.outerHTML}));
+  });
+  const renderUnits = us => { let out = "", cur = null, buf = "";
+    const flush = ()=>{ if(cur) out += `<div class="rp-obs">${cur.head}${buf}</div>`; cur = null; buf = ""; };
+    us.forEach(u=>{ if(u.whole){ flush(); out += u.whole; return; } if(!cur || cur.bi!==u.bi){ flush(); cur = {bi:u.bi, head:u.head}; } buf += u.item; });
+    flush(); return out; };
+  const fitsPage = (html, sel) => {
+    const pr = document.createElement("div"); pr.style.cssText = "position:fixed;left:-12000px;top:0;visibility:hidden;pointer-events:none"; pr.innerHTML = html; document.body.appendChild(pr);
+    const pg = pr.firstElementChild, box = pg && pg.querySelector(sel), last = box && box.lastElementChild;
+    const ok = !last || (last.getBoundingClientRect().bottom - pg.getBoundingClientRect().top) <= 1056 - 64;
+    pr.remove(); return ok; };
+  let ui0 = 0; const first = [];
+  while(ui0 < units.length && fitsPage(p1(renderUnits([...first, units[ui0]]), ui0 < units.length-1), ".rp-main")){ first.push(units[ui0]); ui0++; }
+  if(!first.length && units.length){ first.push(units[0]); ui0 = 1; }
+  pages.push(p1(renderUnits(first), ui0 < units.length));
+  while(ui0 < units.length){
+    const pg = [];
+    while(ui0 < units.length && (!pg.length || fitsPage(contPage(renderUnits([...pg, units[ui0]])), ".rp-inner"))){ pg.push(units[ui0]); ui0++; }
+    pages.push(contPage(renderUnits(pg)));
+  }
 
   /* ---- Hojas de mesas ---- */
   if(D.tables.length){
@@ -2757,7 +2815,8 @@ function buildReport(key){
       </div>` : "";
       const cells = chunk.map(t=>{
         const p = t.cap ? t.arr/t.cap : 0;
-        const st = p>=.9 ? [P.dark,P.okBg,P.okTx] : p>=.7 ? [P.mid,P.midBg,P.midTx] : [P.accent,P.lowBg,P.lowTx];
+        const free = t.cap - t.arr;
+        const st = free<=0 ? ["#E02424","#FFD6D3","#B01717"] : free<=4 ? ["#D9A900","#FFF3BF","#7A5F00"] : ["#3F8A4A","#E3F1E0","#2F6B34"];
         const n = Math.max(1, Math.min(t.cap, 30)), onN = Math.min(n, t.arr), bl = Math.min(onN, t.blue); let s = "";
         for(let k=0;k<n;k++){ const an = k/n*2*Math.PI-Math.PI/2, x = 50+44*Math.cos(an), y = 50+44*Math.sin(an), on = k<onN, ex = k>=t.base, blue = on && k>=onN-bl, c = blue ? "#4A7FC1" : st[0];
           s += `<span class="rp-seat${ex?" ex":""}" style="width:${seat}px;height:${seat}px;margin:-${seat/2}px 0 0 -${seat/2}px;left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;${ex?`border-color:${P.accentText};`:""}${on?`background:${c};border-color:${c};border-style:solid`:""}"></span>`; }
@@ -2768,9 +2827,9 @@ function buildReport(key){
         ${hl}
         <div class="rp-fl" style="grid-template-columns:repeat(${cols},1fr)">${cells}</div>
         <div style="display:flex;gap:22px;flex-wrap:wrap;justify-content:center;border-top:1px dashed ${P.line};padding-top:12px;margin-top:auto" class="rp-mu">
-          <span class="rp-lg"><i style="border-color:${P.dark};background:${P.okBg}"></i>90% o más</span>
-          <span class="rp-lg"><i style="border-color:${P.mid};background:${P.midBg}"></i>70–89%</span>
-          <span class="rp-lg"><i style="border-color:${P.accent};background:${P.lowBg}"></i>menos de 70%</span>
+          <span class="rp-lg"><i style="border-color:#3F8A4A;background:#E3F1E0"></i>más de 4 lugares libres</span>
+          <span class="rp-lg"><i style="border-color:#D9A900;background:#FFF3BF"></i>4 o menos libres</span>
+          <span class="rp-lg"><i style="border-color:#E02424;background:#FFD6D3"></i>llena</span>
           <span class="rp-lg"><i style="border-color:${P.accentText};border-style:dashed;background:#FFF"></i>silla extra</span>
           <span class="rp-lg"><i style="border-color:#4A7FC1;background:#4A7FC1"></i>cambio o agregado</span>
         </div>
@@ -2780,7 +2839,7 @@ function buildReport(key){
 
   /* ---- Hojas de lista ---- */
   const lab = {ok:"Llegó", part:"Parcial", no:"No asistió", add:"Agregado"};
-  const pill = {ok:[P.okBg,P.okTx], part:["#F7ECD3","#7A5A10"], no:["#F4C9C2","#8A2F25"], add:["#F3EAD6","#7A5A2E"]};
+  const pill = {ok:["#CFE8CB","#2F6B34"], part:["#CFE8CB","#2F6B34"], no:["#F4C9C2","#8A2F25"], add:["#D6E4F7","#2B5591"]};
   const stOf = g => g.walkIn ? "add" : g.arrived===0 ? "no" : g.arrived<g.persons ? "part" : "ok";
   const BUDGET = 790, ROW = 33, ROWN = 52;
   const chunks2 = []; let cur = [], used = 0;
@@ -2792,7 +2851,7 @@ function buildReport(key){
       <div class="rp-hd"><span class="rp-sv" style="font-size:32px">Lista de invitados</span>${headRight}</div>
       <table class="rp-tb"><tr><th style="width:15%">Estatus</th><th>Nombre</th><th style="width:7%">Mesa</th><th style="width:9%">Invitados</th><th style="width:8%">Asistió</th><th style="width:9%">Hora</th><th style="width:13%">Registró</th></tr>
       ${rows.map((g,j)=>{ const s = stOf(g), c = chgInfo(g), nt = c.any ? chgNotes(g).join(" · ") : "";
-        const cls = s==="no" ? "no" : c.any ? "chg" : j%2 ? "z" : "";
+        const cls = (c.any || g.walkIn) ? "chg" : s==="no" ? "no" : "okr";
         return `<tr class="${cls}"><td><span class="rp-pill" style="background:${pill[s][0]};color:${pill[s][1]}">${lab[s]}</span></td><td style="white-space:normal">${esc(g.name)}${nt?`<div style="font-size:11.5px;color:#2B5591;line-height:1.3;margin-top:2px">${esc(nt)}</div>`:""}</td><td>${g.table||"—"}</td><td>${g.persons}</td><td>${g.arrived}</td><td>${g.at?hhmm(g.at):"—"}</td><td>${esc(g.by||"—")}</td></tr>`; }).join("")}
       </table>
       ${more?`<div class="rp-mu" style="text-align:right;font-size:13px;font-style:italic">Continúa en la siguiente hoja…</div>`:""}

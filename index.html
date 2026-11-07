@@ -2826,10 +2826,10 @@ function buildReport(key){
     const flush = ()=>{ if(cur) out += `<div class="rp-obs">${cur.head}${buf}</div>`; cur = null; buf = ""; };
     us.forEach(u=>{ if(u.whole){ flush(); out += u.whole; return; } if(!cur || cur.bi!==u.bi){ flush(); cur = {bi:u.bi, head:u.head}; } buf += u.item; });
     flush(); return out; };
-  const fitsPage = (html, sel) => {
+  const fitsPage = (html, sel, self=false, reserve=0) => {
     const pr = document.createElement("div"); pr.style.cssText = "position:fixed;left:-12000px;top:0;visibility:hidden;pointer-events:none"; pr.innerHTML = html; document.body.appendChild(pr);
-    const pg = pr.firstElementChild, box = pg && pg.querySelector(sel), last = box && box.lastElementChild;
-    const ok = !last || (last.getBoundingClientRect().bottom - pg.getBoundingClientRect().top) <= 1056 - 64;
+    const pg = pr.firstElementChild, box = pg && pg.querySelector(sel), last = box && (self ? box : box.lastElementChild);
+    const ok = !last || (last.getBoundingClientRect().bottom - pg.getBoundingClientRect().top) <= 1056 - 78 - reserve;
     pr.remove(); return ok; };
   let ui0 = 0; const first = [];
   while(ui0 < units.length && fitsPage(p1(renderUnits([...first, units[ui0]]), ui0 < units.length-1), ".rp-main")){ first.push(units[ui0]); ui0++; }
@@ -2844,8 +2844,7 @@ function buildReport(key){
   /* ---- Hojas de mesas ---- */
   if(D.tables.length){
     const per = D.tables.length<=16 ? 16 : 25, cols = per===16 ? 4 : 5, size = per===16 ? 140 : 112, seat = per===16 ? 13 : 11;
-    for(let i=0;i<D.tables.length;i+=per){
-      const chunk = D.tables.slice(i,i+per);
+    const tablePage = (chunk, i) => {
       const hl = i===0 ? `<div class="rp-cards" style="text-align:left">
         <div style="background:${P.panel};border:0;padding:12px 14px">${ri("trophy",P.accentText,20)}<div class="rp-sv" style="font-size:22px">${D.complete.length ? (D.complete.length>4 ? D.complete.length+" mesas" : (D.complete.length>1?"Mesas ":"Mesa ")+joinNums(D.complete)) : "—"}</div><div class="rp-mu">${D.complete.length?"100% completas":"ninguna mesa llena"}</div></div>
         <div style="background:${P.panel};border:0;padding:12px 14px">${ri("chair",P.accentText,20)}<div class="rp-sv" style="font-size:22px">${D.extras.length ? D.extras.reduce((a,t)=>a+t.extra,0) : 0}</div><div class="rp-mu">sillas extra${D.extras.length?` (mesa ${joinNums(D.extras.map(t=>t.num))})`:""}</div></div>
@@ -2860,7 +2859,7 @@ function buildReport(key){
           s += `<span class="rp-seat${ex?" ex":""}" style="width:${seat}px;height:${seat}px;margin:-${seat/2}px 0 0 -${seat/2}px;left:${x.toFixed(1)}%;top:${y.toFixed(1)}%;${ex?`border-color:${P.accentText};`:""}${on?`background:${c};border-color:${c};border-style:solid`:""}"></span>`; }
         return `<div class="rp-tbl"><div class="rp-plate" style="width:${size}px;height:${size}px">${s}<div class="rp-disc" style="background:${st[1]};border-color:${st[0]};color:${st[2]}"><em>Mesa</em><b style="font-size:${size>120?34:28}px">${t.num}</b></div></div><span style="color:${st[2]};font-size:13.5px">${t.arr} de ${t.cap}${t.extra?` · +${t.extra} ${t.extra===1?"silla":"sillas"}`:""}</span></div>`;
       }).join("");
-      pages.push(`<div class="rp-page" style="${vars}"><div class="rp-band"></div><div class="rp-inner">
+      return (`<div class="rp-page" style="${vars}"><div class="rp-band"></div><div class="rp-inner">
         <div class="rp-hd"><span class="rp-sv" style="font-size:32px">Asistencia por mesa</span>${headRight}</div>
         ${hl}
         <div class="rp-fl" style="grid-template-columns:repeat(${cols},1fr)">${cells}</div>
@@ -2872,6 +2871,12 @@ function buildReport(key){
           <span class="rp-lg"><i style="border-color:#4A7FC1;background:#4A7FC1"></i>cambio o agregado</span>
         </div>
       </div>${foot()}</div>`);
+    };
+    let ti = 0;
+    while(ti < D.tables.length){
+      let n = Math.min(per, D.tables.length - ti);
+      while(n > cols && !fitsPage(tablePage(D.tables.slice(ti, ti+n), ti), ".rp-fl", true, 56)) n -= cols;
+      pages.push(tablePage(D.tables.slice(ti, ti+n), ti)); ti += n;
     }
   }
 
@@ -2879,13 +2884,7 @@ function buildReport(key){
   const lab = {ok:"Llegó", part:"Parcial", no:"No asistió", add:"Agregado"};
   const pill = {ok:["#CFE8CB","#2F6B34"], part:["#CFE8CB","#2F6B34"], no:["#F4C9C2","#8A2F25"], add:["#D6E4F7","#2B5591"]};
   const stOf = g => g.walkIn ? "add" : g.arrived===0 ? "no" : g.arrived<g.persons ? "part" : "ok";
-  const BUDGET = 790, ROW = 33, ROWN = 52;
-  const chunks2 = []; let cur = [], used = 0;
-  D.list.forEach(g=>{ const hgt = chgInfo(g).any ? ROWN : ROW; if(used + hgt > BUDGET && cur.length){ chunks2.push(cur); cur = []; used = 0; } cur.push(g); used += hgt; });
-  if(cur.length || !chunks2.length) chunks2.push(cur);
-  chunks2.forEach((rows, ci)=>{
-    const more = ci < chunks2.length-1;
-    pages.push(`<div class="rp-page" style="${vars}"><div class="rp-band"></div><div class="rp-inner">
+  const listPage = (rows, more) => `<div class="rp-page" style="${vars}"><div class="rp-band"></div><div class="rp-inner">
       <div class="rp-hd"><span class="rp-sv" style="font-size:32px">Lista de invitados</span>${headRight}</div>
       <table class="rp-tb"><tr><th style="width:15%">Estatus</th><th>Nombre</th><th style="width:7%">Mesa</th><th style="width:9%">Invitados</th><th style="width:8%">Asistió</th><th style="width:9%">Hora</th><th style="width:13%">Registró</th></tr>
       ${rows.map((g,j)=>{ const s = stOf(g), c = chgInfo(g), nt = c.any ? chgNotes(g).join(" · ") : "";
@@ -2894,8 +2893,17 @@ function buildReport(key){
       </table>
       ${more?`<div class="rp-mu" style="text-align:right;font-size:13px;font-style:italic">Continúa en la siguiente hoja…</div>`:""}
       ${!D.list.length?`<div class="rp-mu" style="text-align:center;padding:30px">Este evento aún no tiene invitados.</div>`:""}
-    </div>${foot()}</div>`);
-  });
+    </div>${foot()}</div>`;
+  const lpages = []; let li = 0;
+  do {
+    const rows = [];
+    while(li < D.list.length){
+      if(rows.length && !fitsPage(listPage([...rows, D.list[li]], true), ".rp-inner")) break;
+      rows.push(D.list[li]); li++;
+    }
+    lpages.push(rows);
+  } while(li < D.list.length);
+  lpages.forEach((rows, ci)=>pages.push(listPage(rows, ci < lpages.length-1)));
   return pages.map((pg,i)=>pg.replace("{{P}}", `${i+1} de ${pages.length}`));
 }
 

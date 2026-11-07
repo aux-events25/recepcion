@@ -815,6 +815,25 @@ body.ro .check{opacity:.35;cursor:not-allowed}
 .ro-grid b{font-family:var(--serif);font-size:22px}
 .ro-log{margin-top:12px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--chg-ink)}
 .ro-log div{display:flex;gap:8px;align-items:flex-start}
+/* ---------- Encabezado del evento: planner en una línea y "Recepción / Invitados" ---------- */
+#eventApp .brand .planner-tag{display:flex;flex-direction:column;justify-content:center;gap:4px;min-width:0}
+#eventApp .brand .planner-tag b{display:block;white-space:nowrap;font-family:"Outfit","Jost",sans-serif;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#FFFFFF;line-height:1.2}
+#eventApp .brand .planner-tag span{display:block;white-space:nowrap;font-family:"Outfit","Jost",sans-serif;font-style:normal;font-weight:400;font-size:11.5px;letter-spacing:.28em;text-transform:uppercase;color:color-mix(in srgb,#FFFFFF 78%, transparent);line-height:1.35;margin:0}
+/* Tableta (iPad): encabezado en dos filas, ordenado */
+@media (min-width:641px) and (max-width:1180px){
+  #eventApp .band{grid-template-columns:1fr auto;grid-template-areas:"brand right" "event event";row-gap:14px;align-items:center;padding-bottom:18px}
+  #eventApp .band .brand{grid-area:brand}
+  #eventApp .band .band-right{grid-area:right}
+  #eventApp .band .event{grid-area:event;padding-top:12px;border-top:1px solid color-mix(in srgb,var(--on-band) 16%, transparent)}
+  #eventApp .event h1{font-size:clamp(34px,5vw,44px)}
+  #eventApp .event .meta{font-size:14px;gap:4px 18px;margin-top:8px}
+  #eventApp .band-right .icon-btn{height:44px}
+}
+@media (min-width:641px) and (max-width:900px){
+  #eventApp .band-right .icon-btn .lbl{display:none}
+  #eventApp .band-right .icon-btn{width:44px;padding:0;justify-content:center}
+}
+@media (max-width:640px){ #eventApp .brand .planner-tag{display:none !important} }
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1692,9 +1711,14 @@ function blueSeats(num){
 function renderHeader(){
   const e = S.event;
   const isAux = /^aux/i.test(e.planner||"");
-  $("plannerName").textContent = isAux ? "" : (e.planner||"");
-  $("plannerSub").textContent = isAux ? "" : (e.sub||"");
-  document.querySelector("#eventApp .planner-tag").hidden = isAux;
+  const pn = isAux ? "" : (e.planner||"");
+  $("plannerName").textContent = pn;
+  // tamaño de letra según lo largo del nombre, para que siempre quepa en una sola línea
+  $("plannerName").style.fontSize = pn.length<=14 ? "14px" : pn.length<=20 ? "12.5px" : pn.length<=26 ? "11px" : "10px";
+  const subTxt = (e.sub||"").trim();
+  if(!subTxt || /recepci[oó]n(\s+de)?\s+invitados/i.test(subTxt)) $("plannerSub").innerHTML = "Recepción<br>Invitados";
+  else $("plannerSub").textContent = subTxt;
+  document.querySelector("#eventApp .planner-tag").hidden = false;
   $("plannerMono").textContent = /^aux/i.test(e.planner) ? "AUX" : initials(e.planner);
   $("eventName").textContent = e.name;
   let d = "";

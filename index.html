@@ -798,6 +798,19 @@ a.ev-map[hidden]{display:none}
 html[data-theme="grafito"] .band .sprig,html[data-theme="grafito"] .invite .sprig,.ev-t-grafito .sprig{display:none}
 html[data-theme="grafito"] .band::after{background:linear-gradient(90deg,transparent,#C8C8C8,transparent)}
 html[data-theme="grafito"] .icon-btn{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.26)}
+/* ---------- Evento pasado (solo lectura para hostess) ---------- */
+.ro-banner{display:flex;gap:10px;align-items:flex-start;margin:0 0 12px;padding:12px 14px;border-radius:14px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-soft);font-size:14.5px}
+.ro-banner[hidden]{display:none}
+.ro-banner svg{flex:none;margin-top:2px}
+body.ro #addGuest{display:none}
+body.ro .check{opacity:.35;cursor:not-allowed}
+.ro-card{padding:22px}
+.ro-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ro-grid div{background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.ro-grid small{display:block;color:var(--muted);font-size:12px}
+.ro-grid b{font-family:var(--serif);font-size:22px}
+.ro-log{margin-top:12px;display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--chg-ink)}
+.ro-log div{display:flex;gap:8px;align-items:flex-start}
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1012,6 +1025,7 @@ html[data-theme="grafito"] .icon-btn{background:rgba(255,255,255,.04);border-col
       <kbd>Enter abre al primero</kbd>
       <button class="clear" id="clearQ"><i data-icon="x"></i>Limpiar</button>
     </div>
+    <div class="ro-banner" id="roBanner" hidden><i data-icon="lock"></i><span><b>Evento pasado · solo lectura.</b> Ya no se pueden registrar llegadas, agregar invitados ni pedir cambios. Puedes ver las solicitudes y descargar el reporte.</span></div>
     <div class="filters">
       <button class="chip" data-status="all" aria-pressed="true">Todos <span class="ct" id="cAll"></span></button>
       <button class="chip" data-status="pending" aria-pressed="false"><i data-icon="hourglass"></i>Pendientes <span class="ct" id="cPen"></span></button>
@@ -1879,11 +1893,16 @@ function renderRequests(){
       <small>${r.reason?`Motivo: ${esc(r.reason)} · `:""}Solicitó <b>${esc(r.createdBy||"—")}</b> · ${r.status==="rejected"?"Rechazó":"Liberó"} <b>${esc(r.resolvedBy||"—")}</b>${r.validatedWith?` · Validado: ${esc(r.validatedWith)}`:""}</small></div>`).join("")}</div>`
     : `<p class="req-intro">Aún no hay solicitudes resueltas.</p>`;
 }
-function render(){ renderStats(); renderList(); renderTables(); renderRequests(); if(document.body.dataset.section==="reports") scheduleReport(); }
+/* Eventos pasados: solo lectura para hostess (los administradores pueden editar) */
+const isPastEv = () => { const d = dayDiff(S && S.event ? S.event.date : null); return d!==null && d<0; };
+const LOCKED = () => !isAdmin() && isPastEv();
+function lockMsg(){ showToast("Este evento ya pasó: solo puedes ver solicitudes y descargar reportes.", false); }
+function render(){ document.body.classList.toggle("ro", LOCKED()); const rb = $("roBanner"); if(rb) rb.hidden = !LOCKED(); renderStats(); renderList(); renderTables(); renderRequests(); if(document.body.dataset.section==="reports") scheduleReport(); }
 
 /* ================= Acciones ================= */
 let undo = null, toastT = null;
 function setArrival(g, n, msg){
+  if(LOCKED()){ lockMsg(); return; }
   const prev = {arrived:g.arrived, at:g.at, by:g.by};
   g.arrived = Math.max(0,n);
   g.at = g.arrived>0 ? (prev.arrived>0 && prev.at ? prev.at : Date.now()) : null;
@@ -1901,6 +1920,7 @@ function showToast(msg, canUndo=true){
 $("toastUndo").onclick = () => { if(undo){ undo(); undo=null; } $("toast").classList.remove("show"); };
 
 function createRequest(r){
+  if(LOCKED()){ lockMsg(); return; }
   r.id = uuid(); r.at = Date.now(); r.status = "pending"; r.createdBy = ME();
   S.requests.unshift(r); store.save(); render();
   undo = () => { S.requests = S.requests.filter(x=>x!==r); store.save(); render(); };
@@ -1934,6 +1954,20 @@ function drawCard(){
   else if(d.n > g.persons && !g.walkIn) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar a solicitudes (${d.n-g.persons} extra)</button>`;
   else if(!ok) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar a solicitudes</button>`;
   else primary = `<button class="btn primary" id="confirmArrival" data-act="arrive">${ic("check",2.4)}${st==="pending"?"Registrar llegada":"Guardar cambios"}</button>`;
+  if(LOCKED()){
+    $("guestCard").innerHTML = `<div class="ro-card">
+      <div class="sh"><span class="hi">${ic("lock")}</span><h3 style="margin:0">${esc(g.name)}</h3></div>
+      <p class="muted" style="margin:6px 0 14px">Evento pasado: solo lectura.</p>
+      <div class="ro-grid">
+        <div><small>Mesa</small><b>${g.table||"—"}</b></div>
+        <div><small>Invitación</small><b>${g.persons}</b></div>
+        <div><small>Llegaron</small><b>${g.arrived}</b></div>
+        <div><small>Hora</small><b>${g.at?fmtTime(g.at):"—"}</b></div>
+      </div>
+      ${(g.log||[]).length?`<div class="ro-log">${g.log.map(l=>`<div>${ic("move")}<span>${esc(l.txt)}</span></div>`).join("")}</div>`:""}
+      <div class="actions"><button class="btn" data-close>Cerrar</button></div></div>`;
+    return;
+  }
   $("guestCard").innerHTML = `
     <div class="invite">
       <svg class="sprig l" aria-hidden="true"><use href="#sprig"/></svg>

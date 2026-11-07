@@ -686,6 +686,10 @@ body[data-role="hostess"] .admin-only{display:none !important}
 /* ---------- Cambios (azul tenue) ---------- */
 .row.chg{background:var(--chg-soft)}
 .row.chg .rname small.note{color:var(--chg-ink)}
+/* Registros marcados con * al final: rojo tenue mientras están pendientes */
+.row.star{background:color-mix(in srgb,#E02424 12%, var(--surface));box-shadow:inset 4px 0 0 color-mix(in srgb,#E02424 55%, transparent)}
+.row.star .avatar{border-color:color-mix(in srgb,#E02424 45%, transparent);color:#B01717;background:color-mix(in srgb,#E02424 10%, var(--surface))}
+.row.star .check{border-color:color-mix(in srgb,#E02424 40%, var(--line))}
 .rname small.note{color:var(--chg-ink);font-weight:500}
 .seat.chg{background:var(--chg) !important;border-color:var(--chg) !important;border-style:solid !important}
 .chip.chg-chip[aria-pressed="true"]{background:var(--chg);border-color:var(--chg);color:#fff}
@@ -1767,7 +1771,7 @@ function renderList(){
     const sub = st==="review" ? `${ic("inbox")}${pendingReq(g).kind==="delete"?"En revisión: eliminar de la lista":pendingReq(g).fromTable?`En revisión: cambio a Mesa ${pendingReq(g).table}`:pendingReq(g).kind==="guest"?"En revisión, mesa llena":"En revisión"}` : st==="pending" ? `${ic("hourglass")}Pendiente` : st==="partial" ? `${ic("clock")}Llegaron ${g.arrived} de ${g.persons} a las ${fmtTime(g.at)}${by}` : `${ic("clock")}Llegó a las ${fmtTime(g.at)}${by}`;
     const ci = chgInfo(g), notes = ci.any ? chgNotes(g) : [], cb = ci.any ? chgBy(g) : "";
     const note = notes.length ? `<small class="note">${ic(ci.walk?"userPlus":ci.moved?"move":"users")}${esc(notes.join(" · "))}${cb?` · por ${esc(cb)}`:""}</small>` : "";
-    return `<div class="row ${st}${ci.any?" chg":""}${i===0&&ui.q?" first":""}" role="listitem" data-id="${g.id}">
+    return `<div class="row ${st}${ci.any?" chg":""}${st==="pending" && !ci.any && /\*\s*$/.test(g.name)?" star":""}${i===0&&ui.q?" first":""}" role="listitem" data-id="${g.id}">
       <span class="rid">${g.id}</span>
       <span class="rname"><span class="avatar">${esc(initials(g.name))}</span><span class="tx">${highlight(g.name)}<small>${sub}</small>${note}</span></span>
       <span class="rpers">${g.persons}</span>

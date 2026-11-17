@@ -217,6 +217,8 @@ main{max-width:1500px;margin:0 auto;display:grid;grid-template-columns:minmax(0,
 body[data-section="requests"] main,body[data-section="requests"] .tabs,body[data-section="reports"] main,body[data-section="reports"] .tabs{display:none}
 body[data-section="reception"] #requestsView,body[data-section="reports"] #requestsView{display:none}
 body:not([data-section="reports"]) #reportsView{display:none}
+body[data-section="details"] main,body[data-section="details"] .tabs,body[data-section="details"] #requestsView{display:none}
+body:not([data-section="details"]) #detailsView{display:none}
 .panel{min-width:0}
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
 .panel-head h2{margin:0;display:flex;align-items:center;gap:12px;font-family:"Outfit","Jost",sans-serif;font-weight:400;font-size:28px;line-height:1.1;letter-spacing:-.01em}
@@ -327,6 +329,7 @@ html[data-theme="marino"] .add-btn,html[data-theme="vino"] .add-btn,html[data-th
 
 /* ---------- Solicitudes ---------- */
 #requestsView{max-width:1500px;margin:0 auto;padding:18px clamp(16px,3vw,40px) 70px}
+#detailsView{max-width:1500px;margin:0 auto;padding:18px clamp(16px,3vw,40px) 70px}
 .req-intro{margin:0 0 16px;color:var(--muted);font-size:14.5px;max-width:70ch}
 .req{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--bad);border-radius:16px;padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
 .req-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -844,6 +847,53 @@ body.ro .check{opacity:.35;cursor:not-allowed}
 .chair-info b{color:var(--ink);font-weight:600}
 .chair-ctl{display:inline-flex;gap:6px}
 .chair-ctl .chip:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- Detalles ---------- */
+#detailsView .panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.det-group{margin-bottom:22px}
+.det-gh{font-family:"Outfit","Jost",sans-serif;font-weight:500;font-size:13px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin:6px 0 10px;display:flex;align-items:center;gap:12px}
+.det-gh::after{content:"";flex:1;height:1px;background:var(--line)}
+.det-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:14px}
+.det-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow-sm);border-top:4px solid var(--tc)}
+.det-h{display:flex;align-items:center;gap:10px}
+.det-h b{display:block;font-size:16.5px;font-weight:600}
+.det-h small{display:block;color:var(--muted);font-size:12.5px}
+.det-ico{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:20px;flex:none}
+.det-ico.sm{width:30px;height:30px;font-size:15px;border-radius:9px}
+.det-count{margin-left:auto;font-weight:600;font-size:13.5px;color:var(--ok-ink);white-space:nowrap}
+.det-prog{height:6px;border-radius:9px;background:var(--surface-2);overflow:hidden;margin:10px 0}
+.det-prog i{display:block;height:100%;background:var(--ok)}
+.det-list{display:flex;flex-direction:column;max-height:420px;overflow:auto}
+.det-row{display:grid;grid-template-columns:minmax(0,1fr) 40px 70px 104px;gap:8px;align-items:center;padding:8px 2px;border-top:1px solid var(--line);font-size:14px}
+.det-name{border:0;background:none;text-align:left;padding:0;font:inherit;color:var(--ink);line-height:1.3;overflow-wrap:anywhere}
+.det-name:not(:disabled){cursor:pointer;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.det-ms{background:var(--surface-2);border-radius:8px;text-align:center;font-weight:600;font-size:13px;padding:3px 0}
+.det-st{font-size:12.5px;color:var(--muted)} .det-st.ok{color:var(--ok-ink)}
+.det-btn{height:34px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:12.5px;font-weight:600;color:var(--ink)}
+.det-btn.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.det-none{color:var(--muted);font-size:13.5px;margin:6px 0}
+.det-add{margin-top:10px;width:100%}
+.det-empty{text-align:center;padding:30px 16px;border:1px dashed var(--line);border-radius:18px;background:var(--surface)}
+.det-empty b{display:block;font-size:17px;margin-bottom:6px}
+.tm-list{display:flex;flex-direction:column;gap:10px;max-height:55vh;overflow:auto;padding-right:4px}
+.tm-row{border:1px solid var(--line);border-radius:14px;padding:10px;background:var(--surface-2);display:flex;flex-direction:column;gap:8px}
+.tm-row input{height:40px;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:0 10px;width:100%;font:inherit}
+.tm-a{display:grid;grid-template-columns:56px 1fr;gap:8px}
+.tm-ico{text-align:center;font-size:20px}
+.tm-b{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tm-row label{font-size:12px;color:var(--ink-soft);display:flex;flex-direction:column;gap:4px}
+.tm-c{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.tm-cols{display:flex;gap:6px}
+.tm-col{width:24px;height:24px;border-radius:7px;border:2px solid transparent;padding:0}
+.tm-col.on{border-color:var(--ink);box-shadow:0 0 0 2px var(--surface) inset}
+.tm-mv{display:flex;gap:6px} .tm-mv .btn{height:34px;min-width:34px;padding:0 10px}
+.pk-q{width:100%;height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:0 12px;font:inherit;margin-bottom:8px}
+.pk-list,.gt-list{max-height:50vh;overflow:auto;border:1px solid var(--line);border-radius:12px}
+.pk-row,.gt-row{display:grid;grid-template-columns:22px minmax(0,1fr) 44px;gap:10px;align-items:center;padding:9px 12px;border-bottom:1px solid var(--line);font-size:14px;cursor:pointer}
+.gt-row{grid-template-columns:22px 30px minmax(0,1fr)}
+.gt-row small{display:block;color:var(--muted);font-size:12px}
+.pk-row input,.gt-row input{width:18px;height:18px;accent-color:var(--primary)}
+@media (max-width:640px){ .det-grid{grid-template-columns:1fr} .det-row{grid-template-columns:minmax(0,1fr) 34px 60px 96px;font-size:13px} .tm-b{grid-template-columns:1fr} }
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1040,6 +1090,7 @@ body.ro .check{opacity:.35;cursor:not-allowed}
 <nav class="sections" role="tablist" aria-label="Secciones">
   <button class="sec-btn" role="tab" data-section="reception" aria-selected="true"><i data-icon="userCheck"></i>Recepción</button>
   <button class="sec-btn" role="tab" data-section="requests" aria-selected="false"><i data-icon="inbox"></i>Solicitudes <span class="bdg" id="reqBadge" hidden>0</span></button>
+  <button class="sec-btn" role="tab" data-section="details" aria-selected="false"><i data-icon="gift"></i>Detalles</button>
   <button class="sec-btn" role="tab" data-section="reports" aria-selected="false"><i data-icon="fileReport"></i>Reportes</button>
 </nav>
 
@@ -1108,6 +1159,14 @@ body.ro .check{opacity:.35;cursor:not-allowed}
   <h3 class="sub-h"><i data-icon="check"></i>Resueltas</h3>
   <div id="reqDone"></div>
 </section>
+
+<section id="detailsView" aria-label="Detalles">
+  <div class="panel-head"><h2><span class="hi"><i data-icon="gift"></i></span>Detalles</h2><div class="det-tools"><button class="btn admin-only" id="detManage"><i data-icon="sliders"></i>Etiquetas</button></div></div>
+  <p class="req-intro">Capitanes de mesa, detalles a la hora del postre, felicitaciones y lo que los novios pidan. Esta lista es independiente de la recepción: aquí se marca cuándo se entregó cada detalle.</p>
+  <div id="detBody"></div>
+</section>
+
+<div class="overlay" id="detOverlay" role="dialog" aria-modal="true"><div class="card sheet" id="detSheet"></div></div>
 
 <div class="overlay" id="guestOverlay" role="dialog" aria-modal="true" aria-labelledby="gName">
   <div class="card" id="guestCard"></div>
@@ -1284,6 +1343,7 @@ const ICONS = {
   search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
   calendar:'<rect x="3" y="4.5" width="18" height="16.5" rx="2"/><path d="M16 2.5v4M8 2.5v4M3 10h18"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  gift:'<rect x="3" y="8" width="18" height="5" rx="1"/><path d="M12 8v13M5 13v8h14v-8M12 8C10 4 6 4 6 6.5S9 8 12 8zM12 8c2-4 6-4 6-1.5S15 8 12 8z"/>',
   sliders:'<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
   palette:'<circle cx="13.5" cy="6.5" r="1.3"/><circle cx="17.5" cy="10.5" r="1.3"/><circle cx="8.5" cy="7.5" r="1.3"/><circle cx="6.5" cy="12.5" r="1.3"/><path d="M12 2a10 10 0 0 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4A5.6 5.6 0 0 0 22 9.8C22 5.5 17.5 2 12 2z"/>',
   users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
@@ -1419,12 +1479,14 @@ const LS = { get(k){ try{ const v = localStorage.getItem("recepcion:"+k); return
 
 /* Filas de la base de datos */
 let NO_VENUE = false; // si aún no existe la columna "venue" en Supabase
-function rowEvent(id, s){ const e = s.event; const r = {id, name:e.name, type:e.type||"Boda", event_date:e.date||null, start_time:e.time||null, theme:e.theme||"olivo", planner:e.planner||"", subtitle:e.sub||""}; if(!NO_VENUE){ r.venue = e.venue||null; r.venue_url = e.venueUrl||null; } return r; }
+let NO_TAGS = false;  // si aún no existen las columnas de etiquetas (Detalles)
+function rowEvent(id, s){ const e = s.event; const r = {id, name:e.name, type:e.type||"Boda", event_date:e.date||null, start_time:e.time||null, theme:e.theme||"olivo", planner:e.planner||"", subtitle:e.sub||""}; if(!NO_VENUE){ r.venue = e.venue||null; r.venue_url = e.venueUrl||null; } if(!NO_TAGS) r.tag_catalog = e.tags||[]; return r; }
 function rowTable(id, t){ if(!t.uid) t.uid = uuid(); if(t.base===undefined || t.base===null) t.base = Math.max(0,(t.cap|0)-(t.extra|0)); const o = {id:t.uid, event_id:id, num:t.num, capacity:Math.max(0,t.cap|0), extra:Math.max(0,t.extra|0)}; if(!NO_EXTRA) o.base_capacity = Math.max(0,t.base|0); return o; }
 function rowGuest(id, g){
   if(!g.uid) g.uid = uuid();
   const r = {id:g.uid, event_id:id, seq:g.id|0, name:g.name, persons:Math.max(1,g.persons|0), table_num:g.table||null, arrived:Math.max(0,g.arrived|0), arrived_at:isoOf(g.at)};
   if(!NO_EXTRA){ r.walk_in = !!g.walkIn; r.original_table = g.orig || null; r.checked_by = g.by || null; r.changes = g.log || []; }
+  if(!NO_TAGS) r.tags = g.tags || [];
   return r;
 }
 function rowRequest(id, r){
@@ -1506,11 +1568,11 @@ const DB = {
       if(!ev) return null;
       if(guests.length && (!("walk_in" in guests[0]) || !("changes" in guests[0]))) NO_EXTRA = true;
       if(!("venue" in ev)) NO_VENUE = true;
-      const gl = guests.map(g=>({uid:g.id, seq:g.seq, name:g.name, persons:g.persons, table:g.table_num||0, arrived:g.arrived, at:msOf(g.arrived_at), walkIn:!!g.walk_in, orig:g.original_table||0, by:g.checked_by||"", log:Array.isArray(g.changes)?g.changes:[]})).sort(byName);
+      const gl = guests.map(g=>({uid:g.id, seq:g.seq, name:g.name, persons:g.persons, table:g.table_num||0, arrived:g.arrived, at:msOf(g.arrived_at), walkIn:!!g.walk_in, orig:g.original_table||0, by:g.checked_by||"", log:Array.isArray(g.changes)?g.changes:[], tags:Array.isArray(g.tags)?g.tags:[]})).sort(byName);
       const used = new Set(); let max = gl.reduce((m,g)=>Math.max(m,g.seq||0),0);
       gl.forEach(g=>{ if(g.seq>0 && !used.has(g.seq)){ g.id = g.seq; } else { g.id = ++max; } used.add(g.id); delete g.seq; });
       const st = {
-        event:{name:ev.name, type:ev.type, date:ev.event_date||"", time:(ev.start_time||"").slice(0,5), theme:ev.theme, planner:ev.planner, sub:ev.subtitle, venue:ev.venue||"", venueUrl:ev.venue_url||""},
+        event:{name:ev.name, type:ev.type, date:ev.event_date||"", time:(ev.start_time||"").slice(0,5), theme:ev.theme, planner:ev.planner, sub:ev.subtitle, venue:ev.venue||"", venueUrl:ev.venue_url||"", tags:Array.isArray(ev.tag_catalog)?ev.tag_catalog:[]},
         tables: tables.map(t=>({uid:t.id, num:t.num, cap:t.capacity, extra:t.extra, base:(t.base_capacity ?? Math.max(0,t.capacity-(t.extra||0)))})),
         guests: gl,
         requests: reqs.map(r=>({id:r.id, kind:r.kind, guestUid:r.guest_id, name:r.name, persons:r.persons, table:r.table_num||0, status:r.status, mode:r.mode, resolution:r.resolution, at:msOf(r.created_at), resolvedAt:msOf(r.resolved_at), createdBy:r.created_by||"", resolvedBy:r.resolved_by||"", reason:r.reason||"", validatedWith:r.validated_with||"", fromTable:r.from_table||0, withArrival:(r.with_arrival===null||r.with_arrival===undefined)?undefined:r.with_arrival, newName:r.new_name||""}))
@@ -1526,7 +1588,9 @@ const DB = {
   },
   async saveEventFull(id, s){
     try{ await must(sb.from("events").upsert(rowEvent(id, s))); }
-    catch(e){ if(!/venue/i.test((e&&(e.message||e.details))||"") || NO_VENUE) throw e; NO_VENUE = true; await must(sb.from("events").upsert(rowEvent(id, s))); }
+    catch(e){ const m = (e&&(e.message||e.details))||"";
+      if(/tag_catalog/i.test(m) && !NO_TAGS) NO_TAGS = true; else if(/venue/i.test(m) && !NO_VENUE) NO_VENUE = true; else throw e;
+      await must(sb.from("events").upsert(rowEvent(id, s))); }
     let rows = rowsOf(id, s);
     try{ for(const c of chunks(rows.tables, 500)) await must(sb.from(TBL.tables).upsert(c)); for(const c of chunks(rows.guests, 500)) await must(sb.from(TBL.guests).upsert(c)); }
     catch(e){ if(!isExtraErr(e) || NO_EXTRA) throw e; NO_EXTRA = true; rows = rowsOf(id, s); }
@@ -1577,6 +1641,7 @@ const store = {
       LS.set("cache:"+id, S);
       clearTimeout(SYNC.retry); setSync("ok");
     }catch(e){
+      if(/tag_catalog|column "?tags"?|\btags\b/i.test((e&&(e.message||e.details))||"") && !NO_TAGS){ NO_TAGS = true; SYNC.busy = false; SYNC.again = true; return; }
       if(/venue/i.test((e&&(e.message||e.details))||"") && !NO_VENUE){ NO_VENUE = true; SYNC.busy = false; SYNC.again = true; return; }
       if(isExtraErr(e) && !NO_EXTRA){ NO_EXTRA = true; SYNC.busy = false; SYNC.again = true; return; }
       console.warn("Sincronización pendiente", e); setSync("offline");
@@ -1610,7 +1675,7 @@ function remote(kind, payload){
     if(row.id !== currentId) return;
     if(del){ showToast("Este evento fue eliminado desde otro dispositivo.", false); currentId = null; S = null; showEvents(); return; }
     if(JSON.stringify(rowEvent(currentId, S)) !== last.event) return; // hay cambios locales sin guardar
-    Object.assign(S.event, {name:row.name, type:row.type, date:row.event_date||"", time:(row.start_time||"").slice(0,5), theme:row.theme, planner:row.planner, sub:row.subtitle, venue:row.venue||S.event.venue||"", venueUrl:row.venue_url||S.event.venueUrl||""});
+    Object.assign(S.event, {name:row.name, type:row.type, date:row.event_date||"", time:(row.start_time||"").slice(0,5), theme:row.theme, planner:row.planner, sub:row.subtitle, venue:row.venue||S.event.venue||"", venueUrl:row.venue_url||S.event.venueUrl||"", tags:Array.isArray(row.tag_catalog)?row.tag_catalog:(S.event.tags||[])});
     last.event = JSON.stringify(rowEvent(currentId, S));
     scheduleRender(true); return;
   }
@@ -1640,6 +1705,7 @@ function remote(kind, payload){
     Object.assign(t, {name:row.name, persons:row.persons, table:row.table_num||0, arrived:row.arrived, at:msOf(row.arrived_at)});
     if("walk_in" in row){ t.walkIn = !!row.walk_in; t.orig = row.original_table || 0; }
     if("changes" in row){ t.by = row.checked_by || ""; t.log = Array.isArray(row.changes) ? row.changes : []; }
+    if("tags" in row) t.tags = Array.isArray(row.tags) ? row.tags : [];
     S.guests.sort(byName);
     S.requests.forEach(r=>{ if(r.guestUid===t.uid) r.guestId = t.id; });
   } else {
@@ -1940,7 +2006,7 @@ function renderRequests(){
 const isPastEv = () => { const d = dayDiff(S && S.event ? S.event.date : null); return d!==null && d<0; };
 const LOCKED = () => !isAdmin() && isPastEv();
 function lockMsg(){ showToast("Este evento ya pasó: solo puedes ver solicitudes y descargar reportes.", false); }
-function render(){ document.body.classList.toggle("ro", LOCKED()); const rb = $("roBanner"); if(rb) rb.hidden = !LOCKED(); renderStats(); renderList(); renderTables(); renderRequests(); if(document.body.dataset.section==="reports") scheduleReport(); }
+function render(){ document.body.classList.toggle("ro", LOCKED()); const rb = $("roBanner"); if(rb) rb.hidden = !LOCKED(); renderStats(); renderList(); renderTables(); renderRequests(); if(document.body.dataset.section==="details") renderDetails(); if(document.body.dataset.section==="reports") scheduleReport(); }
 
 /* ================= Acciones ================= */
 let undo = null, toastT = null;
@@ -2332,8 +2398,143 @@ $("saveAdd").onclick = ()=>{
 };
 
 /* ---------- Navegación, búsqueda y filtros ---------- */
+/* ================= Detalles (etiquetas de invitados) ================= */
+const DET_COLORS = ["#F2C94C","#E68FB4","#7FA8E0","#7DBA80","#A78BD9","#F2994A","#9AA0A6","#E57373"];
+const DET_GROUPS = ["Capitanes de mesa","Detalles","Participaciones"];
+const DET_SAMPLE = [
+  {name:"Capitanes de mesa", icon:"⭐", color:"#F2C94C", group:"Capitanes de mesa", moment:"Al llegar", note:"Entregar distintivo y sobre de su mesa"},
+  {name:"You're next", icon:"🍰", color:"#E68FB4", group:"Detalles", moment:"Hora del postre", note:"Entregar detalle"},
+  {name:"Happy birthday", icon:"🎂", color:"#7FA8E0", group:"Detalles", moment:"Hora del pastel", note:""},
+  {name:"Feliz aniversario", icon:"💍", color:"#7DBA80", group:"Detalles", moment:"Brindis", note:""}
+];
+const detTags = () => (S.event.tags || []);
+const tagOf = id => detTags().find(t=>t.id===id);
+const gTag = (g, id) => (g.tags||[]).find(x=>x.t===id);
+const soft = c => `color-mix(in srgb, ${c} 22%, var(--surface))`;
+let detOpen = null; // etiqueta abierta en "Agregar invitados"
+function renderDetails(){
+  const tags = detTags(), body = $("detBody"); if(!body) return;
+  if(!tags.length){
+    body.innerHTML = `<div class="det-empty"><b>Aún no hay etiquetas en este evento</b>${isAdmin()?`<p>Crea las etiquetas que necesites: capitanes de mesa, detalles a la hora del postre, felicitaciones…</p><div class="actions" style="justify-content:center"><button class="btn" id="detSample">${ic("sparkle")}Usar etiquetas de ejemplo</button><button class="btn dark" id="detCreate">${ic("plus")}Crear etiquetas</button></div>`:`<p>Un administrador puede crearlas desde esta pestaña.</p>`}</div>`;
+    return;
+  }
+  const groups = [...new Set(tags.map(t=>t.group||"Detalles"))];
+  body.innerHTML = groups.map(gr=>`<div class="det-group"><h3 class="det-gh">${esc(gr)}</h3><div class="det-grid">${tags.filter(t=>(t.group||"Detalles")===gr).map(t=>{
+    const list = S.guests.filter(g=>gTag(g,t.id)).sort(byName), done = list.filter(g=>gTag(g,t.id).d).length, pct = list.length ? Math.round(done/list.length*100) : 0;
+    return `<div class="det-card" style="--tc:${t.color||"#9AA0A6"}">
+      <div class="det-h"><span class="det-ico" style="background:${soft(t.color||"#9AA0A6")}">${esc(t.icon||"🏷️")}</span><div><b>${esc(t.name)}</b><small>${[t.moment, t.note].filter(Boolean).map(esc).join(" · ")||"&nbsp;"}</small></div><span class="det-count">${done} de ${list.length}</span></div>
+      <div class="det-prog"><i style="width:${pct}%"></i></div>
+      <div class="det-list">${list.length ? list.map(g=>{ const x = gTag(g,t.id); return `<div class="det-row">
+          <button class="det-name" data-dg="${g.id}" ${isAdmin()?"":"disabled"}>${esc(g.name)}</button>
+          <span class="det-ms">${g.table||"—"}</span>
+          <span class="det-st ${g.arrived>0?"ok":""}">${g.arrived>0?"✓ Llegó":"Pendiente"}</span>
+          <button class="det-btn ${x.d?"on":""}" data-dmark="${t.id}" data-g="${g.id}">${x.d?`✓ ${new Date(x.d).toLocaleTimeString("es-MX",{hour:"numeric",minute:"2-digit"})}`:"Entregar"}</button>
+        </div>`; }).join("") : `<p class="det-none">Sin invitados asignados.</p>`}</div>
+      ${isAdmin()?`<button class="btn det-add" data-dadd="${t.id}">${ic("plus")}Agregar invitados</button>`:""}
+    </div>`; }).join("")}</div></div>`).join("");
+}
+function detSave(){ store.save(); render(); }
+$("detBody").addEventListener("click", e=>{
+  if(e.target.closest("#detSample")){ S.event.tags = DET_SAMPLE.map(t=>({...t, id:uuid()})); detSave(); showToast("Etiquetas de ejemplo creadas. Ajústalas en “Etiquetas”.", false); return; }
+  if(e.target.closest("#detCreate")){ openTagManager(); return; }
+  const mk = e.target.closest("[data-dmark]");
+  if(mk){
+    if(LOCKED()){ lockMsg(); return; }
+    const g = S.guests.find(x=>x.id===+mk.dataset.g), x = g && gTag(g, mk.dataset.dmark); if(!x) return;
+    if(x.d){ if(!confirm(`¿Quitar la marca de entregado a ${g.name}?`)) return; x.d = null; x.by = ""; }
+    else { x.d = Date.now(); x.by = ME(); }
+    detSave(); return;
+  }
+  const ad = e.target.closest("[data-dadd]"); if(ad){ openTagPicker(ad.dataset.dadd); return; }
+  const dg = e.target.closest("[data-dg]"); if(dg && isAdmin()){ openGuestTags(+dg.dataset.dg); return; }
+});
+$("detManage").onclick = ()=>openTagManager();
+function openDet(html){ $("detSheet").innerHTML = html; paintIcons($("detSheet")); $("detOverlay").classList.add("open"); }
+$("detOverlay").addEventListener("click", e=>{ if(e.target===$("detOverlay") || e.target.closest("[data-close]")) $("detOverlay").classList.remove("open"); });
+
+/* --- Administrar etiquetas --- */
+let TDRAFT = [];
+function openTagManager(){
+  if(!isAdmin()) return;
+  TDRAFT = JSON.parse(JSON.stringify(detTags()));
+  if(!TDRAFT.length) TDRAFT.push({id:uuid(), name:"", icon:"⭐", color:DET_COLORS[0], group:"Capitanes de mesa", moment:"", note:""});
+  drawTagManager();
+}
+function drawTagManager(){
+  const groups = [...new Set([...DET_GROUPS, ...TDRAFT.map(t=>t.group).filter(Boolean)])];
+  openDet(`<div class="sh"><span class="hi"><i data-icon="sliders"></i></span><h3>Etiquetas del evento</h3></div>
+    <p class="muted" style="margin:4px 0 12px">Cada etiqueta aparece en su apartado dentro de Detalles. Puedes agregar, quitar u ordenar.</p>
+    <datalist id="detGroups">${groups.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>
+    <div class="tm-list">${TDRAFT.map((t,i)=>`<div class="tm-row" data-ti="${i}">
+      <div class="tm-a"><input class="tm-ico" data-tf="icon" value="${esc(t.icon||"")}" maxlength="4" aria-label="Ícono"><input data-tf="name" value="${esc(t.name)}" placeholder="Nombre (ej. You're next)"></div>
+      <div class="tm-b"><label>Apartado<input data-tf="group" list="detGroups" value="${esc(t.group||"")}" placeholder="Capitanes de mesa / Detalles"></label><label>Momento<input data-tf="moment" value="${esc(t.moment||"")}" placeholder="Al llegar, hora del postre…"></label></div>
+      <label class="tm-n">Instrucción para el equipo<input data-tf="note" value="${esc(t.note||"")}" placeholder="Ej. Entregar detalle"></label>
+      <div class="tm-c"><span class="tm-cols">${DET_COLORS.map(c=>`<button class="tm-col ${t.color===c?"on":""}" data-tc="${c}" style="background:${c}" aria-label="Color"></button>`).join("")}</span>
+        <span class="tm-mv"><button class="btn" data-tmv="-1" aria-label="Subir">↑</button><button class="btn" data-tmv="1" aria-label="Bajar">↓</button><button class="btn danger" data-tdel aria-label="Quitar">${ic("trash")}</button></span></div>
+    </div>`).join("")}</div>
+    <div class="actions"><button class="btn" id="tmAdd">${ic("plus")}Nueva etiqueta</button><button class="btn" data-close>Cancelar</button><button class="btn dark" id="tmSave">${ic("check")}Guardar</button></div>`);
+  const sh = $("detSheet");
+  sh.querySelectorAll("[data-tf]").forEach(inp=>inp.addEventListener("input", ()=>{ TDRAFT[+inp.closest("[data-ti]").dataset.ti][inp.dataset.tf] = inp.value; }));
+  sh.querySelectorAll("[data-tc]").forEach(b=>b.onclick=()=>{ TDRAFT[+b.closest("[data-ti]").dataset.ti].color = b.dataset.tc; drawTagManager(); });
+  sh.querySelectorAll("[data-tmv]").forEach(b=>b.onclick=()=>{ const i = +b.closest("[data-ti]").dataset.ti, j = i + +b.dataset.tmv; if(j<0||j>=TDRAFT.length) return; [TDRAFT[i],TDRAFT[j]] = [TDRAFT[j],TDRAFT[i]]; drawTagManager(); });
+  sh.querySelectorAll("[data-tdel]").forEach(b=>b.onclick=()=>{ const i = +b.closest("[data-ti]").dataset.ti, t = TDRAFT[i]; const n = S.guests.filter(g=>gTag(g,t.id)).length; if(n && !confirm(`“${t.name||"Etiqueta"}” tiene ${n} invitados asignados. ¿Quitarla?`)) return; TDRAFT.splice(i,1); drawTagManager(); });
+  $("tmAdd").onclick = ()=>{ TDRAFT.push({id:uuid(), name:"", icon:"🎁", color:DET_COLORS[TDRAFT.length % DET_COLORS.length], group:"Detalles", moment:"", note:""}); drawTagManager(); setTimeout(()=>{ const r = [...$("detSheet").querySelectorAll('[data-tf="name"]')].pop(); if(r) r.focus(); }, 30); };
+  $("tmSave").onclick = ()=>{
+    const clean = TDRAFT.map(t=>({...t, name:String(t.name||"").trim(), group:String(t.group||"").trim()||"Detalles", icon:String(t.icon||"").trim()||"🏷️"})).filter(t=>t.name);
+    const ids = new Set(clean.map(t=>t.id));
+    S.event.tags = clean;
+    S.guests.forEach(g=>{ if(g.tags && g.tags.some(x=>!ids.has(x.t))) g.tags = g.tags.filter(x=>ids.has(x.t)); });
+    detSave(); $("detOverlay").classList.remove("open"); showToast("Etiquetas guardadas", false);
+  };
+}
+
+/* --- Agregar invitados a una etiqueta --- */
+let PICK = null;
+function openTagPicker(tid){
+  const t = tagOf(tid); if(!t || !isAdmin()) return;
+  PICK = {tid, q:"", sel:new Set(S.guests.filter(g=>gTag(g,tid)).map(g=>g.id))};
+  openDet(`<div class="sh"><span class="hi" style="background:${soft(t.color)}">${esc(t.icon||"🏷️")}</span><h3>${esc(t.name)}</h3></div>
+    <p class="muted" style="margin:4px 0 10px">Palomea a los invitados que tienen esta etiqueta.</p>
+    <input class="pk-q" id="pkQ" placeholder="Buscar invitado…" autocomplete="off">
+    <div class="pk-list" id="pkList"></div>
+    <div class="actions"><button class="btn" data-close>Cancelar</button><button class="btn dark" id="pkSave">${ic("check")}Guardar</button></div>`);
+  drawPick();
+  $("pkQ").addEventListener("input", e=>{ PICK.q = e.target.value; drawPick(); });
+  $("pkList").addEventListener("change", e=>{ const c = e.target.closest("[data-pk]"); if(!c) return; const id = +c.dataset.pk; if(c.checked) PICK.sel.add(id); else PICK.sel.delete(id); $("pkSave").innerHTML = `${ic("check")}Guardar (${PICK.sel.size})`; });
+  $("pkSave").onclick = ()=>{
+    S.guests.forEach(g=>{
+      const has = !!gTag(g, PICK.tid), want = PICK.sel.has(g.id);
+      if(want && !has) g.tags = (g.tags||[]).concat({t:PICK.tid, d:null, by:""});
+      if(!want && has) g.tags = g.tags.filter(x=>x.t!==PICK.tid);
+    });
+    detSave(); $("detOverlay").classList.remove("open"); showToast("Invitados actualizados", false);
+  };
+  $("pkSave").innerHTML = `${ic("check")}Guardar (${PICK.sel.size})`;
+  setTimeout(()=>$("pkQ").focus(), 40);
+}
+function drawPick(){
+  const q = norm(PICK.q), list = S.guests.filter(g=>!q || norm(g.name).includes(q)).sort((a,b)=>(PICK.sel.has(b.id)-PICK.sel.has(a.id)) || byName(a,b)).slice(0,200);
+  $("pkList").innerHTML = list.map(g=>`<label class="pk-row"><input type="checkbox" data-pk="${g.id}" ${PICK.sel.has(g.id)?"checked":""}><span>${esc(g.name)}</span><span class="det-ms">${g.table||"—"}</span></label>`).join("") || `<p class="det-none">Sin resultados.</p>`;
+}
+
+/* --- Etiquetas de un invitado --- */
+function openGuestTags(gid){
+  const g = S.guests.find(x=>x.id===gid); if(!g || !isAdmin()) return;
+  openDet(`<div class="sh"><span class="hi">${ic("user")}</span><h3>${esc(g.name)}</h3></div>
+    <p class="muted" style="margin:4px 0 10px">Mesa ${g.table||"—"} · ${g.arrived>0?"Llegó":"Pendiente en recepción"}</p>
+    <div class="gt-list">${detTags().map(t=>`<label class="gt-row"><input type="checkbox" data-gt="${t.id}" ${gTag(g,t.id)?"checked":""}><span class="det-ico sm" style="background:${soft(t.color)}">${esc(t.icon||"🏷️")}</span><span>${esc(t.name)}<small>${esc(t.group||"")}${t.moment?" · "+esc(t.moment):""}</small></span></label>`).join("")}</div>
+    <div class="actions"><button class="btn" data-close>Cancelar</button><button class="btn dark" id="gtSave">${ic("check")}Guardar</button></div>`);
+  $("gtSave").onclick = ()=>{
+    const want = new Set([...$("detSheet").querySelectorAll("[data-gt]")].filter(c=>c.checked).map(c=>c.dataset.gt));
+    const keep = (g.tags||[]).filter(x=>want.has(x.t));
+    want.forEach(t=>{ if(!keep.some(x=>x.t===t)) keep.push({t, d:null, by:""}); });
+    g.tags = keep; detSave(); $("detOverlay").classList.remove("open"); showToast("Etiquetas del invitado guardadas", false);
+  };
+}
+
 function setSection(s){
   document.body.dataset.section = s;
+  if(s==="details") renderDetails();
   if(s==="reports") renderReport();
   document.querySelectorAll(".sec-btn").forEach(b=>b.setAttribute("aria-selected", b.dataset.section===s));
   if(s==="reception" && window.matchMedia("(pointer:fine)").matches) $("q").focus();

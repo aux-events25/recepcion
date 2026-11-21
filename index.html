@@ -894,6 +894,37 @@ body.ro .check{opacity:.35;cursor:not-allowed}
 .gt-row small{display:block;color:var(--muted);font-size:12px}
 .pk-row input,.gt-row input{width:18px;height:18px;accent-color:var(--primary)}
 @media (max-width:640px){ .det-grid{grid-template-columns:1fr} .det-row{grid-template-columns:minmax(0,1fr) 34px 60px 96px;font-size:13px} .tm-b{grid-template-columns:1fr} }
+/* ---------- Entrada general ---------- */
+.zone-seg{display:flex;gap:6px;background:var(--surface-2);border-radius:14px;padding:5px;margin-bottom:12px}
+.zone-seg[hidden],.gen-quick[hidden]{display:none}
+.zs{flex:1;border:0;border-radius:10px;background:transparent;padding:8px 10px;text-align:center;color:var(--ink-soft);font:inherit;cursor:pointer}
+.zs b{display:block;font-weight:600;font-size:14.5px}
+.zs small{display:block;font-size:12px;color:var(--muted)}
+.zs.on{background:var(--surface);color:var(--ink);box-shadow:0 2px 8px -4px rgba(0,0,0,.35)}
+.gen-quick{display:flex;gap:8px;align-items:center;padding:8px;border:1px dashed var(--line);border-radius:14px;background:var(--surface);margin-bottom:12px}
+.gen-quick input{height:44px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);padding:0 12px;font:inherit;min-width:0}
+.gen-quick #gqName{flex:1}
+.gen-quick #gqPers{width:64px;text-align:center}
+.gen-quick .btn{height:44px;flex:none}
+body.zone-gen #tablesPanel{display:none}
+body.zone-gen #addGuest{display:none}
+body.zone-gen main{grid-template-columns:1fr !important}
+.rmesa.gen{background:color-mix(in srgb,#7E5BB5 14%, var(--surface));border-color:color-mix(in srgb,#7E5BB5 30%, transparent)}
+.rmesa.gen b{font-size:12px;font-family:"Outfit","Jost",sans-serif;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5B3E91}
+.gen-card{padding:20px}
+.gen-top{text-align:center;padding:18px 14px;border-radius:16px;background:linear-gradient(150deg,var(--band-2),var(--band));color:var(--on-band);display:flex;flex-direction:column;align-items:center;gap:4px}
+.gen-top b{font-family:var(--serif);font-size:28px;line-height:1.1;color:var(--band-title,#fff)}
+.gen-top small{opacity:.8}
+.gen-pill{margin-top:6px;padding:5px 14px;border-radius:99px;background:rgba(255,255,255,.14);font-weight:600;font-size:14px}
+.stepper-row{display:flex;justify-content:space-between;align-items:center;margin:16px 2px 4px}
+.stepper-row > span:first-child{display:flex;gap:8px;align-items:center;color:var(--ink-soft)}
+.stp{display:flex;align-items:center;gap:12px}
+.stp .btn{width:44px;height:44px;padding:0;font-size:20px}
+.stp b{font-size:20px;min-width:22px;text-align:center}
+.gen-opt{display:flex !important;flex-direction:row !important;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2);cursor:pointer}
+.gen-opt input{width:18px;height:18px;margin-top:2px;flex:none;accent-color:var(--primary)}
+.gen-opt b{display:block;font-weight:500;color:var(--ink)} .gen-opt small{display:block;color:var(--muted);font-size:12.5px}
+@media (max-width:640px){ .gen-quick{flex-wrap:wrap} .gen-quick #gqName{flex:1 1 100%} .gen-quick .btn{flex:1} }
 /* ---------- Responsivo ---------- */
 @media (max-width:1180px){
   .summary{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -1102,6 +1133,12 @@ body.ro .check{opacity:.35;cursor:not-allowed}
 <main>
   <section class="panel" id="guestsPanel">
     <div class="panel-head"><h2><span class="hi"><i data-icon="list"></i></span>Lista de invitados</h2><p id="listInfo"></p></div>
+    <div class="zone-seg" id="zoneSeg" hidden></div>
+    <div class="gen-quick" id="genQuick" hidden>
+      <input id="gqName" placeholder="Nombre de quien llega y no está en la lista…" autocomplete="off">
+      <input id="gqPers" type="number" min="1" max="20" value="1" aria-label="Personas">
+      <button class="btn primary" id="gqAdd"><i data-icon="userPlus"></i>Registrar llegada</button>
+    </div>
     <div class="search" id="searchBox">
       <span class="si"><i data-icon="search"></i></span>
       <label for="q" class="sr">Buscar invitado</label>
@@ -1193,6 +1230,7 @@ body.ro .check{opacity:.35;cursor:not-allowed}
       <label>Fecha<input id="fDate" type="date"></label>
       <label>Hora<input id="fTime" type="time"></label>
       <label class="wide">Nombre del lugar<input id="fVenue" placeholder="Ej. Hacienda Los Olivos"></label>
+      <label class="wide gen-opt"><input type="checkbox" id="fGeneral"><span><b>Usar entrada general</b><small>Agrega la lista "Entrada general" (sin mesa), como en XV años para los jóvenes.</small></span></label>
       <label class="wide">Link de ubicación (Google Maps o Waze)<input id="fVenueUrl" inputmode="url" placeholder="Pega aquí el link completo"></label>
     </div>
     <div class="actions admin-only"><button class="btn" data-close>Cancelar</button><button class="btn dark" id="saveSettings"><i data-icon="check"></i>Guardar datos</button></div>
@@ -1446,7 +1484,7 @@ function demoState(theme){
 }
 function finalize(list){
   return list.sort((a,b)=>a.name.localeCompare(b.name,"es",{sensitivity:"base"}))
-    .map((g,i)=>({id:i+1,uid:g.uid||uuid(),name:String(g.name).trim(),persons:Math.max(1,+g.persons||1),table:+g.table||0,arrived:+g.arrived||0,at:g.at||null,walkIn:!!g.walkIn,orig:(g.orig!=null?+g.orig:(+g.table||0)),by:g.by||"",log:g.log||[]}));
+    .map((g,i)=>({id:i+1,uid:g.uid||uuid(),name:String(g.name).trim(),persons:Math.max(1,+g.persons||1),table:+g.table||0,arrived:+g.arrived||0,at:g.at||null,walkIn:!!g.walkIn,orig:(g.orig!=null?+g.orig:(+g.table||0)),by:g.by||"",log:g.log||[],gen:!!g.gen,tags:g.tags||[]}));
 }
 function migrate(s){
   s.requests = s.requests || [];
@@ -1480,13 +1518,14 @@ const LS = { get(k){ try{ const v = localStorage.getItem("recepcion:"+k); return
 /* Filas de la base de datos */
 let NO_VENUE = false; // si aún no existe la columna "venue" en Supabase
 let NO_TAGS = false;  // si aún no existen las columnas de etiquetas (Detalles)
-function rowEvent(id, s){ const e = s.event; const r = {id, name:e.name, type:e.type||"Boda", event_date:e.date||null, start_time:e.time||null, theme:e.theme||"olivo", planner:e.planner||"", subtitle:e.sub||""}; if(!NO_VENUE){ r.venue = e.venue||null; r.venue_url = e.venueUrl||null; } if(!NO_TAGS) r.tag_catalog = e.tags||[]; return r; }
+function rowEvent(id, s){ const e = s.event; const r = {id, name:e.name, type:e.type||"Boda", event_date:e.date||null, start_time:e.time||null, theme:e.theme||"olivo", planner:e.planner||"", subtitle:e.sub||""}; if(!NO_VENUE){ r.venue = e.venue||null; r.venue_url = e.venueUrl||null; } if(!NO_TAGS){ r.tag_catalog = e.tags||[]; r.general_entry = !!e.general; } return r; }
 function rowTable(id, t){ if(!t.uid) t.uid = uuid(); if(t.base===undefined || t.base===null) t.base = Math.max(0,(t.cap|0)-(t.extra|0)); const o = {id:t.uid, event_id:id, num:t.num, capacity:Math.max(0,t.cap|0), extra:Math.max(0,t.extra|0)}; if(!NO_EXTRA) o.base_capacity = Math.max(0,t.base|0); return o; }
 function rowGuest(id, g){
   if(!g.uid) g.uid = uuid();
   const r = {id:g.uid, event_id:id, seq:g.id|0, name:g.name, persons:Math.max(1,g.persons|0), table_num:g.table||null, arrived:Math.max(0,g.arrived|0), arrived_at:isoOf(g.at)};
   if(!NO_EXTRA){ r.walk_in = !!g.walkIn; r.original_table = g.orig || null; r.checked_by = g.by || null; r.changes = g.log || []; }
   if(!NO_TAGS) r.tags = g.tags || [];
+  if(!NO_TAGS) r.general = !!g.gen;
   return r;
 }
 function rowRequest(id, r){
@@ -1568,11 +1607,11 @@ const DB = {
       if(!ev) return null;
       if(guests.length && (!("walk_in" in guests[0]) || !("changes" in guests[0]))) NO_EXTRA = true;
       if(!("venue" in ev)) NO_VENUE = true;
-      const gl = guests.map(g=>({uid:g.id, seq:g.seq, name:g.name, persons:g.persons, table:g.table_num||0, arrived:g.arrived, at:msOf(g.arrived_at), walkIn:!!g.walk_in, orig:g.original_table||0, by:g.checked_by||"", log:Array.isArray(g.changes)?g.changes:[], tags:Array.isArray(g.tags)?g.tags:[]})).sort(byName);
+      const gl = guests.map(g=>({uid:g.id, seq:g.seq, name:g.name, persons:g.persons, table:g.table_num||0, arrived:g.arrived, at:msOf(g.arrived_at), walkIn:!!g.walk_in, orig:g.original_table||0, by:g.checked_by||"", log:Array.isArray(g.changes)?g.changes:[], tags:Array.isArray(g.tags)?g.tags:[], gen:!!g.general})).sort(byName);
       const used = new Set(); let max = gl.reduce((m,g)=>Math.max(m,g.seq||0),0);
       gl.forEach(g=>{ if(g.seq>0 && !used.has(g.seq)){ g.id = g.seq; } else { g.id = ++max; } used.add(g.id); delete g.seq; });
       const st = {
-        event:{name:ev.name, type:ev.type, date:ev.event_date||"", time:(ev.start_time||"").slice(0,5), theme:ev.theme, planner:ev.planner, sub:ev.subtitle, venue:ev.venue||"", venueUrl:ev.venue_url||"", tags:Array.isArray(ev.tag_catalog)?ev.tag_catalog:[]},
+        event:{name:ev.name, type:ev.type, date:ev.event_date||"", time:(ev.start_time||"").slice(0,5), theme:ev.theme, planner:ev.planner, sub:ev.subtitle, venue:ev.venue||"", venueUrl:ev.venue_url||"", tags:Array.isArray(ev.tag_catalog)?ev.tag_catalog:[], general:!!ev.general_entry},
         tables: tables.map(t=>({uid:t.id, num:t.num, cap:t.capacity, extra:t.extra, base:(t.base_capacity ?? Math.max(0,t.capacity-(t.extra||0)))})),
         guests: gl,
         requests: reqs.map(r=>({id:r.id, kind:r.kind, guestUid:r.guest_id, name:r.name, persons:r.persons, table:r.table_num||0, status:r.status, mode:r.mode, resolution:r.resolution, at:msOf(r.created_at), resolvedAt:msOf(r.resolved_at), createdBy:r.created_by||"", resolvedBy:r.resolved_by||"", reason:r.reason||"", validatedWith:r.validated_with||"", fromTable:r.from_table||0, withArrival:(r.with_arrival===null||r.with_arrival===undefined)?undefined:r.with_arrival, newName:r.new_name||""}))
@@ -1589,7 +1628,7 @@ const DB = {
   async saveEventFull(id, s){
     try{ await must(sb.from("events").upsert(rowEvent(id, s))); }
     catch(e){ const m = (e&&(e.message||e.details))||"";
-      if(/tag_catalog/i.test(m) && !NO_TAGS) NO_TAGS = true; else if(/venue/i.test(m) && !NO_VENUE) NO_VENUE = true; else throw e;
+      if(/tag_catalog|general_entry/i.test(m) && !NO_TAGS) NO_TAGS = true; else if(/venue/i.test(m) && !NO_VENUE) NO_VENUE = true; else throw e;
       await must(sb.from("events").upsert(rowEvent(id, s))); }
     let rows = rowsOf(id, s);
     try{ for(const c of chunks(rows.tables, 500)) await must(sb.from(TBL.tables).upsert(c)); for(const c of chunks(rows.guests, 500)) await must(sb.from(TBL.guests).upsert(c)); }
@@ -1641,7 +1680,7 @@ const store = {
       LS.set("cache:"+id, S);
       clearTimeout(SYNC.retry); setSync("ok");
     }catch(e){
-      if(/tag_catalog|column "?tags"?|\btags\b/i.test((e&&(e.message||e.details))||"") && !NO_TAGS){ NO_TAGS = true; SYNC.busy = false; SYNC.again = true; return; }
+      if(/tag_catalog|general_entry|column "?general"?|column "?tags"?|\btags\b/i.test((e&&(e.message||e.details))||"") && !NO_TAGS){ NO_TAGS = true; SYNC.busy = false; SYNC.again = true; return; }
       if(/venue/i.test((e&&(e.message||e.details))||"") && !NO_VENUE){ NO_VENUE = true; SYNC.busy = false; SYNC.again = true; return; }
       if(isExtraErr(e) && !NO_EXTRA){ NO_EXTRA = true; SYNC.busy = false; SYNC.again = true; return; }
       console.warn("Sincronización pendiente", e); setSync("offline");
@@ -1675,7 +1714,7 @@ function remote(kind, payload){
     if(row.id !== currentId) return;
     if(del){ showToast("Este evento fue eliminado desde otro dispositivo.", false); currentId = null; S = null; showEvents(); return; }
     if(JSON.stringify(rowEvent(currentId, S)) !== last.event) return; // hay cambios locales sin guardar
-    Object.assign(S.event, {name:row.name, type:row.type, date:row.event_date||"", time:(row.start_time||"").slice(0,5), theme:row.theme, planner:row.planner, sub:row.subtitle, venue:row.venue||S.event.venue||"", venueUrl:row.venue_url||S.event.venueUrl||"", tags:Array.isArray(row.tag_catalog)?row.tag_catalog:(S.event.tags||[])});
+    Object.assign(S.event, {name:row.name, type:row.type, date:row.event_date||"", time:(row.start_time||"").slice(0,5), theme:row.theme, planner:row.planner, sub:row.subtitle, venue:row.venue||S.event.venue||"", venueUrl:row.venue_url||S.event.venueUrl||"", tags:Array.isArray(row.tag_catalog)?row.tag_catalog:(S.event.tags||[]), general:("general_entry" in row)?!!row.general_entry:!!S.event.general});
     last.event = JSON.stringify(rowEvent(currentId, S));
     scheduleRender(true); return;
   }
@@ -1706,6 +1745,7 @@ function remote(kind, payload){
     if("walk_in" in row){ t.walkIn = !!row.walk_in; t.orig = row.original_table || 0; }
     if("changes" in row){ t.by = row.checked_by || ""; t.log = Array.isArray(row.changes) ? row.changes : []; }
     if("tags" in row) t.tags = Array.isArray(row.tags) ? row.tags : [];
+    if("general" in row) t.gen = !!row.general;
     S.guests.sort(byName);
     S.requests.forEach(r=>{ if(r.guestUid===t.uid) r.guestId = t.id; });
   } else {
@@ -1773,7 +1813,7 @@ function chgInfo(g){
 }
 function chgNotes(g){
   const c = chgInfo(g), n = [];
-  if(c.walk) n.push(`Agregado fuera de lista · Mesa ${g.table||"—"}`);
+  if(c.walk) n.push(g.gen ? "Agregado en puerta · entrada general" : `Agregado fuera de lista · Mesa ${g.table||"—"}`);
   if(c.moved) n.push(`Cambio de mesa: original Mesa ${g.orig}, nueva ubicación Mesa ${g.table}`);
   if(c.extra) n.push(`Tenía ${g.persons} en invitación, se ${c.extra===1?"agrega 1":"agregan "+c.extra} a Mesa ${g.table}`);
   return n;
@@ -1823,16 +1863,32 @@ function renderStats(){
   $("pct").textContent = pct+"%";
   $("ringBar").style.strokeDashoffset = 263.9*(1-pct/100);
   $("progressNote").textContent = pct===0 ? "Aún no llega nadie" : pct>=100 ? "¡Llegaron todos!" : pct>=75 ? "Ya casi están todos" : pct>=40 ? "La recepción va avanzada" : "La recepción comenzó";
-  $("cAll").textContent = S.guests.length;
-  $("cPen").textContent = S.guests.filter(g=>status(g)!=="arrived").length;
-  $("cArr").textContent = invArr;
-  $("cChg").textContent = S.guests.filter(g=>chgInfo(g).any).length;
+  const zg = S.guests.filter(inZone);
+  $("cAll").textContent = zg.length;
+  $("cPen").textContent = zg.filter(g=>status(g)!=="arrived").length;
+  $("cArr").textContent = zg.filter(g=>g.arrived>0).length;
+  $("cChg").textContent = zg.filter(g=>chgInfo(g).any).length;
 }
 
 function tokens(){ return norm(ui.q).split(/\s+/).filter(Boolean); }
+const genOn = () => !!(S && S.event && S.event.general);
+const inZone = g => !genOn() || (ui.zone==="gen" ? !!g.gen : !g.gen);
+function renderZone(){
+  const on = genOn(); if(!on) ui.zone = "mesa"; else if(!ui.zone) ui.zone = "mesa";
+  $("zoneSeg").hidden = !on; $("genQuick").hidden = !(on && ui.zone==="gen" && !LOCKED());
+  document.body.classList.toggle("zone-gen", on && ui.zone==="gen");
+  if(!on) return;
+  const m = S.guests.filter(g=>!g.gen), gg = S.guests.filter(g=>g.gen);
+  const sum = (l,f) => l.reduce((a,g)=>a+f(g),0);
+  const mT = sum(m,g=>g.persons), mA = sum(m,g=>Math.min(g.arrived,g.persons)), gT = sum(gg.filter(g=>!g.walkIn),g=>g.persons), gA = sum(gg,g=>g.arrived);
+  const door = gg.filter(g=>g.walkIn).length;
+  $("zoneSeg").innerHTML = `<button class="zs ${ui.zone!=="gen"?"on":""}" data-zone="mesa"><b>🍽 Con mesa</b><small>${mA} de ${mT} llegaron</small></button>
+    <button class="zs ${ui.zone==="gen"?"on":""}" data-zone="gen"><b>🎟 Entrada general</b><small>${gA} llegaron${gT?` · lista de ${gT}`:""}${door?` · ${door} en puerta`:""}</small></button>`;
+}
 function filtered(){
   const tk = tokens();
   return S.guests.filter(g=>{
+    if(!inZone(g)) return false;
     if(ui.table && g.table!==ui.table) return false;
     const st = status(g);
     if(ui.status==="pending" && st==="arrived") return false;
@@ -1854,8 +1910,9 @@ function highlight(name){
   return out+(open?"</mark>":"");
 }
 function renderList(){
+  renderZone();
   const list = filtered();
-  $("listInfo").textContent = `${list.length} de ${S.guests.length} invitaciones`;
+  $("listInfo").textContent = `${list.length} de ${S.guests.filter(inZone).length} invitaciones`;
   if(!S.guests.length){
     $("rows").innerHTML = `<div class="empty"><div class="ei">${ic("upload",1.5)}</div><b>Este evento aún no tiene invitados</b>${isAdmin()?`Importa la lista desde la plantilla de Excel para empezar.<br><button class="btn dark" data-import>${ic("upload")}Importar lista de Excel</button>`:"El administrador debe importar la lista de invitados."}</div>`;
     return;
@@ -1876,7 +1933,7 @@ function renderList(){
       <span class="rid">${g.id}</span>
       <span class="rname"><span class="avatar">${esc(initials(g.name))}</span><span class="tx">${highlight(g.name)}<small>${sub}</small>${note}</span></span>
       <span class="rpers">${g.persons}</span>
-      <span class="rmesa"><em>Mesa</em><b>${g.table||"—"}</b></span>
+      ${g.gen ? `<span class="rmesa gen"><b>General</b></span>` : `<span class="rmesa"><em>Mesa</em><b>${g.table||"—"}</b></span>`}
       <button class="check" data-check="${g.id}" aria-label="${st==="pending"?"Registrar llegada de":"Ver"} ${esc(g.name)}">${ic(st==="review"?"inbox":"check", st==="review"?2:3)}</button>
     </div>`;
   }).join("");
@@ -2040,6 +2097,7 @@ function quickToggle(id){
   const st = status(g);
   if(st==="review"){ openGuest(id); return; }
   if(g.arrived>0){ setArrival(g,0,`${g.name}: llegada quitada`); return; }
+  if(g.gen){ setArrival(g,g.persons,`${g.name} registrado · entrada general`); return; }
   if(!fits(g.table, g.persons, g)){ openGuest(id); return; }
   setArrival(g,g.persons,`${g.name} registrado en la Mesa ${g.table}`);
 }
@@ -2063,6 +2121,16 @@ function drawCard(){
   else if(d.n > g.persons && !g.walkIn) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar a solicitudes (${d.n-g.persons} extra)</button>`;
   else if(!ok) primary = `<button class="btn request" id="confirmArrival" data-act="request">${ic("send")}Enviar a solicitudes</button>`;
   else primary = `<button class="btn primary" id="confirmArrival" data-act="arrive">${ic("check",2.4)}${st==="pending"?"Registrar llegada":"Guardar cambios"}</button>`;
+  if(g.gen && !LOCKED()){
+    const st = status(g);
+    $("guestCard").innerHTML = `<div class="gen-card">
+      <div class="gen-top"><small>Bienvenidos</small><b>${esc(g.name)}</b><span class="gen-pill">🎟 Entrada general</span>${g.walkIn?`<small style="margin-top:6px">Agregado en puerta${g.by?` · ${esc(g.by)}`:""}</small>`:""}</div>
+      <div class="stepper-row"><span>${ic("userCheck")}¿Cuántos llegaron?</span><span class="stp"><button class="btn" data-gstep="-1" aria-label="Menos">−</button><b>${d.n}</b><button class="btn" data-gstep="1" aria-label="Más">+</button></span></div>
+      <div class="actions">${st==="arrived"||st==="partial"?`<button class="btn danger" id="genUndo">${ic("undo")}Quitar llegada</button>`:`<button class="btn" data-close>Cerrar</button>`}<button class="btn primary" id="genGo">${ic("check")}${g.arrived>0?"Actualizar":"Registrar llegada"}</button></div>
+      ${(g.log||[]).length?`<div class="ro-log">${g.log.map(l=>`<div>${ic("notes")}<span>${esc(l.txt)}</span></div>`).join("")}</div>`:""}
+    </div>`;
+    return;
+  }
   if(LOCKED()){
     $("guestCard").innerHTML = `<div class="ro-card">
       <div class="sh"><span class="hi">${ic("lock")}</span><h3 style="margin:0">${esc(g.name)}</h3></div>
@@ -2187,6 +2255,12 @@ $("guestCard").addEventListener("click", e=>{
     closeAll(); return;
   }
 });
+$("guestCard").addEventListener("click", e=>{
+  const g = ui.current; if(!g || !g.gen) return;
+  const s = e.target.closest("[data-gstep]"); if(s){ ui.draft.n = Math.max(1, Math.min(30, ui.draft.n + +s.dataset.gstep)); drawCard(); return; }
+  if(e.target.closest("#genGo")){ setArrival(g, ui.draft.n, `${g.name} registrado · entrada general`); closeAll(); return; }
+  if(e.target.closest("#genUndo")){ setArrival(g, 0, `${g.name}: llegada quitada`); closeAll(); return; }
+});
 $("guestCard").addEventListener("input", e=>{ if(e.target.id==="renName") ui.draft.renName = e.target.value; });
 $("guestCard").addEventListener("change", e=>{ if(e.target.id==="renReason"){ ui.draft.renReason = e.target.value; return; } if(e.target.id==="cardValid"){ ui.draft.valid = e.target.value; return; } if(e.target.id==="cardArrive"){ ui.draft.arrive = e.target.checked; return; } if(e.target.id==="delReason"){ ui.draft.delReason = e.target.value; return; } if(e.target.id==="cardReason"){ ui.draft.reason = e.target.value; return; } if(e.target.id==="cardTable"){ ui.draft.table = +e.target.value; drawCard(); } });
 
@@ -2280,10 +2354,11 @@ $("openSettings").onclick = ()=>{
   $("demoBtn").style.display = hasList ? "none" : "";
   $("clearListBtn").style.display = hasList ? "" : "none";
   $("fType").innerHTML = TYPES.map(t=>`<option ${t===(e.type||"Boda")?"selected":""}>${t}</option>`).join("");
-  $("fPlanner").value=e.planner; $("fSub").value=e.sub; $("fEvent").value=e.name; $("fDate").value=e.date; $("fTime").value=e.time; $("fVenue").value=e.venue||""; $("fVenueUrl").value=e.venueUrl||"";
+  $("fPlanner").value=e.planner; $("fSub").value=e.sub; $("fEvent").value=e.name; $("fDate").value=e.date; $("fTime").value=e.time; $("fVenue").value=e.venue||""; $("fGeneral").checked = !!e.general; $("fVenueUrl").value=e.venueUrl||"";
   $("settingsOverlay").classList.add("open");
 };
 $("saveSettings").onclick = ()=>{
+  S.event.general = $("fGeneral").checked;
   Object.assign(S.event,{planner:$("fPlanner").value.trim()||"Planner",sub:$("fSub").value.trim(),type:$("fType").value,name:$("fEvent").value.trim()||"Evento",date:$("fDate").value,time:$("fTime").value,venue:$("fVenue").value.trim(),venueUrl:cleanUrl($("fVenueUrl").value)});
   store.save(); renderHeader(); closeAll(); undo=null; showToast("Datos del evento guardados", false);
 };
@@ -2333,7 +2408,7 @@ $("fileIn").onchange = async e=>{
         const h = rows[i].map(c=>norm(String(c)).trim());
         const iN=h.indexOf("nombre"), iM=h.indexOf("mesa"), iP=h.findIndex(x=>x.startsWith("persona")), iC=h.findIndex(x=>x.startsWith("capacidad"));
         if(iN>-1 && iM>-1 && !guests){
-          guests = rows.slice(i+1).filter(r=>String(r[iN]).trim()).map(r=>({name:r[iN], persons:iP>-1?+r[iP]||1:1, table:parseInt(String(r[iM]).replace(/\D/g,""))||0}));
+          guests = rows.slice(i+1).filter(r=>String(r[iN]).trim()).map(r=>{ const mv = norm(String(r[iM])); const gen = /general|entrada|lounge|sin mesa/.test(mv); return {name:r[iN], persons:iP>-1?+r[iP]||1:1, table:gen?0:(parseInt(String(r[iM]).replace(/\D/g,""))||0), gen}; });
           break;
         }
         if(iM>-1 && iC>-1 && iN===-1){
@@ -2345,7 +2420,9 @@ $("fileIn").onchange = async e=>{
     if(!guests || !guests.length){ alert("No encontré una hoja con las columnas Nombre y Mesa. Revisa los encabezados y vuelve a importar."); return; }
     const nums = [...new Set([...guests.map(g=>g.table).filter(Boolean), ...Object.keys(caps).map(Number)])].sort((a,b)=>a-b);
     const tables = nums.map(n=>({num:n, extra:0, cap: caps[n] || guests.filter(g=>g.table===n).reduce((a,g)=>a+g.persons,0)}));
-    if(!confirm(`Se encontraron ${guests.length} invitaciones y ${tables.length} mesas. ¿Reemplazar la lista actual?`)) return;
+    const nGen = guests.filter(g=>g.gen).length;
+    if(!confirm(`Se encontraron ${guests.length-nGen} invitaciones con mesa${nGen?`, ${nGen} de entrada general`:""} y ${tables.length} mesas. ¿Reemplazar la lista actual?`)) return;
+    if(nGen) S.event.general = true;
     tables.forEach(t=>{ t.base = t.cap; t.extra = 0; }); S.guests = finalize(guests); S.tables = tables; S.requests = []; ui.table=null;
     store.save(); render(); closeAll(); undo=null; showToast(`Lista importada: ${S.guests.length} invitaciones`, false);
   }catch(err){ console.error(err); alert("No se pudo leer el archivo. Guárdalo como .xlsx o .csv e inténtalo de nuevo."); }
@@ -2353,7 +2430,7 @@ $("fileIn").onchange = async e=>{
 $("exportBtn").onclick = ()=>{
   const lab = {pending:"Pendiente",partial:"Parcial",arrived:"Llegó",review:"En revisión"};
   const rows = [["ID","Nombre","Personas","Mesa","Llegaron","Estado","Hora de llegada","Registró","Cambios"]].concat(
-    S.guests.slice().sort(byName).map(g=>{ const c = chgInfo(g); return [g.id,g.name,g.persons,g.table?"Mesa "+g.table:"Sin mesa",g.arrived,c.walk?"Agregado":lab[status(g)],g.at?fmtTime(g.at):"",g.by||"",c.any?chgNotes(g).join(" · ")+(chgBy(g)?" · por "+chgBy(g):""):""]; }));
+    S.guests.slice().sort(byName).map(g=>{ const c = chgInfo(g); return [g.id,g.name,g.persons,g.gen?"General":g.table?"Mesa "+g.table:"Sin mesa",g.arrived,c.walk?(g.gen?"En puerta":"Agregado"):lab[status(g)],g.at?fmtTime(g.at):"",g.by||"",c.any?chgNotes(g).join(" · ")+(chgBy(g)?" · por "+chgBy(g):""):""]; }));
   if(S.requests.length){
     rows.push([]); rows.push(["Solicitudes","Nombre","Personas","Mesa pedida","Estado","Resolución","Hora","Solicitó","Liberó","Motivo","Validado con"]);
     S.requests.forEach(r=>rows.push(["",r.name,r.persons,r.table?"Mesa "+r.table:"Sin mesa",r.status==="pending"?"Pendiente":r.status==="rejected"?"No procede":"Resuelta",r.resolution||"",fmtTime(r.at),r.createdBy||"",r.resolvedBy||"",r.reason||"",r.validatedWith||""]));
@@ -2532,6 +2609,22 @@ function openGuestTags(gid){
   };
 }
 
+$("zoneSeg").addEventListener("click", e=>{ const b = e.target.closest("[data-zone]"); if(!b) return; ui.zone = b.dataset.zone; ui.table = null; render(); });
+function addAtDoor(){
+  if(LOCKED()){ lockMsg(); return; }
+  const name = $("gqName").value.replace(/\s+/g," ").trim(), n = Math.max(1, Math.min(30, +$("gqPers").value||1));
+  if(!name){ showToast("Escribe el nombre de quien llega.", false); $("gqName").focus(); return; }
+  const dup = S.guests.find(g=>g.gen && norm(g.name)===norm(name));
+  if(dup && !confirm(`Ya existe “${dup.name}” en entrada general. ¿Registrar de todos modos como nuevo?`)) return;
+  const g = {id: Math.max(0,...S.guests.map(x=>x.id))+1, uid:uuid(), name, persons:n, table:0, orig:0, arrived:n, at:Date.now(), by:ME(), walkIn:true, gen:true, log:[], tags:[]};
+  logChange(g, "add", `Agregado en puerta · entrada general`);
+  S.guests.push(g); S.guests.sort(byName); store.save(); render();
+  undo = ()=>{ S.guests = S.guests.filter(x=>x!==g); store.save(); render(); };
+  $("gqName").value = ""; $("gqPers").value = 1; $("gqName").focus();
+  showToast(`${name} registrado en la puerta`);
+}
+$("gqAdd").onclick = addAtDoor;
+$("gqName").addEventListener("keydown", e=>{ if(e.key==="Enter"){ e.preventDefault(); addAtDoor(); } });
 function setSection(s){
   document.body.dataset.section = s;
   if(s==="details") renderDetails();
@@ -2905,7 +2998,7 @@ $("nTheme").addEventListener("click", e=>{ const b = e.target.closest("[data-nt]
 $("createEvent").onclick = async ()=>{
   const name = $("nName").value.trim();
   if(!name){ $("nErr").innerHTML = `<div class="alert">${ic("alert")}<span>Escribe el nombre del evento, por ejemplo “${esc($("nName").placeholder)}”.</span></div>`; $("nName").focus(); return; }
-  const ev = {name, type:$("nType").value, date:$("nDate").value, time:$("nTime").value, venue:$("nVenue").value.trim(), venueUrl:cleanUrl($("nVenueUrl").value), theme:newTheme, planner:PROFILE.planner, sub:PROFILE.sub};
+  const ev = {general: $("nType").value==="XV años", name, type:$("nType").value, date:$("nDate").value, time:$("nTime").value, venue:$("nVenue").value.trim(), venueUrl:cleanUrl($("nVenueUrl").value), theme:newTheme, planner:PROFILE.planner, sub:PROFILE.sub};
   let st;
   if(document.querySelector('input[name="nStart"]:checked').value==="demo"){ st = demoState(newTheme); st.event = ev; }
   else st = emptyState(ev);
@@ -3005,7 +3098,9 @@ function reportData(){
     extras: ts.filter(t=>t.extra>0), rejected: S.requests.filter(r=>r.status==="rejected"),
     tables: ts, libres: ts.reduce((a,t)=>a+Math.max(0,t.cap-t.arr),0),
     complete: ts.filter(t=>t.cap>0 && t.arr>=t.cap).map(t=>t.num),
-    list: S.guests.slice().sort(byName)
+    list: S.guests.filter(g=>!g.gen).sort(byName),
+    gen: S.guests.filter(g=>g.gen).sort(byName),
+    walkTbl: walk.filter(g=>!g.gen)
   };
 }
 function cleanUrl(u){ u = String(u||"").trim(); if(!u) return ""; const m = u.match(/https?:\/\/\S+/i); if(m) return m[0]; return /^[\w.-]+\.[a-z]{2,}(\/|$)/i.test(u) ? "https://"+u : ""; }
@@ -3020,12 +3115,12 @@ function longDate(){
 function joinNums(a){ return a.length<=1 ? a.join("") : a.slice(0,-1).join(", ")+" y "+a[a.length-1]; }
 
 function buildReport(key){
-  const P = PALETTES[key], D = reportData(), E = S.event;
-  const vars = `--r-side:${P.side};--r-sideText:${P.sideText};--r-ink:${P.ink};--r-muted:${P.muted};--r-line:${P.line};--r-zebra:${P.zebra};--r-panel:${P.panel};--r-wm:${P.wm}`;
+  let P = PALETTES[key]; const D = reportData(), E = S.event;
+  let vars = `--r-side:${P.side};--r-sideText:${P.sideText};--r-ink:${P.ink};--r-muted:${P.muted};--r-line:${P.line};--r-zebra:${P.zebra};--r-panel:${P.panel};--r-wm:${P.wm}`;
   const planner = esc(E.planner||"AUX Events"), sub = esc(E.sub||""), title = esc(E.name);
   const pages = [];
   const foot = () => `<div class="rp-pn">{{P}}</div><div class="rp-wm"><img src="${LOGO_DARK_PNG}" alt="AUX Events" style="height:22px;display:block"></div>`;
-  const headRight = `<span style="color:${P.accentText};font-size:15px">${withWord(planner)}${sub?" · "+sub:""}</span>`;
+  let headRight = `<span style="color:${P.accentText};font-size:15px">${withWord(planner)}${sub?" · "+sub:""}</span>`;
 
   /* ---- Hoja 1: resumen ---- */
   const maxN = D.peak ? D.peak.n : 1;
@@ -3048,10 +3143,14 @@ function buildReport(key){
     <div style="display:flex;height:16px;border-radius:8px;overflow:hidden;background:#E6E3DC"><i style="width:${D.full/D.invCount*100}%;background:${P.dark}"></i><i style="width:${D.partial/D.invCount*100}%;background:${P.accent}"></i></div>
     <div style="display:flex;gap:18px" class="rp-mu"><span><b style="color:${P.dark};font-weight:500">${D.full}</b> completas</span><span><b style="color:${P.accentText};font-weight:500">${D.partial}</b> parciales</span><span><b style="color:#5F5E5A;font-weight:500">${D.none}</b> no llegaron</span></div>` : "";
   let obs = "";
-  if(D.walk.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Fuera de lista (${plural(D.walkPersons,"persona","personas")})</b>${D.walk.map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)} <b class="rp-n">(${g.persons})</b> → Mesa ${g.table||"—"}${(()=>{ const rq = S.requests.find(r=>r.kind==="new" && r.status==="done" && r.name===g.name); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· aprobó ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${false?`<div class="rp-mu">y ${D.walk.length-6} más (ver lista)</div>`:""}</div>`;
+  if(D.walkTbl.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Fuera de lista (${plural(D.walkTbl.reduce((a,g)=>a+g.persons,0),"persona","personas")})</b>${D.walkTbl.map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)} <b class="rp-n">(${g.persons})</b> → Mesa ${g.table||"—"}${(()=>{ const rq = S.requests.find(r=>r.kind==="new" && r.status==="done" && r.name===g.name); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· aprobó ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${false?`<div class="rp-mu">y ${D.walk.length-6} más (ver lista)</div>`:""}</div>`;
   if(D.moves.length || D.extras.length) obs += `<div class="rp-obs"><b>${ri("move",P.accentText)}Cambios de mesa${D.moves.length?` (${plural(D.moves.reduce((a,g)=>a+g.persons,0),"persona","personas")})`:""}</b>${D.moves.map(g=>`<div>${ri("move",P.accentText)}${esc(g.name)} <b class="rp-n">(${g.persons})</b>: Mesa ${g.orig} → Mesa ${g.table}${(()=>{ const rq = S.requests.filter(r=>r.fromTable && r.status==="done" && r.guestUid===g.uid).pop(); return rq ? ` <span class="rp-mu">· ${esc(rq.reason||"")}${rq.validatedWith?` · validado: ${esc(rq.validatedWith.replace(/^Con /,"con "))}`:""}${rq.resolvedBy?` · aprobó ${esc(rq.resolvedBy)}`:""}</span>` : (chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""); })()}</div>`).join("")}${false?`<div class="rp-mu">y ${D.moves.length-5} cambios más</div>`:""}${D.extras.map(t=>`<div>${ri("chair",P.accentText)}Mesa ${t.num}: se ${t.extra===1?"agregó 1 silla":`agregaron ${t.extra} sillas`}</div>`).join("")}</div>`;
   if(D.plus.length) obs += `<div class="rp-obs"><b>${ri("userPlus",P.accentText)}Personas adicionales a la invitación</b>${D.plus.map(g=>`<div>${ri("userPlus",P.accentText)}${esc(g.name)}: tenía ${g.persons}, llegaron ${g.arrived} (+${g.arrived-g.persons}) · Mesa ${g.table}${chgBy(g)?` <span class="rp-mu">· por ${esc(chgBy(g))}</span>`:""}</div>`).join("")}${false?`<div class="rp-mu">y ${D.plus.length-5} más (ver lista)</div>`:""}</div>`;
   const dels = S.requests.filter(r=>r.kind==="delete" && r.status==="done");
+  if(E.general || D.gen.length){
+    const gl = D.gen, gT = gl.filter(g=>!g.walkIn).reduce((a,g)=>a+g.persons,0), gA = gl.reduce((a,g)=>a+g.arrived,0), door = gl.filter(g=>g.walkIn), doorP = door.reduce((a,g)=>a+g.persons,0);
+    obs += `<div class="rp-obs"><b>${ri("userCheck",P.accentText)}Entrada general</b><div>${ri("userCheck",P.accentText)}Llegaron <b class="rp-n">${gA}</b> personas${gT?` de ${gT} en la lista`:""}</div>${door.length?`<div>${ri("userPlus",P.accentText)}Agregados en puerta: <b class="rp-n">${door.length}</b> (${plural(doorP,"persona","personas")})</div>`:""}<div class="rp-mu">Detalle en la hoja “Entrada general”.</div></div>`;
+  }
   const renames = []; S.guests.forEach(g=>(g.log||[]).filter(l=>l.k==="name").forEach(l=>renames.push({g, l})));
   if(renames.length) obs += `<div class="rp-obs"><b>${ri("notes",P.accentText)}Nombres corregidos (${renames.length})</b>${renames.map(({g,l})=>`<div>${ri("notes",P.accentText)}${esc(l.txt.replace(/^Nombre corregido:\s*/,""))} <b class="rp-n">(${g.persons})</b>${l.by?` <span class="rp-mu">· ${esc(l.by)}</span>`:""}</div>`).join("")}</div>`;
   if(dels.length) obs += `<div class="rp-obs"><b>${ri("ban",P.accentText)}Eliminados de la lista (${plural(dels.reduce((a,r)=>a+(+r.persons||0),0),"persona","personas")})</b>${dels.map(r=>`<div>${ri("ban",P.accentText)}${esc(r.name)} <b class="rp-n">(${r.persons})</b> · ${esc(r.reason||"")}${r.resolvedBy?` <span class="rp-mu">· aprobó ${esc(r.resolvedBy)}</span>`:""}</div>`).join("")}${false?`<div class="rp-mu">y ${dels.length-5} más</div>`:""}</div>`;
@@ -3122,6 +3221,10 @@ function buildReport(key){
   while(ui0 < units.length && fitsPage(p1(renderUnits([...first, units[ui0]]), ui0 < units.length-1), ".rp-main")){ first.push(units[ui0]); ui0++; }
   if(!first.length && units.length){ first.push(units[0]); ui0 = 1; }
   pages.push(p1(renderUnits(first), ui0 < units.length));
+  // Hojas siguientes (observaciones, mesas, listas): sin tema, en grises neutros
+  P = {...PALETTES.grafito, side:"#C9C9CC", accent:"#9A9AA0", accentText:"#6E6E72", wm:"#1A1B1D"};
+  vars = `--r-side:${P.side};--r-sideText:${P.sideText};--r-ink:${P.ink};--r-muted:${P.muted};--r-line:${P.line};--r-zebra:${P.zebra};--r-panel:${P.panel};--r-wm:${P.wm}`;
+  headRight = `<span style="color:${P.accentText};font-size:15px">${withWord(planner)}${sub?" · "+sub:""}</span>`;
   while(ui0 < units.length){
     const pg = [];
     while(ui0 < units.length && (!pg.length || fitsPage(contPage(renderUnits([...pg, units[ui0]])), ".rp-inner"))){ pg.push(units[ui0]); ui0++; }
@@ -3191,6 +3294,27 @@ function buildReport(key){
     lpages.push(rows);
   } while(li < D.list.length);
   lpages.forEach((rows, ci)=>pages.push(listPage(rows, ci < lpages.length-1)));
+  if(D.gen.length){
+    const genPage = (rows, more, first) => `<div class="rp-page" style="${vars}"><div class="rp-band"></div><div class="rp-inner">
+      <div class="rp-hd"><span class="rp-sv" style="font-size:32px">Entrada general</span>${headRight}</div>
+      ${first?`<div class="rp-mu" style="margin:-4px 0 4px">${plural(D.gen.length,"registro","registros")} · llegaron ${D.gen.reduce((a,g)=>a+g.arrived,0)} personas · ${D.gen.filter(g=>g.walkIn).length} agregados en puerta</div>`:""}
+      <table class="rp-tb"><tr><th style="width:15%">Estatus</th><th>Nombre</th><th style="width:9%">Personas</th><th style="width:8%">Asistió</th><th style="width:10%">Hora</th><th style="width:15%">Registró</th><th style="width:13%">Origen</th></tr>
+      ${rows.map(g=>{ const s = stOf(g), cls = g.walkIn ? "chg" : s==="no" ? "no" : "okr";
+        return `<tr class="${cls}"><td><span class="rp-pill" style="background:${pill[s][0]};color:${pill[s][1]}">${lab[s]}</span></td><td style="white-space:normal">${esc(g.name)}</td><td>${g.persons}</td><td>${g.arrived}</td><td>${g.at?esc(hhmm(g.at)):"—"}</td><td>${esc(g.by||"—")}</td><td>${g.walkIn?"En puerta":"Lista"}</td></tr>`; }).join("")}
+      </table>
+      ${more?`<div class="rp-mu" style="text-align:right;font-size:13px;font-style:italic">Continúa en la siguiente hoja…</div>`:""}
+    </div>${foot()}</div>`;
+    const gp = []; let gi = 0;
+    while(gi < D.gen.length){
+      const rows = [];
+      while(gi < D.gen.length){
+        if(rows.length && !fitsPage(genPage([...rows, D.gen[gi]], true, !gp.length), ".rp-inner")) break;
+        rows.push(D.gen[gi]); gi++;
+      }
+      gp.push(rows);
+    }
+    gp.forEach((rows, ci)=>pages.push(genPage(rows, ci < gp.length-1, ci===0)));
+  }
   return pages.map((pg,i)=>pg.replace("{{P}}", `${i+1} de ${pages.length}`));
 }
 
